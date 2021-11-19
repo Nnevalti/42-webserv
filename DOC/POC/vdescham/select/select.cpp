@@ -42,13 +42,13 @@
 # define YELLOW "\033[0;33m"
 # define SET "\033[0m"
 
-typedef std::vector<int> server_vector;
-server_vector servers_fd;
+typedef std::vector<int> fd_vector;
+fd_vector servers_fd;
 
 void signal_handler(int signum)
 {
-	std::cout << "(" << signum << ") Serveur ending..." << std::endl;
-	for (server_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
+	std::cout << "\r" << "(" << signum << ") Serveur ending...       " << std::endl;
+	for (fd_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
 		close(*it);
 	exit(1);
 }
@@ -107,18 +107,16 @@ int create_socket(char *port)
 
 int main(int ac, char **av)
 {
-	// struct sockaddr_in servaddr;
-	// struct timeval select_timeout;
 	fd_set select_set_read;
 	fd_set select_set_read_ready;
-	// fd_set select_set_write;
-	// fd_set select_set_write_ready;
 	struct timeval select_timeout;
 
+	char request[1024];
 	std::string response;
 	response += "HTTP/1.1 200 OK\n";
 	response += "Content-Length: 13\n\n";
 	response += "Hello World !\r\n\r\n";
+
 	int new_socket = 0;
 	int status;
 	int max_fd;
@@ -145,10 +143,9 @@ int main(int ac, char **av)
 		select_timeout.tv_sec = 1;
 		select_timeout.tv_usec = 0;
 		FD_ZERO(&select_set_read);
-		FD_ZERO(&select_set_read_ready);
 		status = 0;
 
-		for (server_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
+		for (fd_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
 			FD_SET(*it, &select_set_read);
 
 /**========================================================================
@@ -159,53 +156,77 @@ int main(int ac, char **av)
  * ? SEND: ANSWER TO CLIENT REQUEST
  * ? CLOSE: CLOSE THE SOCKET
  *========================================================================**/
- std::string  wait[] = {"⠋ ", "⠙ ", "⠸ ",
-												"⠴ ", "⠦ ", "⠇ "};
+ std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"};
 	int n = 0;
+
 	while (true)
 	{
 		errno = 0;
 
-		select_set_read_ready = select_set_read;
-		// select_set_write_ready = select_set_write;
-
-		if ((status = select(max_fd + 1, &select_set_read_ready, NULL, NULL, &select_timeout)) < 0)
+		while (status == 0)
 		{
-			std::cerr << "error: select()";
-			exit(1);
+			// reset fd_set
+			FD_ZERO(&select_set_read_ready);
+			select_set_read_ready = select_set_read;
+
+			std::cout << "\r" << wait[(n++ % 6)] << GREEN << " waiting for connection" << SET << std::flush;
+			usleep(100000);
+
+			// Verify if a new connection is available
+			if ((status = select(max_fd + 1, &select_set_read_ready, NULL, NULL, &select_timeout)) < 0)
+			{
+				std::cerr << "error: select()";
+				exit(1);
+			}
 		}
 
-		for (server_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
+		if (status > 0)
 		{
-			if (status > 0 && FD_ISSET(*it, &select_set_read_ready))
+			// Verify which server has a new connection
+			for (fd_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
 			{
-				std::cout << "CLIENT GET CONNECT on server: " << *it << std::endl;
-				if ((new_socket = accept(*it, NULL, NULL)) < 0)
+				// If the server has a new connection ready
+				if (FD_ISSET(*it, &select_set_read_ready))
 				{
-					if(errno != EWOULDBLOCK)
-					{
-						std::cerr << "error: accept()" << std::endl;
-						exit(1);
+						std::cout << "\r" << "Client connected on server: " << *it << std::endl;
+						// Accept the connection
+						if ((new_socket = accept(*it, NULL, NULL)) < 0)
+						{
+							if(errno != EWOULDBLOCK)
+							{
+								std::cerr << "error: accept()" << std::endl;
+								exit(1);
+							}
+						}
+						else
+						{
+							int ret = 0;
+
+							// Receive the request
+							if ((ret = recv(new_socket, &request, 1023, 0)) < 0)
+							{
+								std::cerr << "error: recv()" << std::endl;
+								exit(1);
+							}
+							else
+							{
+								request[ret] = '\0';
+								std::cout << request << std::endl;
+							}
+
+							// send the response
+							if(send(new_socket, response.c_str(), response.size(), 0) < 0) {
+								std::cerr << "error: send()" << std::endl;
+								exit(1);
+							}
+							// close the socket
+							close(new_socket);
+						}
 					}
 				}
-				else
-				{
-					// max_fd = new_socket;
-					if(send(new_socket, response.c_str(), response.size(), 0) < 0)
-					{
-						std::cerr << "error: send()" << std::endl;
-						exit(1);
-					}
-				}
+
 			}
-			else
-			{
-				std::cout << "\r" << wait[(n++ % 6)] << GREEN <<"waiting for connection" << SET << std::flush;
-				// std::cerr << "No pending connections; sleeping for one second." << std::endl;
-				sleep(1);
-			}
-			close(new_socket);
-		}
+			status = 0;
 	}
 	return (0);
 }
