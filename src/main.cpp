@@ -6,11 +6,12 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:08:27 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/22 18:22:11 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/22 20:20:02 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parser.hpp"
+#include "Webserv.hpp"
 
 /**========================================================================
  **                           MAIN
@@ -21,7 +22,7 @@
  *========================================================================**/
 int		main(int ac, char **av)
 {
-	Parser parse;
+	Parser	parse;
 
 	if (ac == 2)
 	{
@@ -31,7 +32,7 @@ int		main(int ac, char **av)
 		}
 		catch(const std::exception& e)
 		{
-			std::cerr << e.what() << '\n';
+			std::cerr << "Error Parsing: " << e.what() << '\n';
 		}
 	}
 }
