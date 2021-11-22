@@ -26,7 +26,10 @@ NAME	= webserv
 
 MAIN	= main.cpp
 
-SRC		= $(MAIN)
+PARSER	= Parser.cpp
+
+SRC		= $(MAIN) \
+		  $(addprefix parser/, $(PARSER))
 
 
 DEP		:= $(SRC:%.cpp=$(BUILD)/%.d)

@@ -6,11 +6,28 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/22 16:22:56 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/22 18:11:50 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+
+//* C LIBRARY
+# include <unistd.h>
+# include <errno.h>
+# include <dirent.h>
+# include <fcntl.h>
+
+//* C NETWORK
+# include <sys/types.h>
+# include <sys/time.h>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <sys/socket.h>
+# include <sys/select.h>
+# include <sys/poll.h>
+# include <arpa/inet.h>
+# include <netinet/in.h>
 
 //* CPP LIBRARY
 # include <iostream>
@@ -21,6 +38,8 @@
 # include <cctype>
 # include <fstream>
 # include <string>
+# include <stdexcept>
+
 
 //* STANDARD TEMPLATE LIBRARY
 # include <map>
@@ -37,4 +56,5 @@
 # define END "\033[0m"
 
 //* SHORTCUT
+# define BUFFER_SIZE 512
 # define stringVector std::vector<std::string>

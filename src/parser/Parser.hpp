@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/22 16:28:07 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/22 18:22:11 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,7 @@ class Parser {
 
 		Parser&			operator=(const Parser &rhs);
 
-		void			config(const char *file);
-
+		void			readconf(const char *file);
 
 	private:
 
