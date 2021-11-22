@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webserv.hpp                                        :+:      :+:    :+:   */
+/*   headers.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/22 18:11:50 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/22 19:55:17 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,15 @@
 # define YELLOW "\033[33m"
 # define END "\033[0m"
 
+// *STRUCT
+typedef struct	s_network
+{
+	unsigned int	host;
+	int				port;
+}				t_network;
+
 //* SHORTCUT
 # define BUFFER_SIZE 512
 # define stringVector std::vector<std::string>
+# define stringMap std::map<std::string, std::string>
+
