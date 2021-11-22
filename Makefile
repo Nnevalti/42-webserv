@@ -16,10 +16,10 @@ endif
 # DIRECTORIES
 
 BUILD	= .build
-DIRS	= .build/parser
+DIRS	= .build/parser .build/webserv
 SRC_DIR	= ./src/
 INC		= -I./include
-CLASSINC= -I src/parser
+CLASSINC= -I src/parser -I src/webserv
 
 # FILES
 NAME	= webserv
@@ -28,8 +28,11 @@ MAIN	= main.cpp
 
 PARSER	= Parser.cpp
 
+WEBSERV	= Webserv.cpp
+
 SRC		= $(MAIN) \
-		  $(addprefix parser/, $(PARSER))
+		  $(addprefix parser/, $(PARSER)) \
+		  $(addprefix webserv/, $(WEBSERV))
 
 
 DEP		:= $(SRC:%.cpp=$(BUILD)/%.d)
