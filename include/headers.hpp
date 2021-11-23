@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/22 20:19:52 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/23 23:15:24 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 //* C LIBRARY
 # include <unistd.h>
 # include <errno.h>
-# include <dirent.h>
 # include <fcntl.h>
 
 //* C NETWORK
@@ -66,4 +65,6 @@ typedef struct	s_network
 # define BUFFER_SIZE 512
 # define stringVector std::vector<std::string>
 # define stringMap std::map<std::string, std::string>
+# define netVector std::vector<t_network>
+# define serverMap std::map<std::string, Config>
 

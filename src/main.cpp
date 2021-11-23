@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:08:27 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/22 20:20:02 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/23 18:51:08 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ int		main(int ac, char **av)
 		try
 		{
 			parse.readconf(av[1]);
+			parse.parseconf();
 		}
 		catch(const std::exception& e)
 		{
