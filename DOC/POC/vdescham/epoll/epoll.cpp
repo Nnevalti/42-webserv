@@ -128,6 +128,14 @@ int create_socket(char *port)
 		return listen_fd;
 }
 
+int	fd_is_server(int ready_fd)
+{
+	for (fd_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
+		if (*it == ready_fd)
+			return *it;
+	return 0;
+}
+
 int main(int ac, char **av)
 {
 	// Request buffer and response header (simple one)
@@ -152,7 +160,6 @@ int main(int ac, char **av)
 	/***********************************************************************/
 	/* Creating the different socket listening on all the port provided   */
 	/**********************************************************************/
-
 	int i = 1;
 	while (i < ac)
 	{
@@ -179,97 +186,85 @@ int main(int ac, char **av)
 	/*************************************************************/
 	/*                        Server Loop                        */
 	/*************************************************************/
-	int timeout = 500; // set timeout to 0.5 sec
+	int timeout = 200; // set timeout to 0.5 sec
 	int nfds = 0;
 	int new_socket = 0;
-	// int nb_server = servers_fd.size();
-	bool test;
 
 	while (true)
 	{
 		errno = 0;
 
-		while (nfds == 0)
+		// Verify if a new connection is available
+		if ((nfds = epoll_wait(epfd, events, MAX_EV, timeout)) < 0)
+		{
+			std::cerr << "error: epoll_wait() failed";
+			exit(1);
+		}
+		else if (nfds == 0)
 		{
 			std::cout << "\r" << wait[(n++ % 6)] << GREEN << " waiting for connection" << SET << std::flush;
-
-			// Verify if a new connection is available
-			if ((nfds = epoll_wait(epfd, events, MAX_EV, timeout)) < 0)
-			{
-				std::cerr << "error: epoll_wait() failed";
-				exit(1);
-			}
 		}
 
-		if (nfds > 0)
+		for (int j = 0; j < nfds; j++)
 		{
-			for (int j = 0; j < nfds; j++)
+			int server = 0;
+			if (events[j].events & EPOLLERR || events[j].events & EPOLLHUP)
 			{
-				test = true;
-				if (events[j].events & EPOLLERR || events[j].events & EPOLLHUP)
+				close(events[j].data.fd);
+				continue;
+			}
+			// If the server has a new connection ready
+			if ((server = fd_is_server(events[j].data.fd)) > 0)
+			{
+				if ((new_socket = accept(server, NULL, NULL)) < 0)
 				{
-					close(events[j].data.fd);
-					continue;
-				}
-				// Verify which server has a new connection
-				for (fd_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
-				{
-					// If the server has a new connection ready
-					if (*it == events[j].data.fd)
+					if(errno != EWOULDBLOCK)
 					{
-						if ((new_socket = accept(*it, NULL, NULL)) < 0)
-						{
-							if(errno != EWOULDBLOCK)
-							{
-								std::cerr << "error: accept() failed" << std::endl;
-								exit(1);
-							}
-						}
-						fcntl(new_socket, F_SETFL, O_NONBLOCK);
-						event.data.fd = new_socket;
-						event.events = EPOLLIN;
-						epoll_ctl(epfd, EPOLL_CTL_ADD, new_socket, &event);
-						test = false;
-						break ;
+						std::cerr << "error: accept() failed" << std::endl;
+						exit(1);
 					}
 				}
-				if (test && events[j].events & EPOLLIN)
-				{
-					int ret = 0;
+				std::cout << "\r" << "Client connected on server: " << events[j].data.fd << std::endl;
+				fcntl(new_socket, F_SETFL, O_NONBLOCK);
+				event.data.fd = new_socket;
+				event.events = EPOLLIN;
+				epoll_ctl(epfd, EPOLL_CTL_ADD, new_socket, &event);
+			}
+			else if (events[j].events & EPOLLIN)
+			{
+				int ret = 0;
 
-					// Receive the request
-					if ((ret = recv(events[j].data.fd, &request, 1023, 0)) < 0)
-					{
-						std::cerr << "error: recv() failed" << strerror(errno) << std::endl;
-						exit(1);
-					}
-					else
-					{
-						request[ret] = '\0';
-						std::cout << request << std::endl;
-						event.events = EPOLLOUT;
-						event.data.fd = events[j].data.fd;
-						epoll_ctl(epfd, EPOLL_CTL_MOD, events[j].data.fd, &event);
-					}
-					break ;
-				}
-				else if (test && events[i].events & EPOLLOUT)
+				// Receive the request
+				if ((ret = recv(events[j].data.fd, &request, 1023, 0)) < 0)
 				{
-					if(send(events[j].data.fd, response.c_str(), response.size(), 0) < 0)
-					{
-						std::cerr << "error: send() failed" << std::endl;
-						exit(1);
-					}
-					event.events = EPOLLIN;
-					event.data.fd = events[j].data.fd;
-					// if not keep-alive
-					close(events[j].data.fd);
-					epoll_ctl(epfd, EPOLL_CTL_MOD, events[j].data.fd, &event);
-					break ;
+					std::cerr << "error: recv() failed" << strerror(errno) << std::endl;
+					exit(1);
 				}
+				else
+				{
+					request[ret] = '\0';
+					std::cout << request << std::endl;
+					event.events = EPOLLOUT;
+					event.data.fd = events[j].data.fd;
+					epoll_ctl(epfd, EPOLL_CTL_MOD, events[j].data.fd, &event);
+				}
+				break ;
+			}
+			else if (events[i].events & EPOLLOUT)
+			{
+				if(send(events[j].data.fd, response.c_str(), response.size(), 0) < 0)
+				{
+					std::cerr << "error: send() failed" << std::endl;
+					exit(1);
+				}
+				event.events = EPOLLIN;
+				event.data.fd = events[j].data.fd;
+				// if not keep-alive
+				close(events[j].data.fd);
+				epoll_ctl(epfd, EPOLL_CTL_MOD, events[j].data.fd, &event);
+				break ;
 			}
 		}
-		nfds = 0;
 	}
 	return (0);
 }
