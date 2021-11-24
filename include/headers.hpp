@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/23 23:15:24 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/24 06:04:24 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@
 // *STRUCT
 typedef struct	s_network
 {
-	unsigned int	host;
+	in_addr_t		host;
 	int				port;
 }				t_network;
 
@@ -67,4 +67,7 @@ typedef struct	s_network
 # define stringMap std::map<std::string, std::string>
 # define netVector std::vector<t_network>
 # define serverMap std::map<std::string, Config>
+# define confVector std::vector<Config>
+# define parseDirectiveMap std::map<std::string, void (Parser::*)(Config&, stringVector)>
+
 
