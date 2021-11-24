@@ -1,28 +1,28 @@
 /**========================================================================
- **                           POLL
- *?  The goal of this Proof Of Concept is to reach the pros of asynchronous
- *?  programming.
- *?  Poll will give the power to check if a socket is ready to read in it.
- *
- **  USAGE: ./poll [PORT]
- *@param [PORT] int
- *
- *@functions :
- *    socket
- *    setsockopt
- *    fcntl
- *    bind
- *    listen
- *    poll
- *    accept
- *    send
- *    close
- *
- *@behavion
- *  This is simple, a program that print ""No pending connections;"
- *  every seconds. But when a client is trying to connect to your program,
- *  it print "*Client connected on server: server_fd*" on stdout.
- *========================================================================**/
+**                           EPOLL
+*?  The goal of this Proof Of Concept is to reach the pros of asynchronous
+*?  programming.
+*?  Epoll will give the power to check if a socket is ready to read in it.
+*
+**  USAGE: ./poll [PORT]
+*@param [PORT] int
+*
+*@functions :
+*    socket
+*    setsockopt
+*    fcntl
+*    bind
+*    listen
+*    epoll
+*    accept
+*    send
+*    close
+*
+*@behavion
+*  This is simple, a program that print ""No pending connections;"
+*  every seconds. But when a client is trying to connect to your program,
+*  it print "*Client connected on server: server_fd*" on stdout.
+*========================================================================**/
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -31,7 +31,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstring>
-#include <poll.h>
+#include <sys/epoll.h>
 
 #include <vector>
 #include <algorithm>
@@ -41,15 +41,25 @@
 # define YELLOW "\033[0;33m"
 # define SET "\033[0m"
 
+#define MAX_EV 4096
+
 // vector to store the servers socket descriptor
 typedef std::vector<int> fd_vector;
 fd_vector servers_fd;
+
+// epoll fd
+int epfd;
 
 void signal_handler(int signum)
 {
 	std::cout << "\r" << "(" << signum << ") Serveur ending...       " << std::endl;
 	for (fd_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
+	{
 		close(*it);
+		epoll_ctl(epfd, EPOLL_CTL_DEL, *it, NULL);
+	}
+	close(epfd);
+
 	exit(1);
 }
 
@@ -128,13 +138,14 @@ int main(int ac, char **av)
 	response += "Content-Length: 13\n\n";
 	response += "Hello World !\r\n\r\n";
 
-	// struct pollfd used in poll()
-	struct pollfd fds[ac - 1];
+	// struct epoll_event used in epoll()
+	struct epoll_event event;
+	struct epoll_event events[MAX_EV];
 	signal(SIGINT, signal_handler);
 
 	if (ac < 2)
 	{
-		std::cerr << "USAGE: ./poll [PORT]" << std::endl;
+		std::cerr << "USAGE: ./epoll [PORT]" << std::endl;
 		exit(1);
 	}
 
@@ -149,57 +160,64 @@ int main(int ac, char **av)
 		i++;
 	}
 
- /*************************************************************/
- /*   Init struct poll fd with previously created sockets     */
- /*************************************************************/
-		i = 0;
-		for (fd_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
-		{
-			fds[i].fd = *it; // set descriptor fd to to listening socket
-			fds[i].events = 0; // Clear the bit array
-			fds[i].events = fds[i].events | POLLIN; // Set the POLLIN bit
-			i++;
-		}
+	/*************************************************************/
+	/*                     Init struct epoll_event               */
+	/*************************************************************/
+	epfd = epoll_create1(0);
+	i = 0;
+	for (fd_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
+	{
+		event.data.fd = *it;
+		event.events = EPOLLIN;
+		epoll_ctl(epfd, EPOLL_CTL_ADD, *it, &event);
+	}
 
-		// Loading array for a nice UI
-		std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"}; // array of frame
-		int n = 0; // current frame
+	// Loading array for a nice UI
+	std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"}; // array of frame
+	int n = 0; // current frame
 
-		/*************************************************************/
-	  /*                        Server Loop                        */
-	  /*************************************************************/
+	/*************************************************************/
+	/*                        Server Loop                        */
+	/*************************************************************/
 	int timeout = 500; // set timeout to 0.5 sec
-	int status = 0;
+	int nfds = 0;
 	int new_socket = 0;
-	int nb_server = servers_fd.size();
+	// int nb_server = servers_fd.size();
+	bool test;
 
 	while (true)
 	{
 		errno = 0;
 
-		while (status == 0)
+		while (nfds == 0)
 		{
 			std::cout << "\r" << wait[(n++ % 6)] << GREEN << " waiting for connection" << SET << std::flush;
 
 			// Verify if a new connection is available
-			if ((status = poll(fds, nb_server, timeout)) < 0)
+			if ((nfds = epoll_wait(epfd, events, MAX_EV, timeout)) < 0)
 			{
-				std::cerr << "error: poll() failed";
+				std::cerr << "error: epoll_wait() failed";
 				exit(1);
 			}
 		}
 
-		if (status > 0)
+		if (nfds > 0)
 		{
-			// Verify which server has a new connection
-			for (int j = 0; j < nb_server; j++)
+			for (int j = 0; j < nfds; j++)
 			{
-				// If the server has a new connection ready
-				if ((fds[j].revents & POLLIN) == POLLIN)
+				test = true;
+				if (events[j].events & EPOLLERR || events[j].events & EPOLLHUP)
 				{
-						std::cout << "\r" << "Client connected on server: " << fds[j].fd << std::endl;
-						// Accept the connection
-						if ((new_socket = accept(fds[j].fd, NULL, NULL)) < 0)
+					close(events[j].data.fd);
+					continue;
+				}
+				// Verify which server has a new connection
+				for (fd_vector::iterator it = servers_fd.begin(); it != servers_fd.end(); it++)
+				{
+					// If the server has a new connection ready
+					if (*it == events[j].data.fd)
+					{
+						if ((new_socket = accept(*it, NULL, NULL)) < 0)
 						{
 							if(errno != EWOULDBLOCK)
 							{
@@ -207,35 +225,51 @@ int main(int ac, char **av)
 								exit(1);
 							}
 						}
-						else
-						{
-							int ret = 0;
-
-							// Receive the request
-							if ((ret = recv(new_socket, &request, 1023, 0)) < 0)
-							{
-								std::cerr << "error: recv() failed" << std::endl;
-								exit(1);
-							}
-							else
-							{
-								request[ret] = '\0';
-								std::cout << request << std::endl;
-							}
-
-							// send the response
-							if(send(new_socket, response.c_str(), response.size(), 0) < 0) {
-								std::cerr << "error: send() failed" << std::endl;
-								exit(1);
-							}
-							// close the socket
-							close(new_socket);
-						}
+						fcntl(new_socket, F_SETFL, O_NONBLOCK);
+						event.data.fd = new_socket;
+						event.events = EPOLLIN;
+						epoll_ctl(epfd, EPOLL_CTL_ADD, new_socket, &event);
+						test = false;
+						break ;
 					}
 				}
+				if (test && events[j].events & EPOLLIN)
+				{
+					int ret = 0;
 
+					// Receive the request
+					if ((ret = recv(events[j].data.fd, &request, 1023, 0)) < 0)
+					{
+						std::cerr << "error: recv() failed" << strerror(errno) << std::endl;
+						exit(1);
+					}
+					else
+					{
+						request[ret] = '\0';
+						std::cout << request << std::endl;
+						event.events = EPOLLOUT;
+						event.data.fd = events[j].data.fd;
+						epoll_ctl(epfd, EPOLL_CTL_MOD, events[j].data.fd, &event);
+					}
+					break ;
+				}
+				else if (test && events[i].events & EPOLLOUT)
+				{
+					if(send(events[j].data.fd, response.c_str(), response.size(), 0) < 0)
+					{
+						std::cerr << "error: send() failed" << std::endl;
+						exit(1);
+					}
+					event.events = EPOLLIN;
+					event.data.fd = events[j].data.fd;
+					// if not keep-alive
+					close(events[j].data.fd);
+					epoll_ctl(epfd, EPOLL_CTL_MOD, events[j].data.fd, &event);
+					break ;
+				}
 			}
-			status = 0;
+		}
+		nfds = 0;
 	}
 	return (0);
 }

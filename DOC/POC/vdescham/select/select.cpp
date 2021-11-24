@@ -114,6 +114,7 @@ int main(int ac, char **av)
 	char request[1024];
 	std::string response;
 	response += "HTTP/1.1 200 OK\n";
+	response += "Content-Type: text/html\r\n";
 	response += "Content-Length: 13\n\n";
 	response += "Hello World !\r\n\r\n";
 
