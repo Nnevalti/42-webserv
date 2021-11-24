@@ -15,13 +15,12 @@
 
 # include "webserv.hpp"
 
-class Parser {
-
+class Parser
+{
 	public:
-
 		Parser(void);
-
 		Parser(Parser const & src);
+
 		~Parser(void);
 
 		Parser&			operator=(const Parser &rhs);
@@ -30,7 +29,6 @@ class Parser {
 
 
 	private:
-
 		stringVector	_configfile;
 };
 

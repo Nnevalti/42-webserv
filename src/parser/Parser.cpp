@@ -21,7 +21,7 @@ Parser::Parser(Parser const & src)
 
 Parser::~Parser(void) {}
 
-void		Parser::config(const char *file)
+void	Parser::config(const char *file)
 {
 
 }
