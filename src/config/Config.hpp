@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/24 05:59:04 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/24 19:01:45 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,35 +31,35 @@ class Config {
 		void			addServerName(stringVector serverName);
 		void			addRoot(std::string root);
 		void			addClientBodyBufferSize(int buffer);
-		void			addCgiParam(stringMap cgiParam);
+		void			addCgiParam(stringVector cgiParam);
 		void			addCgiPass(std::string cgiPass);
 		void			addLocation(serverMap locations);
 		void			addAllowedMethods(stringVector methods);
 		void			addIndex(stringVector index);
 		void			addAutoIndex(bool autoIndex);
 		void			addAlias(std::string alias);
-		void			addErrorPage(stringMap pages);
+		void			addErrorPage(std::string page, std::vector<int> codes);
 
 		netVector		getNetwork(void);
 		stringVector	getServerName(void);
 		std::string		getRoot(void);
 		int				getClientBodyBufferSize(void);
-		stringMap		getCgiParam(void);
+		stringVector	getCgiParam(void);
 		std::string		getCgiPass(void);
 		serverMap		getLocation(void);
 		stringVector	getAllowedMethods(void);
 		stringVector	getIndex(void);
 		bool			getAutoIndex(void);
 		std::string		getAlias(void);
-		stringMap		getErrorPage(void);
+		StringIntVectorMap	getErrorPage(void);
 
 	private:
 		netVector		_network;
 		std::string		_root;
 		stringVector	_server_name;
-		stringMap		_error_page;
+		StringIntVectorMap	_error_page;
 		int				_client_body_buffer_size;
-		stringMap		_cgi_param;
+		stringVector	_cgi_param;
 		std::string		_cgi_pass;
 		serverMap		_location;
 		stringVector	_allowed_methods;
