@@ -57,19 +57,17 @@
 // *STRUCT
 typedef struct	s_network
 {
-	in_addr_t		host;
+	struct in_addr	host;
 	int				port;
 }				t_network;
 
 //* SHORTCUT
 # define BUFFER_SIZE 512
-# define stringVector std::vector<std::string>
-# define stringMap std::map<std::string, std::string>
-# define netVector std::vector<t_network>
-# define serverMap std::map<std::string, Config>
-# define confVector std::vector<Config>
-# define parseDirectiveMap std::map<std::string, void (Parser::*)(Config&, stringVector)>
-# define StringIntVectorMap std::map<std::string, std::vector<int> >
-# define pairStringIntVector std::pair<std::string, std::vector<int> >
-
-
+# define stringVector				std::vector<std::string>
+# define stringMap					std::map<std::string, std::string>
+# define netVector					std::vector<t_network>
+# define serverMap					std::map<std::string, Config>
+# define confVector					std::vector<Config>
+# define parseDirectiveMap			std::map<std::string, void (Parser::*)(Config&, stringVector)>
+# define StringIntVectorMap			std::map<std::string, std::vector<int> >
+# define pairStringIntVector		std::pair<std::string, std::vector<int> >

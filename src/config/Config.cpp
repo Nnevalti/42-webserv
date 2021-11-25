@@ -24,19 +24,22 @@ Config::~Config(void) {}
 Config &		Config::operator=(Config const &src)
 {
 
-	_network = src._network;
-	_root = src._root;
-	_server_name = src._server_name;
-	_error_page = src._error_page;
-	_client_body_buffer_size = src._client_body_buffer_size;
-	_cgi_param = src._cgi_param;
-	_cgi_pass = src._cgi_pass;
-	_location = src._location;
-	_allowed_methods = src._allowed_methods;
-	_autoindex = src._autoindex;
-	_index = src._index;
-	_alias = src._alias;
-	_alias_set = src._alias_set;
+	if (this != &src)
+	{
+		_network = src._network;
+		_root = src._root;
+		_server_name = src._server_name;
+		_error_page = src._error_page;
+		_client_body_buffer_size = src._client_body_buffer_size;
+		_cgi_param = src._cgi_param;
+		_cgi_pass = src._cgi_pass;
+		_location = src._location;
+		_allowed_methods = src._allowed_methods;
+		_autoindex = src._autoindex;
+		_index = src._index;
+		_alias = src._alias;
+		_alias_set = src._alias_set;
+	}
 
 	return *this;
 }
@@ -171,7 +174,7 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 {
 	out << "Listen:" << std::endl;
 	for (netVector::const_iterator i = server._network.begin(); i != server._network.end(); i++)
-		out << "\thost: " << i->host << " port: " << i->port << std::endl;
+		out << "\thost: " << inet_ntoa(i->host) << " port: " << i->port << std::endl;
 
 	out << "root: " << server._root << std::endl;
 

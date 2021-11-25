@@ -189,7 +189,7 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 
 	if ((i = address.find(":")) == std::string::npos)
 	{
-		net.host = 0;
+		net.host.s_addr = 0;
 		net.port = std::atoi(address.c_str());
 		configServer.addNetwork(net);
 		return ;
@@ -198,7 +198,7 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 		host = "127.0.0.1";
 
 	i++;
-	net.host = inet_addr(host.c_str());
+	net.host.s_addr = inet_addr(host.c_str());
 	net.port = std::atoi(address.substr(i).c_str());
 	configServer.addNetwork(net);
 }
