@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/24 19:46:32 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/25 02:47:16 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,11 @@ Config &		Config::operator=(Config const &src)
 
 void		Config::addNetwork(t_network net)
 {
+	for (netVector::const_iterator it = _network.begin(); it != _network.end(); it++)
+	{
+		if(it->port == net.port)
+			throw std::runtime_error("Port already exist in listen's directive arguments");
+	}
 	_network.push_back(net);
 }
 
@@ -179,27 +184,33 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 	}
 
 	out << std::endl<< "error_page:" << std::endl;
-	for (std::map<std::string, std::vector<int> >::const_iterator i = server._error_page.begin(); i != server._error_page.end(); i++)
+	for (StringIntVectorMap::const_iterator i = server._error_page.begin(); i != server._error_page.end(); i++)
 	{
-
-		for (std::vector<int>::iterator it = (*i).second().begin(); i < count; i++)
+		out << "\t";
+		std::vector<int> tmp((*i).second);
+		for (std::vector<int>::const_iterator it = tmp.begin(); it != tmp.end(); i++)
 		{
-			/* code */
-		}
+			out << *it;
+			if (it != tmp.end() - 1)
+				out << " ";
 
-		out <<
-		out << "\t" << i->first << " " << i->second << std::endl;
+		}
+		out << i->first << std::endl;
 	}
+
 	out << "client_body_buffer_size: " << server._client_body_buffer_size << std::endl;
 
 	out << "cgi_param:" << std::endl;
-	for (std::map<std::string, std::string>::const_iterator i = server._cgi_param.begin(); i != server._cgi_param.end(); i++)
-		out << "\t" << i->first << " = " << i->second << std::endl;
+	for (stringVector::const_iterator i = server._cgi_param.begin(); i != server._cgi_param.end(); i++)
+		if (i == server._cgi_param.begin())
+			out << "\t" << *i << " = ";
+		else
+			out << *i << std::endl;
 
 	out << "cgi_pass:	" << server._cgi_pass << std::endl;
 
 	out << "allowed methods: ";
-	for (std::set<std::string>::iterator i = server._allowed_methods.begin(); i != server._allowed_methods.end(); i++)
+	for (stringVector::const_iterator i = server._allowed_methods.begin(); i != server._allowed_methods.end(); i++)
 		out << " " << *i;
 
 	out << std::endl;
@@ -214,8 +225,8 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 
 	out << "alias: " << server._alias << std::endl;
 
-	for (std::map<std::string, ConfigServer>::const_iterator i = server._location.begin(); i != server._location.end(); i++)
+/*	for (std::map<std::string, ConfigServer>::const_iterator i = server._location.begin(); i != server._location.end(); i++)
 		out << std::endl << "LOCATION " << i->first << std::endl << i->second << std::endl;
-
+*/
 	return out;
 }
