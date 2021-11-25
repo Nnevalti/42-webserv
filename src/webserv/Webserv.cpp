@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "Webserv.hpp"
-
+#include <typeinfo>
 Webserv::Webserv(void) {}
 
 Webserv::Webserv(Webserv const & src)
@@ -21,3 +21,29 @@ Webserv::Webserv(Webserv const & src)
 
 Webserv::~Webserv(void) {}
 
+void Webserv::buildServers(confVector configServer)
+{
+	std::cout << "\nIn build servers :" << '\n';
+
+	Server server;
+	for (confVector::iterator it = configServer.begin(); it != configServer.end(); it++)
+	{
+		server.setConfig(*it);
+		// _listeningPorts.insert(*it.getNetwork());
+		_servers.push_back(server);
+		std::cout << _servers.front().getConfig() << '\n';
+	}
+	for (serverVector::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		netVector net = (*it).getConfig().getNetwork();
+
+		for (netVector::const_iterator it_net = net.begin(); it_net != net.end(); it_net++)
+		{
+			std::cout << "host: " << inet_ntoa(it_net->host) << '\n';
+			std::cout << "port: " << it_net->port << "\n\n";
+		}
+
+	}
+	std::cout << "All servers were built" << std::endl;
+	return ;
+}

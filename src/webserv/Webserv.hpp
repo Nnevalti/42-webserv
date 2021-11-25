@@ -13,21 +13,28 @@
 #ifndef WEBSERV_H
 # define WEBSERV_H
 
-# include <headers.hpp>
+# include "headers.hpp"
+# include "Config.hpp"
+# include "Server.hpp"
 
-class Webserv {
+class Webserv
+{
 
 	public:
-
 		Webserv(void);
-
 		Webserv(Webserv const & src);
 		~Webserv(void);
-
 		Webserv &	operator=(const Webserv &rhs);
 
+		// typedef std::set<int> setPort;
+		// typedef std::vector<std::pair<std::string, int> > vectorPorts;
+		// typedef std::vector<int> fd_vector;
+		typedef std::vector<Server> serverVector;
 
+		void buildServers(confVector configServer);
 	private:
+		serverVector	_servers;
+		// setPort		_listeningPorts;
 
 };
 
