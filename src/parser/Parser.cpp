@@ -24,6 +24,7 @@ Parser::Parser(Parser const & src)
 
 Parser::~Parser(void) {}
 
+<<<<<<< HEAD
 /**========================================================================
  **                           READCONF
  *?  This function read the configuration file
@@ -32,6 +33,9 @@ Parser::~Parser(void) {}
  *@return void
  *========================================================================**/
 void			Parser::readConf(const char *file)
+=======
+void	Parser::config(const char *file)
+>>>>>>> a472806671a4dcd26de8d60b64109b21fda6b174
 {
 	std::string	conf("");
 	std::string	whitespace(" \t\n\v\r\f");

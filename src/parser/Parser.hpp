@@ -16,13 +16,12 @@
 # include "headers.hpp"
 # include "Config.hpp"
 
-class Parser {
-
+class Parser
+{
 	public:
-
 		Parser(void);
-
 		Parser(Parser const & src);
+
 		~Parser(void);
 
 		Parser&					operator=(const Parser &rhs);
@@ -35,6 +34,7 @@ class Parser {
 		confVector				getConfigServers(void);
 
 	private:
+<<<<<<< HEAD
 		stringVector			_configfile;
 		confVector				_ConfigServers;
 
@@ -54,6 +54,9 @@ class Parser {
 		void					parseServerName(Config& configServer,stringVector opts);
 		void					parseAllowedMethods(Config& configServer,stringVector opts);
 		void					parseClientBodyBufferSize(Config& configServer,stringVector opts);
+=======
+		stringVector	_configfile;
+>>>>>>> a472806671a4dcd26de8d60b64109b21fda6b174
 };
 
 
