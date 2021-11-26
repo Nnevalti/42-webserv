@@ -39,6 +39,7 @@ int		main(int ac, char **av)
 		try
 		{
 			cluster.buildServers(parse.getConfigServers());
+			cluster.run();
 		}
 		catch (const std::exception &e)
 		{

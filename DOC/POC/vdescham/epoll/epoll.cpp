@@ -72,60 +72,60 @@ int create_socket(char *port)
 	/*************************************************************/
 	/*                      Create socket                        */
 	/*************************************************************/
-		if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-		{
-			std::cerr << "error: socket()" << std::endl;
-			exit(1);
-		}
+	if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	{
+		std::cerr << "error: socket()" << std::endl;
+		exit(1);
+	}
 
-		/*************************************************************/
-		/*       Allow socket descriptor to be reuseable             */
-		/*************************************************************/
-		if (setsockopt(listen_fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0)
-		{
-			std::cerr << "error: setsockopt() failed" << std::endl;
-			close(listen_fd);
-			exit(1);
-		}
+	/*************************************************************/
+	/*       Allow socket descriptor to be reuseable             */
+	/*************************************************************/
+	if (setsockopt(listen_fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) < 0)
+	{
+		std::cerr << "error: setsockopt() failed" << std::endl;
+		close(listen_fd);
+		exit(1);
+	}
 
-		/*************************************************************/
-		/* Set socket to be nonblocking. All of the sockets for      */
-		/* the incoming connections will also be nonblocking since   */
-		/* they will inherit that state from the listening socket.   */
-		/*************************************************************/
-		if(fcntl(listen_fd, F_SETFL, O_NONBLOCK) < 0)
-		{
-			std::cerr << "could not set socket to be non blocking" << std::endl;
-			exit(1);
-		}
+	/*************************************************************/
+	/* Set socket to be nonblocking. All of the sockets for      */
+	/* the incoming connections will also be nonblocking since   */
+	/* they will inherit that state from the listening socket.   */
+	/*************************************************************/
+	if(fcntl(listen_fd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		std::cerr << "could not set socket to be non blocking" << std::endl;
+		exit(1);
+	}
 
-		/*************************************************************/
-		/*               Fill the sock_addr_in struct                */
-		/*************************************************************/
-		std::memset((char*)&servaddr, 0, sizeof(servaddr));
-		servaddr.sin_family = AF_INET;
-		servaddr.sin_addr.s_addr = INADDR_ANY;
-		servaddr.sin_port = htons(std::atoi(port));
+	/*************************************************************/
+	/*               Fill the sock_addr_in struct                */
+	/*************************************************************/
+	std::memset((char*)&servaddr, 0, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = INADDR_ANY;
+	servaddr.sin_port = htons(std::atoi(port));
 
-		/*************************************************************/
-		/*                       Bind the socket                     */
-		/*************************************************************/
-		if (bind(listen_fd, (struct sockaddr*) &servaddr, sizeof(servaddr)) < 0)
-		{
-			std::cerr << "error: bind() failed" << std::endl;
-			exit(1);
-		}
+	/*************************************************************/
+	/*                       Bind the socket                     */
+	/*************************************************************/
+	if (bind(listen_fd, (struct sockaddr*) &servaddr, sizeof(servaddr)) < 0)
+	{
+		std::cerr << "error: bind() failed" << std::endl;
+		exit(1);
+	}
 
-		/*************************************************************/
-		/*                       Listen the socket                   */
-		/*************************************************************/
-		if (listen(listen_fd, 100) < 0)
-		{
-			std::cerr << "error: listen() failed" << std::endl;
-			exit(1);
-		}
+	/*************************************************************/
+	/*                       Listen the socket                   */
+	/*************************************************************/
+	if (listen(listen_fd, 100) < 0)
+	{
+		std::cerr << "error: listen() failed" << std::endl;
+		exit(1);
+	}
 
-		return listen_fd;
+	return listen_fd;
 }
 
 int	fd_is_server(int ready_fd)

@@ -25,6 +25,7 @@
 # include <sys/socket.h>
 # include <sys/select.h>
 # include <sys/poll.h>
+# include <sys/epoll.h>
 # include <arpa/inet.h>
 # include <netinet/in.h>
 
@@ -52,7 +53,7 @@
 # define RED "\033[31m"
 # define GREEN "\033[32m"
 # define YELLOW "\033[33m"
-# define END "\033[0m"
+# define SET "\033[0m"
 
 // *STRUCT
 typedef struct	s_network
@@ -63,6 +64,7 @@ typedef struct	s_network
 
 //* SHORTCUT
 # define BUFFER_SIZE 512
+# define MAX_EV 4096
 # define stringVector				std::vector<std::string>
 # define stringMap					std::map<std::string, std::string>
 # define netVector					std::vector<t_network>

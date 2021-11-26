@@ -22,20 +22,31 @@ class Webserv
 
 	public:
 		Webserv(void);
-		Webserv(Webserv const & src);
 		~Webserv(void);
-		Webserv &	operator=(const Webserv &rhs);
 
-		// typedef std::set<int> setPort;
+		typedef std::set<int> setPort;
 		// typedef std::vector<std::pair<std::string, int> > vectorPorts;
 		// typedef std::vector<int> fd_vector;
 		typedef std::vector<Server> serverVector;
+		typedef std::vector<int> fd_vector;
 
 		void buildServers(confVector configServer);
-	private:
-		serverVector	_servers;
-		// setPort		_listeningPorts;
+		int		run(void);
 
+	private:
+		Webserv(Webserv const & src);
+		Webserv &	operator=(const Webserv &rhs);
+		serverVector	_servers;
+		setPort			_listeningPorts;
+		fd_vector		_servers_fd;
+		int				_epfd;
+		struct epoll_event _event;
+		struct epoll_event _events_pool[MAX_EV];
+
+
+		int		init_socket(int port);
+		void	epoll_init(void);
+		int		fd_is_server(int ready_fd);
 };
 
 

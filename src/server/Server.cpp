@@ -31,8 +31,6 @@ Server::~Server(void) {}
 void Server::setConfig(Config config)
 {
 	this->_config = config;
-	// std::cout << "IN SETCONFIG" << '\n';
-	// std::cout << _config << std::endl;
 }
 
 Config Server::getConfig(void) const

@@ -14,36 +14,206 @@
 #include <typeinfo>
 Webserv::Webserv(void) {}
 
-Webserv::Webserv(Webserv const & src)
-{
-	(void)src;
-}
+// Webserv::Webserv(Webserv const & src){}
 
 Webserv::~Webserv(void) {}
 
 void Webserv::buildServers(confVector configServer)
 {
-	std::cout << "\nIn build servers :" << '\n';
-
 	Server server;
+	int fd;
+
 	for (confVector::iterator it = configServer.begin(); it != configServer.end(); it++)
 	{
 		server.setConfig(*it);
-		// _listeningPorts.insert(*it.getNetwork());
 		_servers.push_back(server);
-		std::cout << _servers.front().getConfig() << '\n';
 	}
+	// _netMap.clear();
 	for (serverVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		netVector net = (*it).getConfig().getNetwork();
 
 		for (netVector::const_iterator it_net = net.begin(); it_net != net.end(); it_net++)
 		{
-			std::cout << "host: " << inet_ntoa(it_net->host) << '\n';
-			std::cout << "port: " << it_net->port << "\n\n";
+			_listeningPorts.insert(it_net->port);
+				std::cout << "server name: " << (*it).getConfig().getServerName().front() << '\n';
+				std::cout << "port: " << it_net->port << "\n\n";
 		}
-
+	}
+	for (setPort::iterator it = _listeningPorts.begin(); it != _listeningPorts.end(); it++)
+	{
+		fd = init_socket(*it);
+		_servers_fd.push_back(fd);
 	}
 	std::cout << "All servers were built" << std::endl;
 	return ;
+}
+
+int Webserv::init_socket(int port)
+{
+	int listen_fd;
+	const int opt = 1;
+	struct sockaddr_in servaddr;
+
+	if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	{
+		std::cerr << "error: socket() failed" << std::endl;
+		exit(1);
+	}
+
+	if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT | SO_REUSEADDR, &opt, sizeof(opt)))
+	{
+		std::cerr << "setsockopt" << std::endl;
+		exit(1);
+	}
+
+	if(fcntl(listen_fd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		std::cerr << "could not set socket to be non blocking" << std::endl;
+		exit(1);
+	}
+
+	std::memset((char*)&servaddr, 0, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = INADDR_ANY;
+	servaddr.sin_port = htons(port);
+
+	if (bind(listen_fd, (struct sockaddr*) &servaddr, sizeof(servaddr)) < 0)
+	{
+		std::cerr << "error: bind() failed" << std::endl;
+		exit(1);
+	}
+
+	if (listen(listen_fd, 100) < 0)
+	{
+		std::cerr << "error: listen() failed" << std::endl;
+		exit(1);
+	}
+	return listen_fd;
+}
+
+void Webserv::epoll_init(void)
+{
+	_epfd = epoll_create1(0);
+	for (fd_vector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
+	{
+		_event.data.fd = *it;
+		_event.events = EPOLLIN;
+		epoll_ctl(_epfd, EPOLL_CTL_ADD, *it, &_event);
+	}
+}
+
+int	Webserv::fd_is_server(int ready_fd)
+{
+	for (fd_vector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
+		if (*it == ready_fd)
+			return *it;
+	return 0;
+}
+
+static bool g_run = true;
+void signal_handler(int signum)
+{
+	(void)signum;
+	g_run = false;
+}
+
+int Webserv::run(void)
+{
+	char request[1024];
+	std::string response;
+	response += "HTTP/1.1 200 OK\n";
+	response += "Content-Type: text/html\r\n";
+	response += "Content-Length: 14\n\n";
+	response += "Hello World !\n\r\n\r\n";
+
+	int timeout = 200; // set timeout to 0.5 sec
+	int nfds = 0;
+	int new_socket = 0;
+	std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"}; // array of frame
+	int n = 0; // current frame
+
+	signal(SIGINT, signal_handler);
+	epoll_init();
+	while (g_run)
+	{
+		errno = 0;
+
+		// Verify if a new connection is available
+		nfds = epoll_wait(_epfd, _events_pool, MAX_EV, timeout);
+		// {
+		// 	std::cerr << "error: epoll_wait() failed";
+		// 	exit(1);
+		// }
+		if (nfds == 0)
+		{
+			std::cout << "\r" << wait[(n++ % 6)] << GREEN << " waiting for connection" << SET << std::flush;
+		}
+
+		for (int j = 0; j < nfds; j++)
+		{
+			int server = 0;
+			if (_events_pool[j].events & EPOLLERR || _events_pool[j].events & EPOLLHUP)
+			{
+				close(_events_pool[j].data.fd);
+				continue;
+			}
+			// If the server has a new connection ready
+			if ((server = fd_is_server(_events_pool[j].data.fd)) > 0)
+			{
+				if ((new_socket = accept(server, NULL, NULL)) < 0)
+				{
+					if(errno != EWOULDBLOCK)
+					{
+						std::cerr << "error: accept() failed" << std::endl;
+						exit(1);
+					}
+				}
+				std::cout << "\r" << "Client connected on server: " << _events_pool[j].data.fd << std::endl;
+				fcntl(new_socket, F_SETFL, O_NONBLOCK);
+				_event.data.fd = new_socket;
+				_event.events = EPOLLIN;
+				epoll_ctl(_epfd, EPOLL_CTL_ADD, new_socket, &_event);
+			}
+			else if (_events_pool[j].events & EPOLLIN)
+			{
+				int ret = 0;
+
+				// Receive the request
+				if ((ret = recv(_events_pool[j].data.fd, &request, 1023, 0)) < 0)
+				{
+					std::cerr << "error: recv() failed" << strerror(errno) << std::endl;
+					exit(1);
+				}
+				else
+				{
+					request[ret] = '\0';
+					std::cout << request << std::endl;
+					_event.events = EPOLLOUT;
+					_event.data.fd = _events_pool[j].data.fd;
+					epoll_ctl(_epfd, EPOLL_CTL_MOD, _events_pool[j].data.fd, &_event);
+				}
+				break ;
+			}
+			else if (_events_pool[j].events & EPOLLOUT)
+			{
+				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
+				{
+					std::cerr << "error: send() failed" << std::endl;
+					exit(1);
+				}
+				_event.events = EPOLLIN;
+				_event.data.fd = _events_pool[j].data.fd;
+				// if not keep-alive
+				close(_events_pool[j].data.fd);
+				epoll_ctl(_epfd, EPOLL_CTL_MOD, _events_pool[j].data.fd, &_event);
+				break ;
+			}
+		}
+	}
+	for (fd_vector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
+		close(*it);
+	close(_epfd);
+	std::cout << "\r" << "Serveur ending...       " << std::endl;
+	exit(1);
 }
