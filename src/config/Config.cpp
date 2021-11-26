@@ -6,13 +6,13 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/25 02:47:16 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/26 13:48:23 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
-Config::Config(void) {}
+Config::Config(void): _client_body_buffer_size(0) {}
 
 Config::Config(Config const & src)
 {
@@ -79,9 +79,9 @@ void		Config::addCgiPass(std::string cgiPass)
 	_cgi_pass = cgiPass;
 }
 
-void		Config::addLocation(serverMap location)
+void		Config::addLocation(std::string location_name, Config location)
 {
-	_location = location;
+	_location[location_name] = location;
 }
 
 void		Config::addAllowedMethods(stringVector methods)
@@ -172,6 +172,10 @@ StringIntVectorMap	Config::getErrorPage(void)
 
 std::ostream	&operator<<(std::ostream &out, const Config &server)
 {
+	out << "============================================" << std::endl;
+	out << "                   CONF" << std::endl;
+	out << "============================================" << std::endl;
+
 	out << "Listen:" << std::endl;
 	for (netVector::const_iterator i = server._network.begin(); i != server._network.end(); i++)
 		out << "\thost: " << inet_ntoa(i->host) << " port: " << i->port << std::endl;
@@ -228,8 +232,9 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 
 	out << "alias: " << server._alias << std::endl;
 
-/*	for (std::map<std::string, ConfigServer>::const_iterator i = server._location.begin(); i != server._location.end(); i++)
+	for (serverMap::const_iterator i = server._location.begin(); i != server._location.end(); i++)
 		out << std::endl << "LOCATION " << i->first << std::endl << i->second << std::endl;
-*/
+
+	out << "=============== END OF CONF ==============" << std::endl;
 	return out;
 }

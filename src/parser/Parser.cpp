@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/25 04:46:52 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/26 13:47:36 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void			Parser::readConf(const char *file)
 	return ;
 }
 
-int				Parser::checkDirective(const char* expect, stringVector::iterator* actual)
+void			Parser::checkDirective(const char* expect, stringVector::iterator* actual)
 {
 	std::string errormsg;
 
@@ -73,23 +73,22 @@ int				Parser::checkDirective(const char* expect, stringVector::iterator* actual
 		throw std::runtime_error(errormsg);
 
 	(*actual)++;
-	return (1);
 }
 
 void			Parser::parseConf(void)
 {
 	for (stringVector::iterator it = _configfile.begin(); it != _configfile.end(); it++)
-		if (checkDirective("server", &it))
-		{
-			if (checkDirective("{", &it))
-			{
-				Config	confServer;
-
-				parseServer(&it, confServer);
-				std::cout << confServer;
-				_ConfigServers.push_back(confServer);
-			}
-		}
+	{
+		Config	confServer;
+		std::cout << *it << std::endl;
+		checkDirective("server", &it);
+		checkDirective("{", &it);
+		parseServer(&it, confServer);
+		if (*it != "}")
+			throw std::runtime_error("Curly brackets not close at the end of server block");
+		std::cout << confServer;
+		_ConfigServers.push_back(confServer);
+	}
 	return ;
 }
 
@@ -123,7 +122,8 @@ void			Parser::parseServer(stringVector::iterator* it, Config& server)
 				location_name = **it;
 				(*it) = (*it) + 2;
 				parseServer(it, location);
-				std::cout << location;
+				checkDirective("}", it);
+				server.addLocation(location_name, location);
 		}
 	}
 	return ;

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/25 04:07:06 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/26 13:29:58 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class Config {
 		void				addClientBodyBufferSize(int buffer);
 		void				addCgiParam(stringVector cgiParam);
 		void				addCgiPass(std::string cgiPass);
-		void				addLocation(serverMap locations);
+		void				addLocation(std::string location_name, Config location);
 		void				addAllowedMethods(stringVector methods);
 		void				addIndex(stringVector index);
 		void				addAutoIndex(bool autoIndex);

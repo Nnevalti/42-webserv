@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/24 06:04:15 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/26 12:54:32 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class Parser {
 
 		void					readConf(const char *file);
 		void					parseConf(void);
-		int						checkDirective(const char * expect, stringVector::iterator* actual);
+		void					checkDirective(const char * expect, stringVector::iterator* actual);
 		void					parseServer(stringVector::iterator* it, Config& server);
 
 		confVector				getConfigServers(void);
