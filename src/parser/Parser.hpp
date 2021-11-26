@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/26 12:54:32 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/26 14:11:47 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ class Parser
 		confVector				getConfigServers(void);
 
 	private:
-<<<<<<< HEAD
 		stringVector			_configfile;
 		confVector				_ConfigServers;
 
@@ -54,9 +53,6 @@ class Parser
 		void					parseServerName(Config& configServer,stringVector opts);
 		void					parseAllowedMethods(Config& configServer,stringVector opts);
 		void					parseClientBodyBufferSize(Config& configServer,stringVector opts);
-=======
-		stringVector	_configfile;
->>>>>>> a472806671a4dcd26de8d60b64109b21fda6b174
 };
 
 
