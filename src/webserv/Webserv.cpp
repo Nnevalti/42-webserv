@@ -12,39 +12,40 @@
 
 #include "Webserv.hpp"
 #include <typeinfo>
-Webserv::Webserv(void) {}
 
-// Webserv::Webserv(Webserv const & src){}
+static bool g_run = true;
+
+void signal_handler(int signum)
+{
+	(void)signum;
+	g_run = false;
+}
+
+Webserv::Webserv(void) {}
 
 Webserv::~Webserv(void) {}
 
-void Webserv::buildServers(confVector configServer)
+void Webserv::initServers(confVector configServer)
 {
-	Server server;
-	int fd;
+	// int			fd;
 
-	for (confVector::iterator it = configServer.begin(); it != configServer.end(); it++)
+	_servers = configServer;
+	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
-		server.setConfig(*it);
-		_servers.push_back(server);
-	}
-	// _netMap.clear();
-	for (serverVector::iterator it = _servers.begin(); it != _servers.end(); it++)
-	{
-		netVector net = (*it).getConfig().getNetwork();
+		netVector net = (*it).getNetwork();
 
 		for (netVector::const_iterator it_net = net.begin(); it_net != net.end(); it_net++)
 		{
-			_listeningPorts.insert(it_net->port);
-				std::cout << "server name: " << (*it).getConfig().getServerName().front() << '\n';
-				std::cout << "port: " << it_net->port << "\n\n";
+			// _listeningPorts.insert(it_net->port);
+			std::cout << "server name: " << (*it).getServerName().front() << '\n';
+			std::cout << "port: " << it_net->port << "\n\n";
 		}
 	}
-	for (setPort::iterator it = _listeningPorts.begin(); it != _listeningPorts.end(); it++)
-	{
-		fd = init_socket(*it);
-		_servers_fd.push_back(fd);
-	}
+	// for (setPort::iterator it = _listeningPorts.begin(); it != _listeningPorts.end(); it++)
+	// {
+	// 	fd = init_socket(*it);
+	// 	_servers_fd.push_back(fd);
+	// }
 	std::cout << "All servers were built" << std::endl;
 	return ;
 }
@@ -63,7 +64,7 @@ int Webserv::init_socket(int port)
 
 	if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT | SO_REUSEADDR, &opt, sizeof(opt)))
 	{
-		std::cerr << "setsockopt" << std::endl;
+		std::cerr << "error: setsockopt() failed" << std::endl;
 		exit(1);
 	}
 
@@ -111,15 +112,13 @@ int	Webserv::fd_is_server(int ready_fd)
 	return 0;
 }
 
-static bool g_run = true;
-void signal_handler(int signum)
+void Webserv::run(confVector configServer)
 {
-	(void)signum;
-	g_run = false;
-}
-
-int Webserv::run(void)
-{
+	initServers(configServer);
+	return ;
+	/************************/
+	/*    Temporary part    */
+	/************************/
 	char request[1024];
 	std::string response;
 	response += "HTTP/1.1 200 OK\n";
@@ -127,13 +126,17 @@ int Webserv::run(void)
 	response += "Content-Length: 14\n\n";
 	response += "Hello World !\n\r\n\r\n";
 
+	std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"}; // array of frame
+	int n = 0; // current frame
+	/*************************/
+	/* End of temporary part */
+	/*************************/
+
 	int timeout = 200; // set timeout to 0.5 sec
 	int nfds = 0;
 	int new_socket = 0;
-	std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"}; // array of frame
-	int n = 0; // current frame
 
-	signal(SIGINT, signal_handler);
+	signal(SIGINT, signal_handler); // to move in main
 	epoll_init();
 	while (g_run)
 	{
@@ -141,14 +144,23 @@ int Webserv::run(void)
 
 		// Verify if a new connection is available
 		nfds = epoll_wait(_epfd, _events_pool, MAX_EV, timeout);
-		// {
-		// 	std::cerr << "error: epoll_wait() failed";
-		// 	exit(1);
-		// }
+		/*
+		errno value returned by epoll
+		EBADF : epfd is not a valid file descriptor.
+
+		EFAULT : The memory area pointed to by events is not accessible with write permissions.
+
+		EINTR : The call was interrupted by a signal handler before either any of the requested events occurred or the timeout expired.
+
+		EINVAL : epfd is not an epoll file descriptor, or maxevents is less than or equal to zero.
+
+		*/
+		if (errno == EINVAL || errno == EFAULT || errno == EBADFD)
+			std::cerr << "error: epoll_wait() failed: " << strerror(errno) << '\n';
+		else if (errno == EINTR)
+			g_run = false;
 		if (nfds == 0)
-		{
 			std::cout << "\r" << wait[(n++ % 6)] << GREEN << " waiting for connection" << SET << std::flush;
-		}
 
 		for (int j = 0; j < nfds; j++)
 		{

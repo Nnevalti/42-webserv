@@ -22,12 +22,9 @@
 # include <sys/time.h>
 # include <sys/stat.h>
 # include <sys/wait.h>
-# include <sys/socket.h>
 # include <sys/select.h>
 # include <sys/poll.h>
 # include <sys/epoll.h>
-# include <arpa/inet.h>
-# include <netinet/in.h>
 
 //* CPP LIBRARY
 # include <iostream>
@@ -55,16 +52,13 @@
 # define YELLOW "\033[33m"
 # define SET "\033[0m"
 
-// *STRUCT
-typedef struct	s_network
-{
-	struct in_addr	host;
-	int				port;
-}				t_network;
+// // *STRUCT
+# include "t_network.hpp"
 
 //* SHORTCUT
 # define BUFFER_SIZE 512
 # define MAX_EV 4096
+
 # define stringVector				std::vector<std::string>
 # define stringMap					std::map<std::string, std::string>
 # define netVector					std::vector<t_network>

@@ -34,11 +34,14 @@ SERVER	= Server.cpp
 
 CONFIG	= Config.cpp
 
+NET		= t_network.cpp
+
 SRC		= $(MAIN) \
 		  $(addprefix parser/, $(PARSER)) \
 		  $(addprefix webserv/, $(WEBSERV)) \
 		  $(addprefix config/, $(CONFIG)) \
-		  $(addprefix server/, $(SERVER))
+		  $(addprefix server/, $(SERVER)) \
+		  $(NET)
 
 
 DEP		:= $(SRC:%.cpp=$(BUILD)/%.d)

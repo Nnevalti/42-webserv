@@ -1,34 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   t_network.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vdescham <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/25 13:49:50 by vdescham          #+#    #+#             */
-/*   Updated: 2021/11/25 13:49:50 by vdescham         ###   ########.fr       */
+/*   Created: 2021/11/29 15:46:53 by vdescham          #+#    #+#             */
+/*   Updated: 2021/11/29 15:46:53 by vdescham         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#ifndef T_NETWORK_HPP
+# define T_NETWORK_HPP
 
-# include <iostream>
-# include "headers.hpp"
-# include "Config.hpp"
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
 
-class Server
+
+class t_network
 {
 	public:
-		Server(void);
-		Server(Server const & src);
-		~Server(void);
+		t_network(void);
+		t_network(t_network const & src);
+		t_network &	operator=(const t_network &rhs);
+		~t_network(void);
+		bool operator==(t_network const &rhs);
+		bool operator!=(t_network const &rhs);
 
-		Server&		operator=(const Server &rhs);
-		void		setConfig(Config config);
-		Config		getConfig(void) const;
+		struct in_addr	host;
+		int				port;
+
 	private:
-		Config		_config;
+
 };
+
 
 #endif

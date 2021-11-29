@@ -23,7 +23,7 @@
 int		main(int ac, char **av)
 {
 	Parser	parse;
-	Webserv cluster;
+	Webserv webserv;
 
 	if (ac == 2)
 	{
@@ -38,8 +38,7 @@ int		main(int ac, char **av)
 		}
 		try
 		{
-			cluster.buildServers(parse.getConfigServers());
-			cluster.run();
+			webserv.run(parse.getConfigServers());
 		}
 		catch (const std::exception &e)
 		{

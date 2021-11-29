@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CONFIG_H
-# define CONFIG_H
+#ifndef CONFIG_HPP
+# define CONFIG_HPP
 
 # include "headers.hpp"
 
@@ -27,7 +27,7 @@ class Config {
 		friend std::ostream	&operator<<(std::ostream &out, const Config &server);
 		Config &	operator=(const Config &rhs);
 
-		void				addNetwork(t_network network);
+		void				addNetwork(t_network &network);
 		void				addServerName(stringVector serverName);
 		void				addRoot(std::string root);
 		void				addClientBodyBufferSize(int buffer);

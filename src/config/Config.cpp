@@ -44,7 +44,7 @@ Config &		Config::operator=(Config const &src)
 	return *this;
 }
 
-void		Config::addNetwork(t_network net)
+void		Config::addNetwork(t_network &net)
 {
 	for (netVector::const_iterator it = _network.begin(); it != _network.end(); it++)
 	{
