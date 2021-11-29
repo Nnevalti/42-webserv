@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/29 17:07:38 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/29 17:27:16 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,8 +125,6 @@ void			Parser::parseServer(stringVector::iterator* it, Config& server)
 				checkDirective("}", it);
 				server.addLocation(location_name, location);
 		}
-		else /*if ((**it) != "}")*/
-			std::runtime_error("Error Parsing: Unknown directive: " + (**it));
 	}
 	return ;
 }
