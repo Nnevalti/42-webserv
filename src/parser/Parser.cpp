@@ -6,12 +6,19 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/29 17:27:16 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/29 17:53:38 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parser.hpp"
 
+/**-----------------------------------------------------------------------------------------------------------------------
+ * todo                                                   HERE MULTIPLE ERROR CASE TO MANAGE
+ *   todo Every parse function that took multiple elemnt must check if the element is correct
+ *   todo Verif IP address cf parseNetwork
+ *
+ *
+ *-----------------------------------------------------------------------------------------------------------------------**/
 /**========================================================================
  *                           CONSTRUCTOR/DESTRUCTOR
  *========================================================================**/
@@ -174,6 +181,13 @@ void			Parser::parseIndex(Config& configServer,stringVector opts)
 	configServer.addIndex(opts);
 }
 
+/**========================================================================
+ * todo                             MANAGE ERROR WRONG IP
+ *   ? if and IP is wrong format the parser might be not validate
+ *   * Create a fonction that parse IP and return a bool
+ *   * Find a function systeme that verif ip
+ *
+ *========================================================================**/
 void			Parser::parseNetwork(Config& configServer,stringVector opts)
 {
 	t_network	net;
@@ -187,10 +201,18 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 
 	std::string address(opts.front());
 
-	if ((i = address.find(":")) == std::string::npos)
+	if ((i = address.find(":")) == std::string::npos && (address.find(".") == std::string::npos))
 	{
 		net.host.s_addr = 0;
 		net.port = std::atoi(address.c_str());
+		configServer.addNetwork(net);
+		return ;
+	}
+	else if(i == std::string::npos && address.find(".") != std::string::npos)
+	{
+		//todo RIGHT HERE
+		net.host.s_addr = inet_addr(address.c_str());
+		net.port = 8080;
 		configServer.addNetwork(net);
 		return ;
 	}
