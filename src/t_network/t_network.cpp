@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "t_network.hpp"
+# include "t_network.hpp"
+# include <string>
 
 t_network::t_network(void) {}
 
@@ -34,7 +35,9 @@ t_network & t_network::operator=(const t_network &rhs)
 
 bool t_network::operator==(t_network const &rhs)
 {
-	return (inet_ntoa(this->host) == inet_ntoa(rhs.host) && this->port == rhs.port);
+	std::string first_ip(inet_ntoa(this->host));
+	std::string second_ip(inet_ntoa(rhs.host));
+	return (first_ip == second_ip && this->port == rhs.port);
 }
 
 bool t_network::operator!=(t_network const &rhs)

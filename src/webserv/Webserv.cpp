@@ -27,76 +27,61 @@ Webserv::~Webserv(void) {}
 
 void Webserv::initServers(confVector configServer)
 {
-	// int			fd;
-
+	netVector				networkVector;
+	netVector::iterator		it2;
 	_servers = configServer;
+
 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
-		netVector net = (*it).getNetwork();
+		t_network net = (*it).getNetwork();
 
-		for (netVector::const_iterator it_net = net.begin(); it_net != net.end(); it_net++)
-		{
-			// _listeningPorts.insert(it_net->port);
-			std::cout << "server name: " << (*it).getServerName().front() << '\n';
-			std::cout << "port: " << it_net->port << "\n\n";
-		}
+		it2 = networkVector.begin();
+		while (it2 != networkVector.end() && net != *it2)
+			it2++;
+		if (it2 != networkVector.end())
+			continue ;
+		networkVector.push_back(net);
+		_servers_fd.push_back(init_socket(net));
 	}
-	// for (setPort::iterator it = _listeningPorts.begin(); it != _listeningPorts.end(); it++)
-	// {
-	// 	fd = init_socket(*it);
-	// 	_servers_fd.push_back(fd);
-	// }
 	std::cout << "All servers were built" << std::endl;
 	return ;
 }
 
-int Webserv::init_socket(int port)
+int Webserv::init_socket(t_network network)
 {
 	int listen_fd;
 	const int opt = 1;
 	struct sockaddr_in servaddr;
 
 	if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-	{
-		std::cerr << "error: socket() failed" << std::endl;
-		exit(1);
-	}
+		throw std::logic_error("error: socket() failed");
 
 	if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT | SO_REUSEADDR, &opt, sizeof(opt)))
-	{
-		std::cerr << "error: setsockopt() failed" << std::endl;
-		exit(1);
-	}
+		throw std::logic_error("error: setsockopt() failed");
 
 	if(fcntl(listen_fd, F_SETFL, O_NONBLOCK) < 0)
-	{
-		std::cerr << "could not set socket to be non blocking" << std::endl;
-		exit(1);
-	}
+		throw std::logic_error("error: fcntl() failed");
 
 	std::memset((char*)&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = INADDR_ANY;
-	servaddr.sin_port = htons(port);
+	servaddr.sin_addr.s_addr = network.host.s_addr;
+	servaddr.sin_port = htons(network.port);
+
+	if (servaddr.sin_addr.s_addr == static_cast<in_addr_t>(-1))
+        throw std::logic_error("error: inet_addr: Invalid IP");
 
 	if (bind(listen_fd, (struct sockaddr*) &servaddr, sizeof(servaddr)) < 0)
-	{
-		std::cerr << "error: bind() failed" << std::endl;
-		exit(1);
-	}
+		throw std::logic_error("error: bind() failed");
 
 	if (listen(listen_fd, 100) < 0)
-	{
-		std::cerr << "error: listen() failed" << std::endl;
-		exit(1);
-	}
+		throw std::logic_error("error: listen() failed");
 	return listen_fd;
 }
 
 void Webserv::epoll_init(void)
 {
 	_epfd = epoll_create1(0);
-	for (fd_vector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
+	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 	{
 		_event.data.fd = *it;
 		_event.events = EPOLLIN;
@@ -106,7 +91,7 @@ void Webserv::epoll_init(void)
 
 int	Webserv::fd_is_server(int ready_fd)
 {
-	for (fd_vector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
+	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 		if (*it == ready_fd)
 			return *it;
 	return 0;
@@ -115,7 +100,6 @@ int	Webserv::fd_is_server(int ready_fd)
 void Webserv::run(confVector configServer)
 {
 	initServers(configServer);
-	return ;
 	/************************/
 	/*    Temporary part    */
 	/************************/
@@ -176,10 +160,7 @@ void Webserv::run(confVector configServer)
 				if ((new_socket = accept(server, NULL, NULL)) < 0)
 				{
 					if(errno != EWOULDBLOCK)
-					{
-						std::cerr << "error: accept() failed" << std::endl;
-						exit(1);
-					}
+						throw std::logic_error("error: accept() failed");
 				}
 				std::cout << "\r" << "Client connected on server: " << _events_pool[j].data.fd << std::endl;
 				fcntl(new_socket, F_SETFL, O_NONBLOCK);
@@ -193,10 +174,7 @@ void Webserv::run(confVector configServer)
 
 				// Receive the request
 				if ((ret = recv(_events_pool[j].data.fd, &request, 1023, 0)) < 0)
-				{
-					std::cerr << "error: recv() failed" << strerror(errno) << std::endl;
-					exit(1);
-				}
+			        throw std::logic_error("error: recv() failed");
 				else
 				{
 					request[ret] = '\0';
@@ -210,10 +188,7 @@ void Webserv::run(confVector configServer)
 			else if (_events_pool[j].events & EPOLLOUT)
 			{
 				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
-				{
-					std::cerr << "error: send() failed" << std::endl;
-					exit(1);
-				}
+					throw std::logic_error("error: send() failed");
 				_event.events = EPOLLIN;
 				_event.data.fd = _events_pool[j].data.fd;
 				// if not keep-alive
@@ -223,7 +198,7 @@ void Webserv::run(confVector configServer)
 			}
 		}
 	}
-	for (fd_vector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
+	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 		close(*it);
 	close(_epfd);
 	std::cout << "\r" << "Serveur ending...       " << std::endl;
