@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/26 13:29:58 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/29 17:11:58 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ class Config {
 		void				addAlias(std::string alias);
 		void				addErrorPage(std::string page, std::vector<int> codes);
 
-		netVector			getNetwork(void);
+		t_network			getNetwork(void);
 		stringVector		getServerName(void);
 		std::string			getRoot(void);
 		int					getClientBodyBufferSize(void);
@@ -54,7 +54,7 @@ class Config {
 		StringIntVectorMap	getErrorPage(void);
 
 	private:
-		netVector			_network;
+		t_network			_network;
 		std::string			_root;
 		stringVector		_server_name;
 		StringIntVectorMap	_error_page;

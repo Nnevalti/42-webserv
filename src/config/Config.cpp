@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/26 13:48:23 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/29 17:14:27 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,7 @@ Config &		Config::operator=(Config const &src)
 
 void		Config::addNetwork(t_network &net)
 {
-	for (netVector::const_iterator it = _network.begin(); it != _network.end(); it++)
-	{
-		if(it->port == net.port)
-			throw std::runtime_error("Port already exist in listen's directive arguments");
-	}
-	_network.push_back(net);
+	_network = net;
 }
 
 void		Config::addServerName(stringVector Name)
@@ -110,7 +105,7 @@ void		Config::addErrorPage(std::string page, std::vector<int> codes)
 	_error_page.insert(std::pair<std::string, std::vector<int> >(page, codes));
 }
 
-netVector		Config::getNetwork(void)
+t_network	Config::getNetwork(void)
 {
 	return (_network);
 }
@@ -177,8 +172,8 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 	out << "============================================" << std::endl;
 
 	out << "Listen:" << std::endl;
-	for (netVector::const_iterator i = server._network.begin(); i != server._network.end(); i++)
-		out << "\thost: " << inet_ntoa(i->host) << " port: " << i->port << std::endl;
+
+	out << "\thost: " << inet_ntoa(server._network.host) << " port: " << server._network.port << std::endl;
 
 	out << "root: " << server._root << std::endl;
 
