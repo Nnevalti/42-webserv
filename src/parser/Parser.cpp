@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/29 17:53:38 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/29 17:58:20 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,16 +208,16 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 		configServer.addNetwork(net);
 		return ;
 	}
-	else if(i == std::string::npos && address.find(".") != std::string::npos)
+	if ((host = address.substr(0, i)) == "localhost")
+		host = "127.0.0.1";
+	if(i == std::string::npos && host.find(".") != std::string::npos)
 	{
 		//todo RIGHT HERE
-		net.host.s_addr = inet_addr(address.c_str());
+		net.host.s_addr = inet_addr(host.c_str());
 		net.port = 8080;
 		configServer.addNetwork(net);
 		return ;
 	}
-	if ((host = address.substr(0, i)) == "localhost")
-		host = "127.0.0.1";
 
 	i++;
 	net.host.s_addr = inet_addr(host.c_str());
