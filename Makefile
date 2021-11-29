@@ -19,7 +19,7 @@ BUILD	= .build
 DIRS	= .build/parser .build/webserv .build/config .build/server
 SRC_DIR	= ./src/
 INC		= -I./include
-CLASSINC= -I src/parser -I src/webserv -I src/config -I src/server
+CLASSINC= -I src/parser -I src/webserv -I src/config -I src/server -I src/
 
 # FILES
 NAME	= webserv

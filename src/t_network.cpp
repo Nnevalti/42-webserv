@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   t_network.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vdescham <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/29 15:46:53 by vdescham          #+#    #+#             */
-/*   Updated: 2021/11/29 15:46:53 by vdescham         ###   ########.fr       */
+/*   Updated: 2021/11/29 16:26:52 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "t_network.hpp"
+
+t_network::t_network(void) {}
 
 t_network::~t_network(void) {}
 
