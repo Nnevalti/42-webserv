@@ -16,10 +16,10 @@ endif
 # DIRECTORIES
 
 BUILD	= .build
-DIRS	= .build/parser .build/webserv .build/config .build/server
+DIRS	= .build/parser .build/webserv .build/config .build/server .build/t_network
 SRC_DIR	= ./src/
 INC		= -I./include
-CLASSINC= -I src/parser -I src/webserv -I src/config -I src/server -I src/
+CLASSINC= -I src/parser -I src/webserv -I src/config -I src/server -I src/t_network
 
 # FILES
 NAME	= webserv
@@ -41,7 +41,7 @@ SRC		= $(MAIN) \
 		  $(addprefix webserv/, $(WEBSERV)) \
 		  $(addprefix config/, $(CONFIG)) \
 		  $(addprefix server/, $(SERVER)) \
-		  $(NET)
+		  $(addprefix t_network/,$(NET))
 
 
 DEP		:= $(SRC:%.cpp=$(BUILD)/%.d)

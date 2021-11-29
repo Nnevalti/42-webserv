@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/24 18:55:08 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/29 16:31:16 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@
 # define YELLOW "\033[33m"
 # define SET "\033[0m"
 
-// // *STRUCT
+// *STRUCT
 # include "t_network.hpp"
 
 //* SHORTCUT
