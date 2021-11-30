@@ -6,19 +6,12 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/29 17:58:20 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/30 18:08:59 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parser.hpp"
 
-/**-----------------------------------------------------------------------------------------------------------------------
- * todo                                                   HERE MULTIPLE ERROR CASE TO MANAGE
- *   todo Every parse function that took multiple elemnt must check if the element is correct
- *   todo Verif IP address cf parseNetwork
- *
- *
- *-----------------------------------------------------------------------------------------------------------------------**/
 /**========================================================================
  *                           CONSTRUCTOR/DESTRUCTOR
  *========================================================================**/
@@ -57,7 +50,7 @@ void			Parser::readConf(const char *file)
 	if (ret < 0)
 		throw std::runtime_error("Error Parsing: Error meanwhile reading the file...");
 
-	conf += " ";
+	conf += "\n";
 
 	while ((start = conf.find_first_not_of(whitespace, end)) != std::string::npos &&
 		(end = conf.find_first_of(whitespace, start)) != std::string::npos)
@@ -70,7 +63,7 @@ void			Parser::checkDirective(const char* expect, stringVector::iterator* actual
 {
 	std::string errormsg;
 
-	errormsg += "directive expected '";
+	errormsg += "Error parsing: directive expected '";
 	errormsg += expect;
 	errormsg += "' and we got: '";
 	errormsg += **actual;
@@ -181,17 +174,11 @@ void			Parser::parseIndex(Config& configServer,stringVector opts)
 	configServer.addIndex(opts);
 }
 
-/**========================================================================
- * todo                             MANAGE ERROR WRONG IP
- *   ? if and IP is wrong format the parser might be not validate
- *   * Create a fonction that parse IP and return a bool
- *   * Find a function systeme that verif ip
- *
- *========================================================================**/
 void			Parser::parseNetwork(Config& configServer,stringVector opts)
 {
 	t_network	net;
-	size_t		i;
+	size_t		colons;
+	size_t		point;
 	std::string	host;
 
 	if (opts.size() > 1)
@@ -201,27 +188,27 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 
 	std::string address(opts.front());
 
-	if ((i = address.find(":")) == std::string::npos && (address.find(".") == std::string::npos))
+	if (((colons = address.find(":")) == std::string::npos) && ((point = address.find(".")) == std::string::npos) && address != "localhost")
 	{
 		net.host.s_addr = 0;
 		net.port = std::atoi(address.c_str());
 		configServer.addNetwork(net);
 		return ;
 	}
-	if ((host = address.substr(0, i)) == "localhost")
-		host = "127.0.0.1";
-	if(i == std::string::npos && host.find(".") != std::string::npos)
+	if(colons == std::string::npos && (point != std::string::npos || address == "localhost"))
 	{
-		//todo RIGHT HERE
+		if (address == "localhost")
+			host = "127.0.0.1";
 		net.host.s_addr = inet_addr(host.c_str());
 		net.port = 8080;
 		configServer.addNetwork(net);
 		return ;
 	}
-
-	i++;
+	if ((host = address.substr(0, colons)) == "localhost")
+		host = "127.0.0.1";
+	colons++;
 	net.host.s_addr = inet_addr(host.c_str());
-	net.port = std::atoi(address.substr(i).c_str());
+	net.port = std::atoi(address.substr(colons).c_str());
 	configServer.addNetwork(net);
 }
 

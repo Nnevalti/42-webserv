@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/26 14:11:47 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/30 18:57:11 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,10 @@ class Parser
 
 		~Parser(void);
 
+
+/**========================================================================
+ *                           PARSING CONF FILE
+ *========================================================================**/
 		Parser&					operator=(const Parser &rhs);
 
 		void					readConf(const char *file);
@@ -40,7 +44,6 @@ class Parser
 	private:
 		static parseDirectiveMap	_ParsingMap;
 		static parseDirectiveMap	_initParsingMap(void);
-
 	private:
 		void					parseRoot(Config& configServer,stringVector opts);
 		void					parseAlias(Config& configServer,stringVector opts);
