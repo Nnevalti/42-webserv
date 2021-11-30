@@ -50,7 +50,7 @@ void Webserv::initServers(confVector configServer)
 
 /*
 	Used in initServers syscall to create a socket with the correct IP/Port
-	Set the socket t be reusable and non-blocking
+	Set the socket to be reusable and non-blocking
 */
 int Webserv::init_socket(t_network network)
 {
@@ -60,11 +60,9 @@ int Webserv::init_socket(t_network network)
 
 	if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		throw std::logic_error("error: socket() failed");
-
 	if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT | SO_REUSEADDR, &opt, sizeof(opt)))
 		throw std::logic_error("error: setsockopt() failed");
-
-	if(fcntl(listen_fd, F_SETFL, O_NONBLOCK) < 0)
+	if (fcntl(listen_fd, F_SETFL, O_NONBLOCK) < 0)
 		throw std::logic_error("error: fcntl() failed");
 
 	std::memset((char*)&servaddr, 0, sizeof(servaddr));
@@ -127,7 +125,7 @@ void	Webserv::accept_new_client(int server)
 }
 
 /*
-	Receive a client request ans stores it in a string
+	Receive a client request and stores it in a string
 */
 std::string Webserv::read_client_request(int client_socket)
 {
@@ -139,6 +137,7 @@ std::string Webserv::read_client_request(int client_socket)
 	else if (ret == 0)
 	{
 		// Empty request = end of connection
+		std::cout << "Closing connection request from clients" << '\n';
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, client_socket, NULL);
 		close(client_socket);
 	}
