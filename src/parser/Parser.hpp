@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 18:57:11 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/30 20:25:22 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,21 +15,25 @@
 
 # include "headers.hpp"
 # include "Config.hpp"
+# include "Request.hpp"
 
 class Parser
 {
+/**========================================================================
+ *                           PARSER
+ *========================================================================**/
 	public:
 		Parser(void);
 		Parser(Parser const & src);
 
 		~Parser(void);
 
-
-/**========================================================================
- *                           PARSING CONF FILE
- *========================================================================**/
 		Parser&					operator=(const Parser &rhs);
 
+/**========================================================================
+ *                           PARSECONFIG
+ *========================================================================**/
+	public:
 		void					readConf(const char *file);
 		void					parseConf(void);
 		void					checkDirective(const char * expect, stringVector::iterator* actual);
@@ -56,6 +60,15 @@ class Parser
 		void					parseServerName(Config& configServer,stringVector opts);
 		void					parseAllowedMethods(Config& configServer,stringVector opts);
 		void					parseClientBodyBufferSize(Config& configServer,stringVector opts);
+
+/**========================================================================
+ *                           PARSING REQUEST
+ *========================================================================**/
+	public:
+		Request					parseRequest(std::string request);
+
+	private:
+
 };
 
 
