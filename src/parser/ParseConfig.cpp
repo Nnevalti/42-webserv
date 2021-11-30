@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 20:25:25 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/30 20:44:10 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ void			Parser::parseServer(stringVector::iterator* it, Config& server)
 				(*it) = (*it) + 2;
 				parseServer(it, location);
 				checkDirective("}", it);
-				server.addLocation(location_name, location);
+				server.setLocation(location_name, location);
 		}
 	}
 	return ;
@@ -143,7 +143,7 @@ void			Parser::parseRoot(Config& configServer,stringVector opts)
 		throw std::runtime_error("Error Parsing: Missing root's directive argument");
 	if (opts.size() > 1)
 		throw std::runtime_error("Error Parsing: Too much root's directive arguments");
-	configServer.addRoot(opts.front());
+	configServer.setRoot(opts.front());
 }
 
 void			Parser::parseAlias(Config& configServer,stringVector opts)
@@ -152,14 +152,14 @@ void			Parser::parseAlias(Config& configServer,stringVector opts)
 		throw std::runtime_error("Error Parsing: Missing alias's directive argument");
 	else if (opts.size() > 1)
 		throw std::runtime_error("Error Parsing: Too much alias's directive arguments");
-	configServer.addAlias(opts.front());
+	configServer.setAlias(opts.front());
 }
 
 void			Parser::parseIndex(Config& configServer,stringVector opts)
 {
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing Index's directive arguments");
-	configServer.addIndex(opts);
+	configServer.setIndex(opts);
 }
 
 void			Parser::parseNetwork(Config& configServer,stringVector opts)
@@ -180,7 +180,7 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 	{
 		net.host.s_addr = 0;
 		net.port = std::atoi(address.c_str());
-		configServer.addNetwork(net);
+		configServer.setNetwork(net);
 		return ;
 	}
 	if(colons == std::string::npos && (point != std::string::npos || address == "localhost"))
@@ -189,7 +189,7 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 			host = "127.0.0.1";
 		net.host.s_addr = inet_addr(host.c_str());
 		net.port = 8080;
-		configServer.addNetwork(net);
+		configServer.setNetwork(net);
 		return ;
 	}
 	if ((host = address.substr(0, colons)) == "localhost")
@@ -197,7 +197,7 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 	colons++;
 	net.host.s_addr = inet_addr(host.c_str());
 	net.port = std::atoi(address.substr(colons).c_str());
-	configServer.addNetwork(net);
+	configServer.setNetwork(net);
 }
 
 void					Parser::parseCgiPass(Config& configServer,stringVector opts)
@@ -206,7 +206,7 @@ void					Parser::parseCgiPass(Config& configServer,stringVector opts)
 		throw std::runtime_error("Error Parsing: Too much cgi_pass's directive arguments");
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing cgi_pass's directive arguments");
-	configServer.addCgiPass(opts.front());
+	configServer.setCgiPass(opts.front());
 }
 
 void					Parser::parseCgiParam(Config& configServer,stringVector opts)
@@ -216,7 +216,7 @@ void					Parser::parseCgiParam(Config& configServer,stringVector opts)
 		throw std::runtime_error("Error Parsing: Too much cgi_param's directive arguments");
 	if (opts.size() <= 1)
 		throw std::runtime_error("Error Parsing: Missing cgi_param's directive arguments");
-	configServer.addCgiParam(opts);
+	configServer.setCgiParam(opts);
 }
 
 void					Parser::parseErrorPage(Config& configServer,stringVector opts)
@@ -240,7 +240,7 @@ void					Parser::parseErrorPage(Config& configServer,stringVector opts)
 		throw std::runtime_error("Error Parsing: Missing error_page's directive arguments(root to page)");
 	if(error_code.empty())
 		throw std::runtime_error("Error Parsing: Missing error_page's directive arguments(error code)");
-	configServer.addErrorPage(error_page, error_code);
+	configServer.setErrorPage(error_page, error_code);
 }
 
 void					Parser::parseAutoIndex(Config& configServer,stringVector opts)
@@ -256,14 +256,14 @@ void					Parser::parseAutoIndex(Config& configServer,stringVector opts)
 		i = false;
 	else
 		throw std::runtime_error("Error Parsing: Auto_index's directive arguments is incorrect");
-	configServer.addAutoIndex(i);
+	configServer.setAutoIndex(i);
 }
 
 void					Parser::parseServerName(Config& configServer,stringVector opts)
 {
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing server_name's directive arguments");
-	configServer.addServerName(opts);
+	configServer.setServerName(opts);
 }
 
 void					Parser::parseAllowedMethods(Config& configServer,stringVector opts)
@@ -271,13 +271,13 @@ void					Parser::parseAllowedMethods(Config& configServer,stringVector opts)
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing allowed_method's directive arguments");
 
-	configServer.addAllowedMethods(opts);
+	configServer.setAllowedMethods(opts);
 }
 
 void					Parser::parseClientBodyBufferSize(Config& configServer,stringVector opts){
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing Client_body_buffer_size's directive arguments");
-	configServer.addClientBodyBufferSize(std::atoi(opts.front().c_str()));
+	configServer.setClientBodyBufferSize(std::atoi(opts.front().c_str()));
 }
 
 confVector	Parser::getConfigServers(void)

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 20:25:22 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/30 21:39:25 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,16 @@ class Parser
  *                           PARSING REQUEST
  *========================================================================**/
 	public:
-		Request					parseRequest(std::string request);
+		void						parseRequest(const std::string& request);
+		Request						getRequest(void) const;
 
 	private:
+		static stringVector			initMethods();
+		static stringVector			methods;
 
+	private:
+		stringVector				getAllLines(std::string request);
+		Request						_request;
 };
 
 

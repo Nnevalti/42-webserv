@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/22 20:26:43 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/30 21:42:18 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,14 @@ volatile bool g_run = true;
 Webserv::Webserv(void) {}
 
 Webserv::~Webserv(void) {}
+
+/*
+	add to webserv the parser class directly
+*/
+void	Webserv::setParser(Parser& parser)
+{
+	_parser = parser;
+}
 
 /*
 	Takes the config vector and create the servers sockets that will listen for connection.
@@ -212,9 +220,13 @@ void Webserv::run(confVector configServer)
 				accept_new_client(server);
 			else if (_events_pool[j].events & EPOLLIN) // EPOLLIN : read
 			{
-				std::string request;
+			//! WARNING  THIS IS NOT WHAT WE WANT TO DO ONLY FOR TEST. TU DOIS MIEUX UTILISER LA CLASS REQUEST
+				//Request		classRequest;
+				std::string	request;
+
 				request = read_client_request(_events_pool[j].data.fd);
-				// parse request
+				//_parser.parseRequest(request);
+				//classRequest = _parser.getRequest();
 			}
 			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
 			{

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/29 17:14:27 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/30 20:43:46 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,63 +45,63 @@ Config &		Config::operator=(Config const &src)
 	return *this;
 }
 
-void		Config::addNetwork(t_network &net)
+void		Config::setNetwork(t_network &net)
 {
 	_network = net;
 }
 
-void		Config::addServerName(stringVector Name)
+void		Config::setServerName(stringVector Name)
 {
 	_server_name = Name;
 }
 
-void		Config::addRoot(std::string root)
+void		Config::setRoot(std::string root)
 {
 	_root = root;
 }
 
-void		Config::addClientBodyBufferSize(int buffer)
+void		Config::setClientBodyBufferSize(int buffer)
 {
 	_client_body_buffer_size = buffer;
 }
 
-void		Config::addCgiParam(stringVector cgiParam)
+void		Config::setCgiParam(stringVector cgiParam)
 {
 	_cgi_param = cgiParam;
 }
 
-void		Config::addCgiPass(std::string cgiPass)
+void		Config::setCgiPass(std::string cgiPass)
 {
 	_cgi_pass = cgiPass;
 }
 
-void		Config::addLocation(std::string location_name, Config location)
+void		Config::setLocation(std::string location_name, Config location)
 {
 	_location[location_name] = location;
 }
 
-void		Config::addAllowedMethods(stringVector methods)
+void		Config::setAllowedMethods(stringVector methods)
 {
 	_allowed_methods = methods;
 }
 
-void		Config::addIndex(stringVector index)
+void		Config::setIndex(stringVector index)
 {
 	_index = index;
 }
 
-void		Config::addAutoIndex(bool autoIndex)
+void		Config::setAutoIndex(bool autoIndex)
 {
 	_autoindex = autoIndex;
 }
 
-void		Config::addAlias(std::string alias)
+void		Config::setAlias(std::string alias)
 {
 	_alias = alias;
 	_alias_set = true;
 }
 
-void		Config::addErrorPage(std::string page, std::vector<int> codes)
+void		Config::setErrorPage(std::string page, std::vector<int> codes)
 {
 	_error_page.insert(std::pair<std::string, std::vector<int> >(page, codes));
 }

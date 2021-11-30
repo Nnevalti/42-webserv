@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:08:27 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 19:15:30 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/30 20:35:06 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int		main(int ac, char **av)
 		{
 			parse.readConf(av[1]);
 			parse.parseConf();
-			webserv.addParser(parse);
+			webserv.setParser(parse);
 			webserv.run(parse.getConfigServers());
 		}
 		catch(const std::exception& e)

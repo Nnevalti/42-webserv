@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/29 17:11:58 by sgah             ###   ########.fr       */
+/*   Updated: 2021/11/30 20:43:46 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,18 +27,18 @@ class Config {
 		friend std::ostream	&operator<<(std::ostream &out, const Config &server);
 		Config &	operator=(const Config &rhs);
 
-		void				addNetwork(t_network &network);
-		void				addServerName(stringVector serverName);
-		void				addRoot(std::string root);
-		void				addClientBodyBufferSize(int buffer);
-		void				addCgiParam(stringVector cgiParam);
-		void				addCgiPass(std::string cgiPass);
-		void				addLocation(std::string location_name, Config location);
-		void				addAllowedMethods(stringVector methods);
-		void				addIndex(stringVector index);
-		void				addAutoIndex(bool autoIndex);
-		void				addAlias(std::string alias);
-		void				addErrorPage(std::string page, std::vector<int> codes);
+		void				setNetwork(t_network &network);
+		void				setServerName(stringVector serverName);
+		void				setRoot(std::string root);
+		void				setClientBodyBufferSize(int buffer);
+		void				setCgiParam(stringVector cgiParam);
+		void				setCgiPass(std::string cgiPass);
+		void				setLocation(std::string location_name, Config location);
+		void				setAllowedMethods(stringVector methods);
+		void				setIndex(stringVector index);
+		void				setAutoIndex(bool autoIndex);
+		void				setAlias(std::string alias);
+		void				setErrorPage(std::string page, std::vector<int> codes);
 
 		t_network			getNetwork(void);
 		stringVector		getServerName(void);
