@@ -12,7 +12,8 @@
 
 #include "Config.hpp"
 
-Config::Config(void): _client_body_buffer_size(0) {}
+Config::Config(void): _client_body_buffer_size(0), _autoindex(false)
+{}
 
 Config::Config(Config const & src)
 {

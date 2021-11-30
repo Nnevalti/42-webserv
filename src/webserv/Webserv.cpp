@@ -19,6 +19,10 @@ Webserv::Webserv(void) {}
 
 Webserv::~Webserv(void) {}
 
+/*
+	Takes the config vector and create the servers sockets that will listen for connection.
+	We avoid IP/Port pair duplication
+*/
 void Webserv::initServers(confVector configServer)
 {
 	netVector				networkVector;
@@ -38,9 +42,16 @@ void Webserv::initServers(confVector configServer)
 		_servers_fd.push_back(init_socket(net));
 	}
 	std::cout << "All servers were built" << std::endl;
+	// confVector::iterator it = configServer.begin();
+	// while (it++ != configServer.end())
+	// 	configServer.erase(--configServer.end());
 	return ;
 }
 
+/*
+	Used in initServers syscall to create a socket with the correct IP/Port
+	Set the socket t be reusable and non-blocking
+*/
 int Webserv::init_socket(t_network network)
 {
 	int listen_fd;
@@ -70,6 +81,9 @@ int Webserv::init_socket(t_network network)
 	return listen_fd;
 }
 
+/*
+	Init the epoll fd and add all the listening socket decriptor in the epoll list
+*/
 void Webserv::epoll_init(void)
 {
 	_epfd = epoll_create1(0);
@@ -81,6 +95,9 @@ void Webserv::epoll_init(void)
 	}
 }
 
+/*
+	Verify if the redy fd pass in parameters is a server listening socket and not a client socket
+*/
 int	Webserv::fd_is_server(int ready_fd)
 {
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
@@ -89,6 +106,9 @@ int	Webserv::fd_is_server(int ready_fd)
 	return 0;
 }
 
+/*
+	Accept a client connection on one of the listening socket and create a new_socket for the connection
+*/
 void	Webserv::accept_new_client(int server)
 {
 	int new_socket = 0;
@@ -106,6 +126,9 @@ void	Webserv::accept_new_client(int server)
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, new_socket, &_event);
 }
 
+/*
+	Receive a client request ans stores it in a string
+*/
 std::string Webserv::read_client_request(int client_socket)
 {
 	char client_request[1025];
@@ -130,6 +153,9 @@ std::string Webserv::read_client_request(int client_socket)
 	return client_request;
 }
 
+/*
+	Main function of the Webserv class, the server loop is here
+*/
 void Webserv::run(confVector configServer)
 {
 	// Loading frames for waiting connection
@@ -183,20 +209,19 @@ void Webserv::run(confVector configServer)
 				continue ;
 			}
 			// If the server has a new connection ready
-			if ((server = fd_is_server(_events_pool[j].data.fd)) > 0)
+			if (_events_pool[j].events & EPOLLIN && (server = fd_is_server(_events_pool[j].data.fd)) > 0)
 				accept_new_client(server);
-			else if (_events_pool[j].events & EPOLLIN)
+			else if (_events_pool[j].events & EPOLLIN) // EPOLLIN : read
 			{
 				std::string request;
 				request = read_client_request(_events_pool[j].data.fd);
 				// parse request
-				// forward request to the right server
 			}
-			else if (_events_pool[j].events & EPOLLOUT)
+			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
 			{
 				// forward request to the right server
 				// send response
-				// listen client again for other requests and wait for a close connection
+				// listen client again for other requests and wait for a close connection request
 				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
 					throw std::logic_error("error: send() failed");
 				_event.events = EPOLLIN;
@@ -210,7 +235,10 @@ void Webserv::run(confVector configServer)
 	}
 	// close the servers fd
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
+	{
 		close(*it);
+		// _servers_fd.erase(it++);
+	}
 	close(_epfd);
 	std::cout << "\r" << "Serveur ending...       " << std::endl;
 	exit(1);

@@ -49,7 +49,7 @@ OBJ		:= $(SRC:%.cpp=$(BUILD)/%.o)
 
 # COMPILATION
 CC		= clang++
-CFLAGS	= -Wall -Werror -Wextra -std=c++98
+CFLAGS	= -Wall -Werror -Wextra -std=c++98 -g
 DFLAGS  = -MP -MMD
 
 $(NAME): $(OBJ)
