@@ -35,14 +35,18 @@ class Webserv
 
 		confVector				_servers;
 		fdVector				_servers_fd;
+		// epoll variables
 		int						_epfd;
 		struct epoll_event		_event;
 		struct epoll_event		_events_pool[MAX_EV];
 
-		void	initServers(confVector configServer);
-		int		init_socket(t_network network);
-		void	epoll_init(void);
-		int		fd_is_server(int ready_fd);
+		void			initServers(confVector configServer);
+		int				init_socket(t_network network);
+		void			epoll_init(void);
+		int				fd_is_server(int ready_fd);
+		void			accept_new_client(int server);
+		std::string		read_client_request(int client_socket);
+
 };
 
 

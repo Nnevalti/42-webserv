@@ -13,6 +13,14 @@
 #include "Parser.hpp"
 #include "Webserv.hpp"
 
+extern volatile bool g_run;
+
+void signal_handler(int signum)
+{
+	(void)signum;
+	g_run = false;
+}
+
 /**========================================================================
  **                           MAIN
  *?   This is the starting point of webserv
@@ -27,6 +35,7 @@ int		main(int ac, char **av)
 
 	if (ac == 2)
 	{
+		signal(SIGINT, signal_handler);
 		try
 		{
 			parse.readConf(av[1]);

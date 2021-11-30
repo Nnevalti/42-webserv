@@ -13,13 +13,7 @@
 #include "Webserv.hpp"
 #include <typeinfo>
 
-static bool g_run = true;
-
-void signal_handler(int signum)
-{
-	(void)signum;
-	g_run = false;
-}
+volatile bool g_run = true;
 
 Webserv::Webserv(void) {}
 
@@ -68,12 +62,10 @@ int Webserv::init_socket(t_network network)
 	servaddr.sin_port = htons(network.port);
 
 	if (servaddr.sin_addr.s_addr == static_cast<in_addr_t>(-1))
-        throw std::logic_error("error: inet_addr: Invalid IP");
-
+		throw std::logic_error("error: inet_addr: Invalid IP");
 	if (bind(listen_fd, (struct sockaddr*) &servaddr, sizeof(servaddr)) < 0)
 		throw std::logic_error("error: bind() failed");
-
-	if (listen(listen_fd, 100) < 0)
+	if (listen(listen_fd, MAX_CLIENTS) < 0)
 		throw std::logic_error("error: listen() failed");
 	return listen_fd;
 }
@@ -97,30 +89,68 @@ int	Webserv::fd_is_server(int ready_fd)
 	return 0;
 }
 
+void	Webserv::accept_new_client(int server)
+{
+	int new_socket = 0;
+
+	if ((new_socket = accept(server, NULL, NULL)) < 0)
+	{
+		if(errno != EWOULDBLOCK)
+			throw std::logic_error("error: accept() failed");
+	}
+	std::cout << "\r" << "Client connected on server: " << server << std::endl;
+	if(fcntl(new_socket, F_SETFL, O_NONBLOCK) < 0)
+		throw std::logic_error("error: fcntl() failed");
+	_event.data.fd = new_socket;
+	_event.events = EPOLLIN;
+	epoll_ctl(_epfd, EPOLL_CTL_ADD, new_socket, &_event);
+}
+
+std::string Webserv::read_client_request(int client_socket)
+{
+	char client_request[1025];
+	int ret = 0;
+
+	if ((ret = recv(client_socket, &client_request, 1024, 0)) < 0)
+		throw std::logic_error("error: recv() failed");
+	else if (ret == 0)
+	{
+		// Empty request = end of connection
+		epoll_ctl(_epfd, EPOLL_CTL_DEL, client_socket, NULL);
+		close(client_socket);
+	}
+	else
+	{
+		client_request[ret] = '\0';
+		std::cout << client_request << std::endl;
+		_event.events = EPOLLOUT;
+		_event.data.fd = client_socket;
+		epoll_ctl(_epfd, EPOLL_CTL_MOD, client_socket, &_event);
+	}
+	return client_request;
+}
+
 void Webserv::run(confVector configServer)
 {
-	initServers(configServer);
+	// Loading frames for waiting connection
+	int n = 0;
+	std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"};
+
+	int timeout = 200; // set epoll timeout to 0.2 sec
+	int nfds = 0;
 	/************************/
 	/*    Temporary part    */
 	/************************/
-	char request[1024];
 	std::string response;
 	response += "HTTP/1.1 200 OK\n";
 	response += "Content-Type: text/html\r\n";
 	response += "Content-Length: 14\n\n";
 	response += "Hello World !\n\r\n\r\n";
-
-	std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"}; // array of frame
-	int n = 0; // current frame
 	/*************************/
 	/* End of temporary part */
 	/*************************/
 
-	int timeout = 200; // set timeout to 0.5 sec
-	int nfds = 0;
-	int new_socket = 0;
-
-	signal(SIGINT, signal_handler); // to move in main
+	initServers(configServer);
 	epoll_init();
 	while (g_run)
 	{
@@ -131,13 +161,9 @@ void Webserv::run(confVector configServer)
 		/*
 		errno value returned by epoll
 		EBADF : epfd is not a valid file descriptor.
-
 		EFAULT : The memory area pointed to by events is not accessible with write permissions.
-
 		EINTR : The call was interrupted by a signal handler before either any of the requested events occurred or the timeout expired.
-
 		EINVAL : epfd is not an epoll file descriptor, or maxevents is less than or equal to zero.
-
 		*/
 		if (errno == EINVAL || errno == EFAULT || errno == EBADFD)
 			std::cerr << "error: epoll_wait() failed: " << strerror(errno) << '\n';
@@ -151,53 +177,38 @@ void Webserv::run(confVector configServer)
 			int server = 0;
 			if (_events_pool[j].events & EPOLLERR || _events_pool[j].events & EPOLLHUP)
 			{
+				// an error occured, we close the connection
+				epoll_ctl(_epfd, EPOLL_CTL_DEL, _events_pool[j].data.fd, NULL);
 				close(_events_pool[j].data.fd);
-				continue;
+				continue ;
 			}
 			// If the server has a new connection ready
 			if ((server = fd_is_server(_events_pool[j].data.fd)) > 0)
-			{
-				if ((new_socket = accept(server, NULL, NULL)) < 0)
-				{
-					if(errno != EWOULDBLOCK)
-						throw std::logic_error("error: accept() failed");
-				}
-				std::cout << "\r" << "Client connected on server: " << _events_pool[j].data.fd << std::endl;
-				fcntl(new_socket, F_SETFL, O_NONBLOCK);
-				_event.data.fd = new_socket;
-				_event.events = EPOLLIN;
-				epoll_ctl(_epfd, EPOLL_CTL_ADD, new_socket, &_event);
-			}
+				accept_new_client(server);
 			else if (_events_pool[j].events & EPOLLIN)
 			{
-				int ret = 0;
-
-				// Receive the request
-				if ((ret = recv(_events_pool[j].data.fd, &request, 1023, 0)) < 0)
-			        throw std::logic_error("error: recv() failed");
-				else
-				{
-					request[ret] = '\0';
-					std::cout << request << std::endl;
-					_event.events = EPOLLOUT;
-					_event.data.fd = _events_pool[j].data.fd;
-					epoll_ctl(_epfd, EPOLL_CTL_MOD, _events_pool[j].data.fd, &_event);
-				}
-				break ;
+				std::string request;
+				request = read_client_request(_events_pool[j].data.fd);
+				// parse request
+				// forward request to the right server
 			}
 			else if (_events_pool[j].events & EPOLLOUT)
 			{
+				// forward request to the right server
+				// send response
+				// listen client again for other requests and wait for a close connection
 				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
 					throw std::logic_error("error: send() failed");
 				_event.events = EPOLLIN;
 				_event.data.fd = _events_pool[j].data.fd;
-				// if not keep-alive
-				close(_events_pool[j].data.fd);
+				// if not keep-alive close the connection
+				// close(_events_pool[j].data.fd);
+				// else keep it going until timeout or if the client close the connection
 				epoll_ctl(_epfd, EPOLL_CTL_MOD, _events_pool[j].data.fd, &_event);
-				break ;
 			}
 		}
 	}
+	// close the servers fd
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 		close(*it);
 	close(_epfd);
