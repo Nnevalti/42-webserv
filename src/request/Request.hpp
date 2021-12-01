@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:16 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 21:22:48 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/01 15:19:01 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,18 @@ class Request {
 
 		Request &	operator=(const Request &rhs);
 
+		void												resetDirective(void);
+
 		std::string											getPath(void) const;
 		std::string											getMethod(void) const;
 		std::string											getVersion(void) const;
 		std::string											getBody(void) const;
 		stringMap											getHeaders(void) const;
 		std::string											getHeader(std::string str);
-		const stringMap &									getEnv(void) const;
-		const std::list<std::pair<std::string, float> > &	getLang(void) const;
+		const stringMap&									getEnv(void) const;
+		const std::list<std::pair<std::string, float> >&	getLang(void) const;
 		int													getRet(void) const;
-		const std::string &									getQuery(void) const;
+		const std::string&									getQuery(void) const;
 		int													getStatus(void) const;
 
 		void												setMethod(std::string method);

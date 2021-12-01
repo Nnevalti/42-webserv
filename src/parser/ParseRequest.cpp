@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 21:41:30 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/01 15:27:18 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,33 +27,35 @@ stringVector		Parser::initMethods()
 
 stringVector	Parser::methods = Parser::initMethods();
 
-stringVector	Parser::getAllLines(std::string request)
+stringVector	Parser::getHeader(std::string request, stringVector& header)
 {
-	stringVector ret;
-	size_t		start;
-	size_t		end(0);
+	std::string tmp;
+	size_t		start(0);
+	size_t		end;
 
-	request += "\n";
-
-	while ((start = request.find_first_not_of("\n", end)) != std::string::npos &&
-		(end = request.find_first_of("\n", start)) != std::string::npos)
+	while((end = request.find_first_of('\n', start)) != std::string::npos)
 	{
-		ret.push_back(request.substr(start, end - start));
+		tmp = request.substr(start, end);
+		if (tmp == "\r")
+			break;
+		header.push_back(tmp);
+		start = (end == std::string::npos) ? end : end + 1;
 	}
-	return ret;
+	return (header);
 }
 
-void			Parser::parseRequest(const std::string& request)
+void			Parser::parseRequest(const std::string& request, Request classRequest)
 {
-//	stringVector	header(getAllLines(request));
+	stringVector	header;
 	Request			ret;
 
-	(void)request;
-	_request = ret;
-}
+	classRequest.resetDirective();
+	getHeader(request, header);
 
-Request			Parser::getRequest(void) const
-{
-	return _request;
-}
+	std::cout << "request:\n";
+	for (stringVector::iterator i = header.begin(); i != header.end(); i++)
+	{
+		std::cout << *i << std::endl;
+	}
 
+}
