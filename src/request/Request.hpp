@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:16 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/01 15:53:12 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/01 19:49:11 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ class Request {
 		const std::list<std::pair<std::string, float> >&	getLang(void) const;
 		int													getRet(void) const;
 		const std::string&									getQuery(void) const;
-		int													getStatus(void) const;
 		int													getPort(void) const;
 
 		void												setMethod(std::string method);
 		void												setPath(std::string path);
+		void												setHeader(std::string token, std::string value);
 		void												setVersion(std::string version);
 		void												swetBody(std::string body);
 		void												setHeaders(stringMap headers);
@@ -50,7 +50,6 @@ class Request {
 		void												setLang(std::list<std::pair<std::string, float> > lang);
 		void												setRet(int ret);
 		void												setQuery(std::string query);
-		void												setStatus(int state);
 
 	private:
 
@@ -61,7 +60,6 @@ class Request {
 		int											_port;
 		std::string									_path;
 		std::string									_query;
-		int											_status;
 		stringMap									_headers;
 		stringMap									_env_for_cgi;
 		std::list<std::pair<std::string, float> >	_lang;

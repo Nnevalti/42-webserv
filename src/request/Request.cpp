@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:17 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/01 15:53:02 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/01 19:49:19 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ Request::Request(Request const & src)
 {
 	*this = src;
 }
+
+Request::~Request(void) {}
 
 void				Request::resetDirective(void)
 {
@@ -46,7 +48,30 @@ void				Request::resetDirective(void)
 	_headers["Connection"] = "Keep-Alive";
 }
 
-Request::~Request(void) {}
+void										Request::setRet(int ret)
+{
+	_ret = ret;
+}
+
+void										Request::setMethod(std::string method)
+{
+	_method = method;
+}
+
+void										Request::setPath(std::string path)
+{
+	_path = path;
+}
+
+void										Request::setVersion(std::string version)
+{
+	_version = version;
+}
+
+void										Request::setHeader(std::string token, std::string value)
+{
+	_headers[token] = value;
+}
 
 int											Request::getPort(void) const
 {
@@ -107,9 +132,4 @@ std::map<std::string, std::string>	Request::getHeaders(void) const
 std::string		Request::getHeader(std::string str)
 {
 	return (_headers[str]);
-}
-
-int				Request::getStatus(void) const
-{
-	return (_status);
 }
