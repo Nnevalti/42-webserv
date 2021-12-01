@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 21:42:18 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/01 15:37:33 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,14 +226,14 @@ void Webserv::run(confVector configServer)
 			else if (_events_pool[j].events & EPOLLIN) // EPOLLIN : read
 			{
 			//! WARNING  THIS IS NOT WHAT WE WANT TO DO ONLY FOR TEST. TU DOIS MIEUX UTILISER LA CLASS REQUEST
-				//Request		classRequest;
+			//	Request		classRequest;
 				std::string	request;
 
 				request = read_client_request(_events_pool[j].data.fd);
-				//_parser.parseRequest(request);
+			//	_parser.parseRequest(request, classRequest);
 				//classRequest = _parser.getRequest();
 				// "/!\" We can do something like that : "/!\"
-				_clients[_events_pool[j].data.fd].addRequest(_parser.getRequest());
+				//_clients[_events_pool[j].data.fd].addRequest(_parser.getRequest());
 			}
 			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
 			{
