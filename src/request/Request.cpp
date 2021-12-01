@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:17 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/01 14:39:30 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/01 15:53:02 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,11 @@ void				Request::resetDirective(void)
 }
 
 Request::~Request(void) {}
+
+int											Request::getPort(void) const
+{
+	return _port;
+}
 
 const std::list<std::pair<std::string, float> >&	Request::getLang() const
 {

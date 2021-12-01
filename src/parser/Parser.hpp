@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/01 15:21:02 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/01 16:03:34 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ class Parser
 		static stringVector			methods;
 
 	private:
-		stringVector				getHeader(std::string request, stringVector& hearder);
+		void						parseHeader(const std::string& request, stringVector& hearder);
 };
 
 
