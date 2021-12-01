@@ -160,7 +160,7 @@ std::string Webserv::read_client_request(int clientSocket)
 		_event.data.fd = clientSocket;
 		epoll_ctl(_epfd, EPOLL_CTL_MOD, clientSocket, &_event);
 		_clients.erase(clientSocket);
-		return NULL;
+		return "";
 	}
 	return client_request;
 }
