@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vdescham <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,25 +10,47 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#include "Client.hpp"
 
-# include <iostream>
-# include "headers.hpp"
-# include "Config.hpp"
+Client::Client(void) {}
 
-class Server
+Client::Client(Client const & src)
 {
-	public:
-		Server(void);
-		Server(Server const & src);
-		~Server(void);
+	*this = src;
+}
 
-		Server&		operator=(const Server &rhs);
-		void		setConfig(Config config);
-		Config		getConfig(void) const;
-	private:
-		Config		_config;
-};
+Client&		Client::operator=(const Client &rhs)
+{
+	if (this != &rhs)
+	{
 
-#endif
+	}
+	return *this;
+}
+
+Client::~Client(void) {}
+
+void Client::setSocket(int socket)
+{
+	_socket = socket;
+}
+
+int Client::getSocket(void)
+{
+	return _socket;
+}
+
+Client::listReq Client::getRequests(void)
+{
+	return _requests;
+}
+
+void Client::addRequest(Request request)
+{
+	_requests.push_back(request);
+}
+
+void Client::removeRequest(listReq::iterator pos)
+{
+	_requests.erase(pos);
+}

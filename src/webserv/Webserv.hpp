@@ -15,6 +15,8 @@
 
 # include "t_network.hpp"
 # include "Parser.hpp"
+# include "Client.hpp"
+# include "Request.hpp"
 
 class Webserv
 {
@@ -24,8 +26,9 @@ class Webserv
 		Webserv(confVector configServer);
 		~Webserv(void);
 
-		typedef std::set<int> setPort;
-		typedef std::vector<int> fdVector;
+		typedef std::set<int>		setPort;
+		typedef std::vector<int>	fdVector;
+		typedef std::map<int, Client>	mapClients;
 
 		void	setParser(Parser& parser);
 
@@ -37,8 +40,13 @@ class Webserv
 
 		Parser					_parser;
 
+		// Server config and fds
 		confVector				_servers;
 		fdVector				_servers_fd;
+
+		// Clients
+		mapClients				_clients;
+		Client					_tmpClient;
 		// epoll variables
 		int						_epfd;
 		struct epoll_event		_event;
@@ -49,7 +57,11 @@ class Webserv
 		void			epoll_init(void);
 		int				fd_is_server(int ready_fd);
 		void			accept_new_client(int server);
-		std::string		read_client_request(int client_socket);
+		std::string		read_client_request(int client_Socket);
+
+		void			addNewClient(Client newClient);
+		void			removeClient(int clientSocket);
+		Client			findClient(int socket);
 
 };
 

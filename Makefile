@@ -17,13 +17,13 @@ endif
 
 BUILD	= .build
 
-DIR		= parser webserv config server t_network request
+DIR		= parser webserv config client t_network request
 DIRS	= $(addprefix .build/, $(DIR))
 
 SRC_DIR	= ./src/
 INC		= -I./include
 
-CLASS	= parser webserv config server t_network request
+CLASS	= parser webserv config client t_network request
 CLASSINC= $(addprefix -I src/, $(CLASS))
 
 # FILES
@@ -35,7 +35,7 @@ PARSER	= Parser.cpp ParseConfig.cpp ParseRequest.cpp
 
 WEBSERV	= Webserv.cpp
 
-SERVER	= Server.cpp
+CLIENT	= Client.cpp
 
 CONFIG	= Config.cpp
 
@@ -47,7 +47,7 @@ SRC		= $(MAIN) \
 		  $(addprefix parser/, $(PARSER)) \
 		  $(addprefix webserv/, $(WEBSERV)) \
 		  $(addprefix config/, $(CONFIG)) \
-		  $(addprefix server/, $(SERVER)) \
+		  $(addprefix client/, $(CLIENT)) \
 		  $(addprefix t_network/,$(NET)) \
 		  $(addprefix request/, $(REQUEST))
 

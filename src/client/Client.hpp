@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vdescham <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,30 +10,33 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#ifndef CLIENT_HPP
+# define CLIENT_HPP
 
-Server::Server(void) {}
+# include <iostream>
+# include "headers.hpp"
+# include "Request.hpp"
 
-Server::Server(Server const & src)
+class Client
 {
-	*this = src;
-}
+	public:
+		Client(void);
+		Client(Client const & src);
+		~Client(void);
 
-Server&		Server::operator=(const Server &rhs)
-{
-	if (this != &rhs)
-		_config = rhs.getConfig();
-	return *this;
-}
+		Client&		operator=(const Client &rhs);
 
-Server::~Server(void) {}
+		typedef std::list<Request> listReq;
 
-void Server::setConfig(Config config)
-{
-	this->_config = config;
-}
+		int			getSocket(void);
+		void		setSocket(int socket);
+		listReq		getRequests(void);
+		void		addRequest(Request request);
+		void		removeRequest(listReq::iterator it);
 
-Config Server::getConfig(void) const
-{
-	return this->_config;
-}
+	private:
+		int			_socket;
+		listReq		_requests;
+};
+
+#endif

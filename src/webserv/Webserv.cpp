@@ -117,6 +117,7 @@ int	Webserv::fd_is_server(int ready_fd)
 */
 void	Webserv::accept_new_client(int server)
 {
+	Client client;
 	int new_socket = 0;
 
 	if ((new_socket = accept(server, NULL, NULL)) < 0)
@@ -130,32 +131,36 @@ void	Webserv::accept_new_client(int server)
 	_event.data.fd = new_socket;
 	_event.events = EPOLLIN;
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, new_socket, &_event);
+	client.setSocket(new_socket);
+	_clients[new_socket] = client;
 }
 
 /*
 	Receive a client request and stores it in a string
 */
-std::string Webserv::read_client_request(int client_socket)
+std::string Webserv::read_client_request(int clientSocket)
 {
 	char client_request[1025];
 	int ret = 0;
 
-	if ((ret = recv(client_socket, &client_request, 1024, 0)) < 0)
+	if ((ret = recv(clientSocket, &client_request, 1024, 0)) < 0)
 		throw std::logic_error("error: recv() failed");
 	else if (ret == 0)
 	{
 		// Empty request = end of connection
 		std::cout << "Closing connection request from clients" << '\n';
-		epoll_ctl(_epfd, EPOLL_CTL_DEL, client_socket, NULL);
-		close(client_socket);
+		epoll_ctl(_epfd, EPOLL_CTL_DEL, clientSocket, NULL);
+		close(clientSocket);
 	}
 	else
 	{
 		client_request[ret] = '\0';
 		std::cout << client_request << std::endl;
 		_event.events = EPOLLOUT;
-		_event.data.fd = client_socket;
-		epoll_ctl(_epfd, EPOLL_CTL_MOD, client_socket, &_event);
+		_event.data.fd = clientSocket;
+		epoll_ctl(_epfd, EPOLL_CTL_MOD, clientSocket, &_event);
+		_clients.erase(clientSocket);
+		return NULL;
 	}
 	return client_request;
 }
@@ -227,6 +232,8 @@ void Webserv::run(confVector configServer)
 				request = read_client_request(_events_pool[j].data.fd);
 				//_parser.parseRequest(request);
 				//classRequest = _parser.getRequest();
+				// "/!\" We can do something like that : "/!\"
+				_clients[_events_pool[j].data.fd].addRequest(_parser.getRequest());
 			}
 			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
 			{
