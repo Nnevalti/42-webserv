@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 20:44:10 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/01 15:47:42 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,6 +187,9 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 	{
 		if (address == "localhost")
 			host = "127.0.0.1";
+		else
+			host = address;
+		std::cout << "host: " << host <<std::endl;
 		net.host.s_addr = inet_addr(host.c_str());
 		net.port = 8080;
 		configServer.setNetwork(net);
