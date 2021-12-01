@@ -37,6 +37,7 @@ class Client
 	private:
 		int			_socket;
 		listReq		_requests;
+		// Config		_server;
 };
 
 #endif

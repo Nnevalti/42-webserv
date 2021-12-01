@@ -138,7 +138,7 @@ void	Webserv::accept_new_client(int server)
 /*
 	Receive a client request and stores it in a string
 */
-std::string Webserv::read_client_request(int clientSocket)
+void	Webserv::read_client_request(int clientSocket, std::string &request)
 {
 	char client_request[1025];
 	int ret = 0;
@@ -151,18 +151,18 @@ std::string Webserv::read_client_request(int clientSocket)
 		std::cout << "Closing connection request from clients" << '\n';
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, clientSocket, NULL);
 		close(clientSocket);
+		_clients.erase(clientSocket);
 	}
 	else
 	{
 		client_request[ret] = '\0';
 		std::cout << client_request << std::endl;
+		request = client_request;
 		_event.events = EPOLLOUT;
 		_event.data.fd = clientSocket;
 		epoll_ctl(_epfd, EPOLL_CTL_MOD, clientSocket, &_event);
-		_clients.erase(clientSocket);
-		return "";
 	}
-	return client_request;
+	return ;
 }
 
 /*
@@ -226,19 +226,22 @@ void Webserv::run(confVector configServer)
 			else if (_events_pool[j].events & EPOLLIN) // EPOLLIN : read
 			{
 			//! WARNING  THIS IS NOT WHAT WE WANT TO DO ONLY FOR TEST. TU DOIS MIEUX UTILISER LA CLASS REQUEST
-			//	Request		classRequest;
+				Request		classRequest;
 				std::string	request;
 
-				request = read_client_request(_events_pool[j].data.fd);
-			//	_parser.parseRequest(request, classRequest);
+				read_client_request(_events_pool[j].data.fd, request);
+				_parser.parseRequest(request, classRequest);
 				//classRequest = _parser.getRequest();
 				// "/!\" We can do something like that : "/!\"
 				//_clients[_events_pool[j].data.fd].addRequest(_parser.getRequest());
 			}
 			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
 			{
-				// forward request to the right server
-				// send response
+				// // forward request to the right server
+				// Config server;
+				// server = getRightServer(_clients[_events_pool[j].data.fd);
+				// _clients[_events_pool[j].data.fd].setServer();
+				// // send response
 				// listen client again for other requests and wait for a close connection request
 				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
 					throw std::logic_error("error: send() failed");
