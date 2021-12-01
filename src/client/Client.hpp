@@ -16,6 +16,7 @@
 # include <iostream>
 # include "headers.hpp"
 # include "Request.hpp"
+# include "Config.hpp"
 
 class Client
 {
@@ -31,13 +32,14 @@ class Client
 		int			getSocket(void);
 		void		setSocket(int socket);
 		listReq		getRequests(void);
-		void		addRequest(Request request);
+		void		addRequest(Request &request);
 		void		removeRequest(listReq::iterator it);
+		void		setServer(Config server);
 
 	private:
 		int			_socket;
 		listReq		_requests;
-		// Config		_server;
+		Config		_server;
 };
 
 #endif

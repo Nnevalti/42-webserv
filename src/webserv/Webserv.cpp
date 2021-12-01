@@ -51,7 +51,7 @@ void Webserv::initServers(confVector configServer)
 	}
 	std::cout << "All servers were built" << std::endl;
 	// confVector::iterator it = configServer.begin();
-	// while (it++ != configServer.end())
+	// while (it != configServer.end())
 	// 	configServer.erase(--configServer.end());
 	return ;
 }
@@ -152,6 +152,7 @@ void	Webserv::read_client_request(int clientSocket, std::string &request)
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, clientSocket, NULL);
 		close(clientSocket);
 		_clients.erase(clientSocket);
+		request = "";
 	}
 	else
 	{
@@ -163,6 +164,33 @@ void	Webserv::read_client_request(int clientSocket, std::string &request)
 		epoll_ctl(_epfd, EPOLL_CTL_MOD, clientSocket, &_event);
 	}
 	return ;
+}
+
+void	Webserv::getRightServer(Client &client)
+{
+	std::cout << "/*************************************************/" << '\n';
+	std::cout << "/*                   getRightServer              */" << '\n';
+	std::cout << "/*************************************************/" << '\n';
+	// requests and config
+	if (!(client.getRequests().empty()))
+	{
+		std::cout << "REQUEST :" << '\n';
+		std::cout << "PATH:" << client.getRequests().front().getPath() << '\n';
+		std::cout << "IP:" << client.getRequests().front().getHeader("Host") << '\n';
+	}
+	std::cout << '\n';
+	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		std::cout << "CONFIG :" << '\n';
+		std::cout << "PATH:" << it->getRoot() << '\n';
+		std::cout << "IP:" << inet_ntoa(it->getNetwork().host) << ":" << it->getNetwork().port << '\n';
+		std::cout << '\n';
+		// if (*it.getNetwork().port == port && *it.getRoot() == client.getRequests().front().getPath())
+		// 	client.setServer(*it);
+	}
+	std::cout << "/*************************************************/" << '\n';
+	std::cout << "/*                          END                  */" << '\n';
+	std::cout << "/*************************************************/" << '\n';
 }
 
 /*
@@ -182,11 +210,15 @@ void Webserv::run(confVector configServer)
 	std::string response;
 	response += "HTTP/1.1 200 OK\n";
 	response += "Content-Type: text/html\r\n";
-	response += "Content-Length: 14\n\n";
-	response += "Hello World !\n\r\n\r\n";
+	response += "Content-Length: 14\n";
+	response += "\n";
+	response += "Hello World !\n";
+	response += "\r\n\r\n";
 	/*************************/
 	/* End of temporary part */
 	/*************************/
+	Request		classRequest;
+	std::string	request;
 
 	initServers(configServer);
 	epoll_init();
@@ -225,23 +257,22 @@ void Webserv::run(confVector configServer)
 				accept_new_client(server);
 			else if (_events_pool[j].events & EPOLLIN) // EPOLLIN : read
 			{
-			//! WARNING  THIS IS NOT WHAT WE WANT TO DO ONLY FOR TEST. TU DOIS MIEUX UTILISER LA CLASS REQUEST
-				Request		classRequest;
-				std::string	request;
+				// Request		classRequest;
+				// std::string	request;
 
 				read_client_request(_events_pool[j].data.fd, request);
-				_parser.parseRequest(request, classRequest);
-				//classRequest = _parser.getRequest();
-				// "/!\" We can do something like that : "/!\"
-				//_clients[_events_pool[j].data.fd].addRequest(_parser.getRequest());
+				if (!request.empty())
+				{
+					_parser.parseRequest(request, classRequest);
+					_clients[_events_pool[j].data.fd].addRequest(classRequest);
+				}
 			}
 			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
 			{
 				// // forward request to the right server
-				// Config server;
-				// server = getRightServer(_clients[_events_pool[j].data.fd);
-				// _clients[_events_pool[j].data.fd].setServer();
+				getRightServer(_clients[_events_pool[j].data.fd]);
 				// // send response
+				_clients[_events_pool[j].data.fd].getRequests().clear();
 				// listen client again for other requests and wait for a close connection request
 				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
 					throw std::logic_error("error: send() failed");

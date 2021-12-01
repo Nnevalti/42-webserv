@@ -45,7 +45,7 @@ Client::listReq Client::getRequests(void)
 	return _requests;
 }
 
-void Client::addRequest(Request request)
+void Client::addRequest(Request &request)
 {
 	_requests.push_back(request);
 }
@@ -53,4 +53,9 @@ void Client::addRequest(Request request)
 void Client::removeRequest(listReq::iterator pos)
 {
 	_requests.erase(pos);
+}
+
+void Client::setServer(Config server)
+{
+	_server = server;
 }

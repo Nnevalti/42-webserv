@@ -57,11 +57,9 @@ class Webserv
 		void			epoll_init(void);
 		int				fd_is_server(int ready_fd);
 		void			accept_new_client(int server);
-		void		read_client_request(int client_Socket, std::string &request);
+		void			read_client_request(int client_Socket, std::string &request);
 
-		void			addNewClient(Client newClient);
-		void			removeClient(int clientSocket);
-		Client			findClient(int socket);
+		void			getRightServer(Client &client);
 
 };
 

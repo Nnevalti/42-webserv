@@ -21,6 +21,24 @@ Request::Request(Request const & src)
 
 Request::~Request(void) {}
 
+Request&	Request::operator=(const Request &rhs)
+{
+	if (this != &rhs)
+	{
+		_method = rhs._method;
+		_version = rhs._version;
+		_ret = rhs._ret;
+		_body = rhs._body;
+		_port = rhs._port;
+		_path = rhs._path;
+		_query = rhs._query;
+		_headers = rhs._headers;
+		_env_for_cgi = rhs._env_for_cgi;
+		_lang = rhs._lang;
+	}
+	return (*this);
+}
+
 void				Request::resetDirective(void)
 {
 	_headers.clear();
@@ -86,12 +104,6 @@ const std::list<std::pair<std::string, float> >&	Request::getLang() const
 const std::map<std::string, std::string>&	Request::getEnv() const
 {
 	return _env_for_cgi;
-}
-
-Request &			Request::operator=(const Request &rhs)
-{
-	(void)rhs;
-	return (*this);
 }
 
 std::string		Request::getMethod(void) const

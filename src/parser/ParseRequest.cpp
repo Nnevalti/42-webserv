@@ -83,7 +83,6 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 		return ;
 	}
 	classRequest.setPath(first.substr(start, end - start));
-	std::cout << "the path is :" <<classRequest.getPath() << std::endl;
 
 	if ((end = first.find_first_not_of(' ', end)) == std::string::npos)
 	{
