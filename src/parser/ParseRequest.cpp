@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/01 19:47:43 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/01 20:05:39 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 		return ;
 	}
 
-	if ((start = first.find_first_of(' ', end))  == std::string::npos)
+	if ((start = first.find_first_not_of(' ', end))  == std::string::npos)
 	{
 		classRequest.setRet(500);
 		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
@@ -83,6 +83,7 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 		return ;
 	}
 	classRequest.setPath(first.substr(start, end - start));
+	std::cout << "the path is :" <<classRequest.getPath() << std::endl;
 
 	if ((end = first.find_first_not_of(' ', end)) == std::string::npos)
 	{
