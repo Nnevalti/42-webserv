@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/02 01:24:33 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/02 02:36:07 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,11 +142,12 @@ void			Parser::parseRequest(const std::string& request, Request& classRequest)
 	classRequest.resetDirective();
 	body_start = splitHeader(request, header);
 
-	if(header.size() != 0)
-		parseHeader(header, classRequest);
-	else
+	parseHeader(header, classRequest);
+
+	if (classRequest.getRet() == 500)
 		return ;
-	if(classRequest.getMethod() == "POST" && classRequest.getRet() != 500)
+
+	if(classRequest.getMethod() == "POST")
 	{
 		body = request.substr(body_start);
 		if (std::atoi(classRequest.getHeader("Content-Length").c_str()) != (int)body.size())
@@ -155,6 +156,8 @@ void			Parser::parseRequest(const std::string& request, Request& classRequest)
 			std::cerr << RED << "Error parsing request: content length different from content real size" << SET << std::endl;
 			return ;
 		}
+		else
+			classRequest.setBody(body);
 	}
-
+	classRequest.setNetwork(classRequest.getHeader("Host"));
 }

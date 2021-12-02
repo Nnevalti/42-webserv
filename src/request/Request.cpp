@@ -6,13 +6,13 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:17 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/02 01:22:26 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/02 02:49:23 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request(void): _method (""), _version(""), _ret(200), _body(""), _port(8080), _path(""), _query("") {}
+Request::Request(void): _method (""), _version(""), _ret(200), _body(""), _port(8080), _path("") {}
 
 Request::Request(Request const & src)
 {
@@ -31,18 +31,21 @@ Request&	Request::operator=(const Request &rhs)
 		_body = rhs._body;
 		_port = rhs._port;
 		_path = rhs._path;
-		_query = rhs._query;
 		_headers = rhs._headers;
 		_env_for_cgi = rhs._env_for_cgi;
-		_lang = rhs._lang;
 	}
 	return (*this);
 }
 
 void				Request::resetDirective(void)
 {
+	_version = "";
+	_method = "";
+	_ret = 200;
+	_body = "";
+	_port = 8080;
+	_path = "";
 	_headers.clear();
-
 	_headers["Accept-Charsets"] = "";
 	_headers["Accept-Language"] = "";
 	_headers["Allow"] = "";
@@ -99,7 +102,19 @@ void										Request::setNetwork(std::string IpPort)
 	if ((host = IpPort.substr(0, colons)) == "localhost")
 		host = "127.0.0.1";
 	_network.host.s_addr = inet_addr(host.c_str());
-	_network.port = std::atoi(IpPort.substr(colons).c_str());
+	_network.port = std::atoi(IpPort.substr(++colons).c_str());
+}
+
+
+void										Request::setBody(std::string body)
+{
+	_body = body;
+}
+
+
+void										Request::setHeaders(stringMap headers)
+{
+	_headers = headers;
 }
 
 t_network									Request::getNetwork(void) const
@@ -110,11 +125,6 @@ t_network									Request::getNetwork(void) const
 int											Request::getPort(void) const
 {
 	return _port;
-}
-
-const std::list<std::pair<std::string, float> >&	Request::getLang() const
-{
-	return _lang;
 }
 
 const std::map<std::string, std::string>&	Request::getEnv() const
@@ -135,11 +145,6 @@ std::string			Request::getPath() const
 std::string		Request::getBody(void) const
 {
 	return _body;
-}
-
-const std::string&			Request::getQuery() const
-{
-	return _query;
 }
 
 int					Request::getRet() const

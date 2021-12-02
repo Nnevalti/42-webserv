@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:16 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/02 01:06:02 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/02 02:46:45 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,7 @@ class Request {
 		stringMap											getHeaders(void) const;
 		std::string											getHeader(std::string str);
 		const stringMap&									getEnv(void) const;
-		const std::list<std::pair<std::string, float> >&	getLang(void) const;
 		int													getRet(void) const;
-		const std::string&									getQuery(void) const;
 		int													getPort(void) const;
 		t_network											getNetwork(void) const;
 
@@ -45,12 +43,11 @@ class Request {
 		void												setPath(std::string path);
 		void												setHeader(std::string token, std::string value);
 		void												setVersion(std::string version);
-		void												swetBody(std::string body);
+		void												setBody(std::string body);
 		void												setHeaders(stringMap headers);
 		void												setEnv(stringMap env);
 		void												setLang(std::list<std::pair<std::string, float> > lang);
 		void												setRet(int ret);
-		void												setQuery(std::string query);
 		void												setNetwork(std::string IpPort);
 
 	private:
@@ -61,10 +58,8 @@ class Request {
 		std::string									_body;
 		int											_port;
 		std::string									_path;
-		std::string									_query;
 		stringMap									_headers;
 		stringMap									_env_for_cgi;
-		std::list<std::pair<std::string, float> >	_lang;
 		t_network									_network;
 };
 
