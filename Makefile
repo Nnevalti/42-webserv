@@ -17,14 +17,12 @@ endif
 
 BUILD	= .build
 
+SRC_DIR	= ./src/
 DIR		= parser webserv config client t_network request
 DIRS	= $(addprefix $(BUILD)/, $(DIR))
+CLASSINC= $(addprefix -I $(SRC_DIR), $(DIR))
 
-SRC_DIR	= ./src/
 INC		= -I./include
-
-CLASS	= parser webserv config client t_network request
-CLASSINC= $(addprefix -I $(SRC_DIR), $(CLASS))
 
 # FILES
 NAME	= webserv
