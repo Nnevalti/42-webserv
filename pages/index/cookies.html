@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<!-- importer le fichier de style -->
+	<link rel="stylesheet" href="cookies.css" media="screen" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
+	<script>
+			function createCookie(name,pwds){
+			let username = document.getElementById("user");
+			let pwd = document.getElementById("pd");
+
+
+			today = new Date();
+			var expire = new Date();
+			expire.setTime(today.getTime() + 3600000*24*15);
+
+
+			document.cookie = "name="+username.value+";path=/" + ";expires="+expire.toUTCString();
+			document.cookie = "password="+encodeURI(pwd.value)+";path=/" + ";expires="+expire.toUTCString();
+
+			}
+
+		</script>
+</head>
+
+<body>
+
+			<div id="container">
+				<!-- zone de connexion -->
+
+				<form>
+					<h1>Connexion</h1>
+
+					<label><b>Nom d'utilisateur</b></label>
+					<input type="text" placeholder="Entrer le nom d'utilisateur" name="username" id="user" required>
+
+					<label><b>Mot de passe</b></label>
+					<input type="password" placeholder="Entrer le mot de passe" name="password" id="pd" required>
+
+					<input type="submit" id='submit' onclick="createCookie()" value='LOGIN' >
+
+				</form>
+			</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
+	<script>
+	window.cookieconsent.initialise({
+	  "palette": {
+		"popup": {
+		  "background": "#000"
+		},
+		"button": {
+		  "background": "#f1d600"
+		}
+	  },
+	  "theme": "classic",
+	  "type": "opt-in"
+	});
+	</script>
+</body>
+
+</html>
