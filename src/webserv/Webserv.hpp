@@ -13,6 +13,8 @@
 #ifndef WEBSERV_HPP
 # define WEBSERV_HPP
 
+# include <cstddef>
+
 # include "t_network.hpp"
 # include "Parser.hpp"
 # include "Client.hpp"
@@ -53,6 +55,7 @@ class Webserv
 		struct epoll_event		_events_pool[MAX_EV];
 
 		void			initServers(confVector configServer);
+		void			verifConfig(void);
 		int				init_socket(t_network network);
 		void			epoll_init(void);
 		int				fd_is_server(int ready_fd);

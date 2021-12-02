@@ -33,6 +33,7 @@ Request&	Request::operator=(const Request &rhs)
 		_path = rhs._path;
 		_headers = rhs._headers;
 		_env_for_cgi = rhs._env_for_cgi;
+		_network = rhs._network;
 	}
 	return (*this);
 }
@@ -105,12 +106,10 @@ void										Request::setNetwork(std::string IpPort)
 	_network.port = std::atoi(IpPort.substr(++colons).c_str());
 }
 
-
 void										Request::setBody(std::string body)
 {
 	_body = body;
 }
-
 
 void										Request::setHeaders(stringMap headers)
 {

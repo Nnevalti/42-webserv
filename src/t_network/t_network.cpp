@@ -37,7 +37,7 @@ bool t_network::operator==(t_network const &rhs)
 {
 	std::string first_ip(inet_ntoa(this->host));
 	std::string second_ip(inet_ntoa(rhs.host));
-	return (first_ip == second_ip && this->port == rhs.port);
+	return ((first_ip == second_ip || (this->host.s_addr == 0 || rhs.host.s_addr == 0)) && this->port == rhs.port);
 }
 
 bool t_network::operator!=(t_network const &rhs)

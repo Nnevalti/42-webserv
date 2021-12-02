@@ -59,3 +59,8 @@ void Client::setServer(Config server)
 {
 	_server = server;
 }
+
+Config Client::getServer(void)
+{
+	return _server;
+}
