@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/01 20:05:39 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/02 01:24:33 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,6 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 	}
 	classRequest.setMethod(first.substr(0, end));
 
-	std::cout << classRequest.getMethod().size() << std::endl;
-
 	if (std::find(methods.begin(), methods.end(), classRequest.getMethod()) == methods.end())
 	{
 		classRequest.setRet(500);
@@ -108,16 +106,12 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 
 static std::string	findtoken(std::string line)
 {
-	size_t end = line.find_first_of(':');
-
-	return (line.substr(0, end));
+	return (line.substr(0, line.find_first_of(':')));
 }
 
 static std::string	findvalue(std::string line)
 {
-	size_t start = line.find_first_of(' ');
-
-	return (line.substr(start + 1));
+	return (line.substr(line.find_first_of(' ') + 1));
 }
 
 void			Parser::parseHeader(stringVector& header, Request& classRequest)
@@ -133,7 +127,6 @@ void			Parser::parseHeader(stringVector& header, Request& classRequest)
 	{
 		token = findtoken(*i);
 		value = findvalue(*i);
-		std::cout << token << ": " << value << std::endl;
 		if (classRequest.getHeaders().count(token))
 			classRequest.setHeader(token, value);
 	}
@@ -154,5 +147,14 @@ void			Parser::parseRequest(const std::string& request, Request& classRequest)
 	else
 		return ;
 	if(classRequest.getMethod() == "POST" && classRequest.getRet() != 500)
+	{
 		body = request.substr(body_start);
+		if (std::atoi(classRequest.getHeader("Content-Length").c_str()) != (int)body.size())
+		{
+			classRequest.setRet(500);
+			std::cerr << RED << "Error parsing request: content length different from content real size" << SET << std::endl;
+			return ;
+		}
+	}
+
 }

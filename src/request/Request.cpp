@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:17 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/01 19:49:19 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/02 01:22:26 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,22 @@ void										Request::setVersion(std::string version)
 void										Request::setHeader(std::string token, std::string value)
 {
 	_headers[token] = value;
+}
+
+void										Request::setNetwork(std::string IpPort)
+{
+	std::string	host;
+	size_t		colons = IpPort.find(":");
+
+	if ((host = IpPort.substr(0, colons)) == "localhost")
+		host = "127.0.0.1";
+	_network.host.s_addr = inet_addr(host.c_str());
+	_network.port = std::atoi(IpPort.substr(colons).c_str());
+}
+
+t_network									Request::getNetwork(void) const
+{
+	return (_network);
 }
 
 int											Request::getPort(void) const
