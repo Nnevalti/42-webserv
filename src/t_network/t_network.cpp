@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/29 15:46:53 by vdescham          #+#    #+#             */
-/*   Updated: 2021/11/29 16:26:52 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/02 02:27:09 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,4 +43,10 @@ bool t_network::operator==(t_network const &rhs)
 bool t_network::operator!=(t_network const &rhs)
 {
 	return (!(*this == rhs));
+}
+
+std::ostream	&operator<<(std::ostream &out, const t_network &net)
+{
+	out << "host: " << inet_ntoa(net.host) << " port: " << net.port <<std::endl;
+	return out;
 }

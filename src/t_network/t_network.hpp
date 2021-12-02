@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   t_network.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vdescham <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/29 15:46:53 by vdescham          #+#    #+#             */
-/*   Updated: 2021/11/29 15:46:53 by vdescham         ###   ########.fr       */
+/*   Updated: 2021/12/02 02:24:19 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
+# include <ostream>
 
 
 class t_network
@@ -28,6 +29,7 @@ class t_network
 		~t_network(void);
 		bool operator==(t_network const &rhs);
 		bool operator!=(t_network const &rhs);
+		friend std::ostream	&operator<<(std::ostream &out, const t_network &net);
 
 		struct in_addr	host;
 		int				port;
