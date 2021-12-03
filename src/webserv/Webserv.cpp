@@ -27,12 +27,14 @@ void	Webserv::setParser(Parser& parser)
 	_parser = parser;
 }
 
+/*
+	Not used for now but maybe it will be later
+*/
 void Webserv::verifConfig(void)
 {
 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		t_network net = it->getNetwork();
-		// std::cout << "NET: " << net << ", NET2: " << net2 << '\n';
 		for (confVector::iterator it2 = (it + 1); it2 != _servers.end(); it2++)
 		{
 			t_network net2 = it2->getNetwork();
@@ -65,10 +67,6 @@ void Webserv::initServers(confVector configServer)
 		networkVector.push_back(net);
 		_servers_fd.push_back(init_socket(net));
 	}
-	std::cout << "All servers were built" << std::endl;
-	// confVector::iterator it = configServer.begin();
-	// while (it != configServer.end())
-	// 	configServer.erase(--configServer.end());
 	return ;
 }
 
@@ -163,7 +161,6 @@ void	Webserv::read_client_request(int clientSocket, std::string &request)
 		throw std::logic_error("error: recv() failed");
 	else if (ret == 0)
 	{
-		// Empty request = end of connection
 		std::cout << "Closing connection request from clients" << '\n';
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, clientSocket, NULL);
 		close(clientSocket);
@@ -184,15 +181,6 @@ void	Webserv::read_client_request(int clientSocket, std::string &request)
 
 bool	comparePath(std::string path, std::string root)
 {
-	// std::string::iterator r_it = root.begin();
-	//
-	// for (;r_it != root.end(); r_it++)
-	// {
-	// 	if (&(*r_it) == path)
-	// 		return true;
-	// }
-	// return false;
-
 	std::string::iterator r_it = root.begin();
 	std::string::iterator r_it2;
 	std::string::iterator p_it;
@@ -210,20 +198,6 @@ bool	comparePath(std::string path, std::string root)
 	}
 	return false;
 }
-
-// root = /test/root
-// path = /test/root/lol
-
-// Config	&selectDefaultServer(Client &client)
-// {
-// 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
-// 	{
-// 		if (client.getRequests().front().getNetwork() == it->getNetwork())
-// 		{
-//
-// 		}
-// 	}
-// }
 
 bool compareMethod(std::string RequestMethod, stringVector allowedMethod)
 {
@@ -243,7 +217,6 @@ void	Webserv::getRightServer(Client &client)
 	std::cout << "/*************************************************/" << '\n';
 	std::cout << "/*                   getRightServer              */" << '\n';
 	std::cout << "/*************************************************/" << '\n';
-	// requests and config
 	if (!(client.getRequests().empty()))
 	{
 		std::cout << "REQUEST :" << '\n';
@@ -287,14 +260,14 @@ void	Webserv::getRightServer(Client &client)
 /*
 	Main function of the Webserv class, the server loop is here
 */
-void Webserv::run(confVector configServer)
+void Webserv::run()
 {
-	// Loading frames for waiting connection
 	int n = 0;
 	std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"};
-
-	int timeout = 200; // set epoll timeout to 0.2 sec
+	int timeout = 200;
 	int nfds = 0;
+	Request		classRequest;
+	std::string	request;
 	/************************/
 	/*    Temporary part    */
 	/************************/
@@ -308,10 +281,8 @@ void Webserv::run(confVector configServer)
 	/*************************/
 	/* End of temporary part */
 	/*************************/
-	Request		classRequest;
-	std::string	request;
 
-	initServers(configServer);
+	initServers(_parser.getConfigServers());
 	epoll_init();
 	while (g_run)
 	{
@@ -319,13 +290,6 @@ void Webserv::run(confVector configServer)
 
 		// Verify if a new connection is available
 		nfds = epoll_wait(_epfd, _events_pool, MAX_EV, timeout);
-		/*
-		errno value returned by epoll
-		EBADF : epfd is not a valid file descriptor.
-		EFAULT : The memory area pointed to by events is not accessible with write permissions.
-		EINTR : The call was interrupted by a signal handler before either any of the requested events occurred or the timeout expired.
-		EINVAL : epfd is not an epoll file descriptor, or maxevents is less than or equal to zero.
-		*/
 		if (errno == EINVAL || errno == EFAULT || errno == EBADFD)
 			std::cerr << "error: epoll_wait() failed: " << strerror(errno) << '\n';
 		else if (errno == EINTR)
@@ -348,9 +312,6 @@ void Webserv::run(confVector configServer)
 				accept_new_client(server);
 			else if (_events_pool[j].events & EPOLLIN) // EPOLLIN : read
 			{
-				// Request		classRequest;
-				// std::string	request;
-
 				read_client_request(_events_pool[j].data.fd, request);
 				if (!request.empty())
 				{
@@ -369,19 +330,12 @@ void Webserv::run(confVector configServer)
 					throw std::logic_error("error: send() failed");
 				_event.events = EPOLLIN;
 				_event.data.fd = _events_pool[j].data.fd;
-				// if not keep-alive close the connection
-				// close(_events_pool[j].data.fd);
-				// else keep it going until timeout or if the client close the connection
 				epoll_ctl(_epfd, EPOLL_CTL_MOD, _events_pool[j].data.fd, &_event);
 			}
 		}
 	}
-	// close the servers fd
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
-	{
 		close(*it);
-		// _servers_fd.erase(it++);
-	}
 	close(_epfd);
 	std::cout << "\r" << "Serveur ending...       " << std::endl;
 	exit(1);

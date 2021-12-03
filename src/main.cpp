@@ -41,7 +41,7 @@ int		main(int ac, char **av)
 			parse.readConf(av[1]);
 			parse.parseConf();
 			webserv.setParser(parse);
-			webserv.run(parse.getConfigServers());
+			webserv.run();
 		}
 		catch(const std::exception& e)
 		{

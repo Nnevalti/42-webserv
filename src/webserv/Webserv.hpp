@@ -34,7 +34,7 @@ class Webserv
 
 		void	setParser(Parser& parser);
 
-		void	run(confVector configServer);
+		void	run(void);
 
 	private:
 		Webserv(Webserv const & src);
@@ -49,6 +49,7 @@ class Webserv
 		// Clients
 		mapClients				_clients;
 		Client					_tmpClient;
+
 		// epoll variables
 		int						_epfd;
 		struct epoll_event		_event;
