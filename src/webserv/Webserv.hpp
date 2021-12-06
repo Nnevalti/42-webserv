@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:35 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 20:35:06 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/06 20:26:42 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include "Parser.hpp"
 # include "Client.hpp"
 # include "Request.hpp"
+# include "Response.hpp"
 
 class Webserv
 {

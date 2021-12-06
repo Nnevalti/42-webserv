@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vdescham <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/25 13:49:50 by vdescham          #+#    #+#             */
-/*   Updated: 2021/11/25 13:49:50 by vdescham         ###   ########.fr       */
+/*   Updated: 2021/12/06 20:35:50 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void Client::setServer(Config server)
 	_server = server;
 }
 
-Config Client::getServer(void)
+Config& Client::getServer(void)
 {
 	return _server;
 }

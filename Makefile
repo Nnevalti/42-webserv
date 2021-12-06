@@ -6,19 +6,12 @@ BRed=\033[1;31m         # Red
 _Orange=\033[1;96m        # Blue
 _Purple=\033[1;35m
 
-#OS DEFINE
-ifeq ($(shell uname -s),Darwin)
-OS = mac
-else
-OS = linux
-endif
-
 # DIRECTORIES
 
 BUILD	= .build
 
 SRC_DIR	= ./src/
-DIR		= parser webserv config client t_network request
+DIR		= parser webserv config client t_network request response
 DIRS	= $(addprefix $(BUILD)/, $(DIR))
 CLASSINC= $(addprefix -I $(SRC_DIR), $(DIR))
 
@@ -41,13 +34,16 @@ REQUEST	= Request.cpp
 
 NET		= t_network.cpp
 
+RESPONSE= Response.cpp
+
 SRC		= $(MAIN) \
 		  $(addprefix parser/, $(PARSER)) \
 		  $(addprefix webserv/, $(WEBSERV)) \
 		  $(addprefix config/, $(CONFIG)) \
 		  $(addprefix client/, $(CLIENT)) \
 		  $(addprefix t_network/,$(NET)) \
-		  $(addprefix request/, $(REQUEST))
+		  $(addprefix request/, $(REQUEST)) \
+		  $(addprefix response/, $(RESPONSE))
 
 
 DEP		:= $(SRC:%.cpp=$(BUILD)/%.d)

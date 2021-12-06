@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/01 19:19:46 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/06 20:36:09 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "headers.hpp"
 # include "Config.hpp"
 # include "Request.hpp"
+# include "Response.hpp"
 
 class Parser
 {
@@ -75,6 +76,12 @@ class Parser
 		size_t						splitHeader(const std::string& request, stringVector& hearder);
 		void						parseHeader(stringVector& hearder, Request& classRequest);
 		void						parseFirstLine(stringVector& header, Request& classRequest);
+
+/**========================================================================
+ *                           PARSING RESPONSE
+ *========================================================================**/
+	public:
+		void						parseResponse(Request& request, Response& response, Config& server);
 };
 
 
