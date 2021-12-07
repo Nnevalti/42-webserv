@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 17:55:55 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 20:22:40 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,9 @@ class Response {
 	private:
 		static methodMap	initMethods(void);
 		static methodMap	_method;
+
+		static stringMap	_typeMap;
+		static stringMap	initType(void);
 
 	private:
 

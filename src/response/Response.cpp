@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 19:54:31 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 20:42:57 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,15 +44,31 @@ methodMap	Response::initMethods()
 
 methodMap Response::_method = Response::initMethods();
 
+stringMap Response::_typeMap = Response::initType();
+
+stringMap	Response::initType()
+{
+	stringMap tmp;
+
+	tmp["html"] = "text/html";
+	tmp["css"] = "text/css";
+	tmp["js"] = "text/javascript";
+	tmp["jpeg"] = "image/jpeg";
+	tmp["jpg"] = "image/jpeg";
+	tmp["png"] = "image/png";
+	tmp["bmp"] = "image/bmp";
+	tmp[""] = "text/plain";
+}
+
 void	Response::initDirectives(void)
 {
 	_directives["Allow"] = "";
 	_directives["Content-Language"] = "";
 	_directives["Content-Length"] = "";
 	_directives["Content-Location"] = "";
-	_directives["_contentType"] = "";
-	_directives["_date"] = "";
-	_directives["_lastModified"] = "";
+	_directives["Content-Type"] = "";
+	_directives["Date"] = "";
+	_directives["Last-Modified"] = "";
 	_directives["_location"] = "";
 	_directives["_retryAfter"] = "";
 	_directives["_server"] = "";
@@ -138,10 +154,34 @@ void	Response::createHeader(void)
 		for (stringVector::const_iterator i = tmp.begin(); i != tmp.end(); i++)
 			_directives["Allow"] += ((i + 1 == tmp.end()) ? *i : *i + ", ");
 	}
-	_directives["Content-Language"] = "*";
+
+	_directives["Content-Language"] = _request.getHeader("Accept-Language");
+
 	_directives["Content-Length"] = _response.size();
+
 	if (_code != 404)
 		_directives["Content-Location"] = _contentLocation;
+
+	std::string type(_contentLocation.substr(_contentLocation.rfind(".") + 1, _contentLocation.size() - _contentLocation.rfind(".")));
+	_directives["Content-Type"] = this->_typeMap[type];
+
+	char			buffer[100];
+	struct timeval	tv;
+	struct tm		*tm;
+	struct stat		stats;
+
+	gettimeofday(&tv, NULL);
+	tm = gmtime(&tv.tv_sec);
+	strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
+	_directives["Date"] = std::string(buffer);
+
+	std::memset(buffer, 0, 100);
+	if (stat(_contentLocation.c_str(), &stats) == 0)
+	{
+		tm = gmtime(&stats.st_mtime);
+		strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
+		_directives["Last-Modified"] = std::string(buffer);
+	}
 
 
 }
