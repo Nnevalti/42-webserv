@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 02:07:37 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 17:55:55 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,17 +33,19 @@ class Response {
 		void		setErrorMap(StringIntVectorMap pages);
 		void		setServer(Config& server);
 		void		setRequest(Request& request);
+		void		setIndex(stringVector index);
+		void		setContentLocation(std::string location);
 
 		void		initResponse(void);
 		void		createBody(void);
 		void		createHeader(void);
+		void		readFile(void);
 
-		void		getMethod();
+		void		getMethod(void);
 
 	private:
 		static methodMap	initMethods(void);
 		static methodMap	_method;
-
 
 	private:
 
@@ -52,6 +54,8 @@ class Response {
 		Config						_server;
 		Request						_request;
 		std::map<int, std::string>	_errorMap;
+		stringVector				_index;
+		std::string					_contentLocation;
 		stringMap					_directives;
 };
 

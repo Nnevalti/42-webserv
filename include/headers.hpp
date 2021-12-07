@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 01:19:36 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 15:59:27 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,10 @@
 # define BUFFER_SIZE 512
 # define MAX_EV 4096
 # define MAX_CLIENTS 1000
+
+# define IS_A_DIRECTORY 2
+# define IS_A_FILE 1
+# define IS_SOMETHING_ELSE 0
 
 # define stringVector				std::vector<std::string>
 # define stringMap					std::map<std::string, std::string>

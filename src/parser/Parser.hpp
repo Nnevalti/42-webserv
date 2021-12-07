@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/06 20:36:09 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 19:15:35 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ class Parser
  *========================================================================**/
 	public:
 		void						parseResponse(Request& request, Response& response, Config& server);
+		Config						getLocationServer(Config& server, std::string path, std::string& name);
 };
 
 

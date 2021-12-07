@@ -6,13 +6,14 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 02:11:18 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 19:35:00 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
-Config::Config(void): _client_body_buffer_size(0), _autoindex(false)
+Config::Config(void):
+_root(""), _client_body_buffer_size(0), _autoindex(false), _alias(""),_alias_set(false)
 {}
 
 Config::Config(Config const & src)
@@ -164,6 +165,11 @@ std::string		Config::getAlias(void)
 StringIntVectorMap	Config::getErrorPage(void)
 {
 	return (_error_page);
+}
+
+bool				Config::getisAliasSet(void)
+{
+	return (_alias_set);
 }
 
 std::ostream	&operator<<(std::ostream &out, const Config &server)
