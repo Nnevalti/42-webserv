@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/06 21:22:44 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 02:08:34 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,19 +268,6 @@ void Webserv::run()
 	int nfds = 0;
 	Request		classRequest;
 	std::string	request;
-	/************************/
-	/*    Temporary part    */
-	/***********************
-	std::string response;
-	response += "HTTP/1.1 200 OK\n";
-	response += "Content-Type: text/html\r\n";
-	response += "Content-Length: 14\n";
-	response += "\n";
-	response += "Hello World !\n";
-	response += "\r\n\r\n";
-	/*************************/
-	/* End of temporary part */
-	/*************************/
 
 	initServers(_parser.getConfigServers());
 	epoll_init();
@@ -321,12 +308,13 @@ void Webserv::run()
 			}
 			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
 			{
-				Response	response;
+				Response	classResponse;
+				std::string	response;
 				// forward request to the right server
 				getRightServer(_clients[_events_pool[j].data.fd]);
-				_parser.parseResponse(_clients[_events_pool[j].data.fd].getRequests().front(), response, _clients[_events_pool[j].data.fd].getServer());
+				_parser.parseResponse(_clients[_events_pool[j].data.fd].getRequests().front(), classResponse, _clients[_events_pool[j].data.fd].getServer());
 				_clients[_events_pool[j].data.fd].getRequests().clear();
-
+				classResponse.initResponse();
 				// listen client again for other requests and wait for a close connection request
 				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
 					throw std::logic_error("error: send() failed");

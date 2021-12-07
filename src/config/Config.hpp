@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 20:43:46 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 02:11:08 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ class Config {
 		t_network			getNetwork(void);
 		stringVector		getServerName(void);
 		std::string			getRoot(void);
-		int					getClientBodyBufferSize(void);
+		size_t				getClientBodyBufferSize(void);
 		stringVector		getCgiParam(void);
 		std::string			getCgiPass(void);
 		serverMap			getLocation(void);
@@ -58,7 +58,7 @@ class Config {
 		std::string			_root;
 		stringVector		_server_name;
 		StringIntVectorMap	_error_page;
-		int					_client_body_buffer_size;
+		size_t				_client_body_buffer_size;
 		stringVector		_cgi_param;
 		std::string			_cgi_pass;
 		serverMap			_location;

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 20:43:46 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 02:11:18 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ std::string		Config::getRoot(void)
 	return (_root);
 }
 
-int				Config::getClientBodyBufferSize(void)
+size_t			Config::getClientBodyBufferSize(void)
 {
 	return (_client_body_buffer_size);
 }

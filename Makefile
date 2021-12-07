@@ -22,7 +22,7 @@ NAME	= webserv
 
 MAIN	= main.cpp
 
-PARSER	= Parser.cpp ParseConfig.cpp ParseRequest.cpp
+PARSER	= Parser.cpp ParseConfig.cpp ParseRequest.cpp ParseResponse.cpp
 
 WEBSERV	= Webserv.cpp
 

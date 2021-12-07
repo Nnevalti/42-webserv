@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/06 21:14:52 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 02:21:54 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,29 @@ Response::Response(Response const & src)
 }
 
 Response::~Response(void) {}
+
+Response&	Response::operator=(const Response& rhs)
+{
+	_response = rhs._response;
+	_code = rhs._code;
+	_server = rhs._server;
+	_request = rhs._request;
+	_errorMap = rhs._errorMap;
+	_directives = rhs._directives;
+
+	return (*this);
+}
+
+methodMap	Response::initMethods()
+{
+	methodMap map;
+
+	map["GET"] = &Response::getMethod;
+
+	return map;
+}
+
+methodMap Response::_method = Response::initMethods();
 
 void	Response::initDirectives(void)
 {
@@ -63,6 +86,42 @@ void	Response::setServer(Config& server)
 	_server = server;
 }
 
+static int		checkPath(const std::string& path)
+{
+	struct stat s;
+	if (stat(path.c_str(), &s) == 0 )
+	{
+		if (s.st_mode & S_IFDIR)
+			return 2; // IS A DIRECTORY
+		else if (s.st_mode & S_IFREG)
+			return 1; //IS A REGULAR FILE
+		else
+			return 0; //SOMETHING ELSE
+	}
+	else
+		return (-1); //ERROR
+}
+
+void	Response::initResponse(void)
+{
+	if (_code == 200)
+		(this->*Response::_method[_request.getMethod()])();
+
+}
+void	Response::createBody(void)
+{
+
+}
+
+void	Response::createHeader(void)
+{
+
+}
+
+void	Response::getMethod(void)
+{
+
+}
 
 
 

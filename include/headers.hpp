@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 21:11:20 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 01:19:36 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,5 +66,6 @@
 # define serverMap					std::map<std::string, Config>
 # define confVector					std::vector<Config>
 # define parseDirectiveMap			std::map<std::string, void (Parser::*)(Config&, stringVector)>
+# define methodMap					std::map<std::string, void (Response::*)(void)>
 # define StringIntVectorMap			std::map<std::string, std::vector<int> >
 # define pairStringIntVector		std::pair<std::string, std::vector<int> >

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/06 21:15:27 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 02:07:37 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,16 @@ class Response {
 		void		setErrorMap(StringIntVectorMap pages);
 		void		setServer(Config& server);
 		void		setRequest(Request& request);
+
+		void		initResponse(void);
+		void		createBody(void);
+		void		createHeader(void);
+
+		void		getMethod();
+
+	private:
+		static methodMap	initMethods(void);
+		static methodMap	_method;
 
 
 	private:
