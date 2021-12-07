@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 19:58:33 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/07 20:11:17 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,9 @@ void					Parser::parseResponse(Request& request, Response& response, Config& ser
 	location = getLocationServer(server, request.getPath(), locationName);
 
 	if (location.getisAliasSet())
-		name = server.getRoot() + location.getAlias() + request.getPath().substr(locationName.size());
+		name = location.getRoot() + location.getAlias() + request.getPath().substr(locationName.size());
 	else
-		name = server.getRoot() + request.getPath();
-	std::cout << "HEEEEEERRRRRRREEEEEE: " + name << std::endl;
+		name = location.getRoot() + request.getPath();
 	response.setContentLocation(name);
 	if (std::find(server.getAllowedMethods().begin(), server.getAllowedMethods().end(), request.getMethod()) == server.getAllowedMethods().end())
 		response.setCode(405);
