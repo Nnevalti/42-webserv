@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 19:15:35 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 01:06:59 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,23 +66,23 @@ class Parser
  *                           PARSING REQUEST
  *========================================================================**/
 	public:
-		void						parseRequest(const std::string& request, Request& classRequest);
+		void					parseRequest(const std::string& request, Request& classRequest);
 
 	private:
-		static stringVector			initMethods();
-		static stringVector			methods;
+		static stringVector		initMethods();
+		static stringVector		methods;
 
 	private:
-		size_t						splitHeader(const std::string& request, stringVector& hearder);
-		void						parseHeader(stringVector& hearder, Request& classRequest);
-		void						parseFirstLine(stringVector& header, Request& classRequest);
+		size_t					splitHeader(const std::string& request, stringVector& hearder);
+		void					parseHeader(stringVector& hearder, Request& classRequest);
+		void					parseFirstLine(stringVector& header, Request& classRequest);
 
 /**========================================================================
  *                           PARSING RESPONSE
  *========================================================================**/
 	public:
-		void						parseResponse(Request& request, Response& response, Config& server);
-		Config						getLocationServer(Config& server, std::string path, std::string& name);
+		void					parseResponse(ConfigResponse& confResponse, Request& request, Config& server);
+		Config					findLocation(Config& server, std::string& locationName);
 };
 
 

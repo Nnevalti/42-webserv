@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 19:21:14 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/08 20:46:33 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,13 @@ class Config {
 		bool				getAutoIndex(void);
 		std::string			getAlias(void);
 		bool				getisAliasSet(void);
-		StringIntVectorMap	getErrorPage(void);
+		stringIntVectorMap	getErrorPage(void);
 
 	private:
 		t_network			_network;
 		std::string			_root;
 		stringVector		_server_name;
-		StringIntVectorMap	_error_page;
+		stringIntVectorMap	_error_page;
 		size_t				_client_body_buffer_size;
 		stringVector		_cgi_param;
 		std::string			_cgi_pass;

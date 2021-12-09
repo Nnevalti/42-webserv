@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 19:35:00 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/08 20:46:33 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ std::string		Config::getAlias(void)
 	return (_alias);
 }
 
-StringIntVectorMap	Config::getErrorPage(void)
+stringIntVectorMap	Config::getErrorPage(void)
 {
 	return (_error_page);
 }
@@ -193,7 +193,7 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 	}
 
 	out << std::endl<< "error_page:" << std::endl;
-	for (StringIntVectorMap::const_iterator i = server._error_page.begin(); i != server._error_page.end(); i++)
+	for (stringIntVectorMap::const_iterator i = server._error_page.begin(); i != server._error_page.end(); i++)
 	{
 		out << "\t";
 		std::vector<int> tmp((*i).second);

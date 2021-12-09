@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 20:22:40 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/08 17:17:48 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "headers.hpp"
 # include "Config.hpp"
+# include "ConfigResponse.hpp"
 # include "Request.hpp"
 
 class Response {
@@ -28,38 +29,6 @@ class Response {
 
 		Response &	operator=(const Response &rhs);
 
-		void		initDirectives(void);
-		void		setCode(int code);
-		void		setErrorMap(StringIntVectorMap pages);
-		void		setServer(Config& server);
-		void		setRequest(Request& request);
-		void		setIndex(stringVector index);
-		void		setContentLocation(std::string location);
-
-		void		initResponse(void);
-		void		createBody(void);
-		void		createHeader(void);
-		void		readFile(void);
-
-		void		getMethod(void);
-
-	private:
-		static methodMap	initMethods(void);
-		static methodMap	_method;
-
-		static stringMap	_typeMap;
-		static stringMap	initType(void);
-
-	private:
-
-		std::string					_response;
-		int							_code;
-		Config						_server;
-		Request						_request;
-		std::map<int, std::string>	_errorMap;
-		stringVector				_index;
-		std::string					_contentLocation;
-		stringMap					_directives;
 };
 
 

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 02:08:34 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/08 17:43:58 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,6 +267,7 @@ void Webserv::run()
 	int timeout = 200;
 	int nfds = 0;
 	Request		classRequest;
+	Response	classResponse;
 	std::string	request;
 
 	initServers(_parser.getConfigServers());
@@ -308,13 +309,13 @@ void Webserv::run()
 			}
 			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
 			{
-				Response	classResponse;
+				ConfigResponse confResponse;
 				std::string	response;
+
 				// forward request to the right server
 				getRightServer(_clients[_events_pool[j].data.fd]);
-				_parser.parseResponse(_clients[_events_pool[j].data.fd].getRequests().front(), classResponse, _clients[_events_pool[j].data.fd].getServer());
+				_parser.parseResponse(confResponse, _clients[_events_pool[j].data.fd].getRequests().front(), _clients[_events_pool[j].data.fd].getServer());
 				_clients[_events_pool[j].data.fd].getRequests().clear();
-				classResponse.initResponse();
 				// listen client again for other requests and wait for a close connection request
 				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
 					throw std::logic_error("error: send() failed");
