@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:08:27 by sgah              #+#    #+#             */
-/*   Updated: 2021/11/30 20:35:06 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 03:24:50 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,11 @@ void signal_handler(int signum)
  *========================================================================**/
 int		main(int ac, char **av)
 {
-	Parser	parse;
-	Webserv webserv;
-
 	if (ac == 2)
 	{
+		Parser	parse;
+		Webserv webserv;
+
 		signal(SIGINT, signal_handler);
 		try
 		{
@@ -48,4 +48,5 @@ int		main(int ac, char **av)
 			std::cerr << e.what() << '\n';
 		}
 	}
+	return 0;
 }

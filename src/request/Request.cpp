@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:17 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/02 02:49:23 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 06:09:58 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,19 +23,27 @@ Request::~Request(void) {}
 
 Request&	Request::operator=(const Request &rhs)
 {
-	if (this != &rhs)
-	{
-		_method = rhs._method;
-		_version = rhs._version;
-		_ret = rhs._ret;
-		_body = rhs._body;
-		_port = rhs._port;
-		_path = rhs._path;
-		_headers = rhs._headers;
-		_env_for_cgi = rhs._env_for_cgi;
-		_network = rhs._network;
-	}
+	_method = rhs._method;
+	_version = rhs._version;
+	_ret = rhs._ret;
+	_body = rhs._body;
+	_port = rhs._port;
+	_path = rhs._path;
+	_headers = rhs._headers;
+	_env_for_cgi = rhs._env_for_cgi;
+	_network = rhs._network;
 	return (*this);
+}
+
+std::ostream	&operator<<(std::ostream &out, const Request &r)
+{
+	out << "Method: " << r._method << std::endl;
+	out << "Version: " << r._version << std::endl;
+	out << "Body: " << r._body << std::endl;
+	out << "Path: " << r._path << std::endl;
+	for (stringMap::const_iterator i = r._headers.begin(); i != r._headers.end(); i++)
+		out << i->first + ": " + i->second << std::endl;
+	return (out);
 }
 
 void				Request::resetDirective(void)
@@ -146,7 +154,7 @@ std::string		Request::getBody(void) const
 	return _body;
 }
 
-int					Request::getRet() const
+int					Request::getCode() const
 {
 	return _ret;
 }

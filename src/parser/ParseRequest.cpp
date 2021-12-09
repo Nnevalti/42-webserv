@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/02 02:36:07 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 03:53:23 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ void			Parser::parseHeader(stringVector& header, Request& classRequest)
 	std::string	token;
 	std::string	value;
 
-	if (classRequest.getRet() == 500)
+	if (classRequest.getCode() == 500)
 		return ;
 
 	for (stringVector::iterator i = header.begin() + 1; i != header.end(); i++)
@@ -144,7 +144,7 @@ void			Parser::parseRequest(const std::string& request, Request& classRequest)
 
 	parseHeader(header, classRequest);
 
-	if (classRequest.getRet() == 500)
+	if (classRequest.getCode() == 500)
 		return ;
 
 	if(classRequest.getMethod() == "POST")

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 01:37:39 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 05:55:14 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "headers.hpp"
 # include "Config.hpp"
+# include "Request.hpp"
 
 class ConfigResponse {
 
@@ -26,7 +27,9 @@ class ConfigResponse {
 		~ConfigResponse(void);
 
 		ConfigResponse &	operator=(const ConfigResponse &rhs);
+		friend std::ostream	&operator<<(std::ostream &out, const ConfigResponse &conf);
 
+		void				setRequest(Request& request);
 		void				setServer(Config server);
 		void				setLocation(Config location);
 		void				setLocationPath(std::string path);
@@ -41,6 +44,7 @@ class ConfigResponse {
 		void				setIndex(stringVector index);
 		void				setContentLocation(std::string content);
 
+		Request				getRequest(void) const;
 		Config				getServer(void) const;
 		Config				getLocation(void) const;
 		std::string			getLocationPath(void) const;
@@ -56,6 +60,7 @@ class ConfigResponse {
 		std::string			getContentLocation(void) const;
 
 	private:
+		Request			_request;
 		Config			_server;
 		Config			_location;
 		std::string		_locationPath;

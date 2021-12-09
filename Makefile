@@ -34,7 +34,7 @@ REQUEST	= Request.cpp
 
 NET		= t_network.cpp
 
-RESPONSE= Response.cpp
+RESPONSE= Response.cpp ConfigResponse.cpp
 
 SRC		= $(MAIN) \
 		  $(addprefix parser/, $(PARSER)) \

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:16 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 17:14:29 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 06:01:58 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ class Request {
 		~Request(void);
 
 		Request &	operator=(const Request &rhs);
+		friend std::ostream	&operator<<(std::ostream &out, const Request &request);
 
 		void												resetDirective(void);
 
@@ -35,7 +36,7 @@ class Request {
 		stringMap											getHeaders(void) const;
 		std::string											getHeader(std::string str);
 		const stringMap&									getEnv(void) const;
-		int													getRet(void) const;
+		int													getCode(void) const;
 		int													getPort(void) const;
 		t_network											getNetwork(void) const;
 

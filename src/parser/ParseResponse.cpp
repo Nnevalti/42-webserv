@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 01:58:46 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 03:50:35 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 	std::string	locationName(request.getPath());
 	Config		location(findLocation(server, locationName));
 
+	confResponse.setRequest(request);
 	confResponse.setServer(server);
 	confResponse.setLocationFile(request.getPath());
 	confResponse.setLocationPath(locationName);
