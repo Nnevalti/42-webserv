@@ -37,6 +37,7 @@ class Parser
 	public:
 		void					readConf(const char *file);
 		void					parseConf(void);
+		void					checkConfig(void);
 		void					checkDirective(const char * expect, stringVector::iterator* actual);
 		void					parseServer(stringVector::iterator* it, Config& server);
 

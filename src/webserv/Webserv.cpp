@@ -28,23 +28,6 @@ void	Webserv::setParser(Parser& parser)
 }
 
 /*
-	Not used for now but maybe it will be later
-*/
-void Webserv::verifConfig(void)
-{
-	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
-	{
-		t_network net = it->getNetwork();
-		for (confVector::iterator it2 = (it + 1); it2 != _servers.end(); it2++)
-		{
-			t_network net2 = it2->getNetwork();
-			if (net2 == net)
-				throw std::logic_error("error config: Same port and server name forbidden");
-		}
-	}
-}
-
-/*
 	Takes the config vector and create the servers sockets that will listen for connection.
 	We avoid IP/Port pair duplication
 */
@@ -54,7 +37,6 @@ void Webserv::initServers(confVector configServer)
 	netVector::iterator		it2;
 	_servers = configServer;
 
-	// verifConfig();
 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		t_network net = it->getNetwork();
@@ -107,6 +89,7 @@ int Webserv::init_socket(t_network network)
 void Webserv::epoll_init(void)
 {
 	_epfd = epoll_create1(0);
+	std::memset((struct epoll_event *)&_event, 0, sizeof(_event));
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 	{
 		_event.data.fd = *it;
@@ -218,38 +201,21 @@ void	Webserv::getRightServer(Client &client)
 	std::cout << "/*                   getRightServer              */" << '\n';
 	std::cout << "/*************************************************/" << '\n';
 	if (!(client.getRequests().empty()))
-	{
-		std::cout << "REQUEST :" << '\n';
-		std::cout << "HOST/PORT:" << client.getRequests().front().getNetwork() << '\n';
-		std::cout << "PATH:" << client.getRequests().front().getPath() << '\n';
-		std::cout << "REQUEST METHOD:" << client.getRequests().front().getMethod() << '\n';
-	}
+		std::cout << "REQUEST:\nHOST/PORT:" << client.getRequests().front().getNetwork() << '\n';
 	std::cout << '\n';
+
 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		if (client.getRequests().front().getNetwork() == it->getNetwork())
 		{
-			if (comparePath(client.getRequests().front().getPath(), it->getRoot())
-				&& compareMethod(client.getRequests().front().getMethod(), it->getAllowedMethods()))
-			{
-				rightConf = *it;
-				foundAConf = true;
-				std::cout << "CONFIG :" << '\n';
-				std::cout << "IP/PORT:" << it->getNetwork() << '\n';
-				std::cout << "PATH:" << it->getRoot() << '\n';
-				stringVector methods = it->getAllowedMethods();
-				std::cout << "ALLOWED METHOD: ";
-				for (stringVector::iterator it2 = methods.begin(); it2 != methods.end(); it2++)
-					std::cout << *it2 << ' ';
-				std::cout << '\n';
-				// break ;
-			}
+			rightConf = *it;
+			foundAConf = true;
+			std::cout << "CONFIG:\nIP/PORT:" << it->getNetwork() << '\n';
+			break ;
 		}
 	}
 	if (!foundAConf)
-	{
 		std::cout << "No corresponding server" << '\n';
-	}
 	std::cout << "/*************************************************/" << '\n';
 	std::cout << "/*                          END                  */" << '\n';
 	std::cout << "/*************************************************/" << '\n';

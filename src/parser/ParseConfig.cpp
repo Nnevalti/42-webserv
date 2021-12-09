@@ -63,6 +63,20 @@ void			Parser::checkDirective(const char* expect, stringVector::iterator* actual
 	(*actual)++;
 }
 
+void Parser::checkConfig(void)
+{
+	for (confVector::iterator it = _ConfigServers.begin(); it != _ConfigServers.end(); it++)
+	{
+		t_network net = it->getNetwork();
+		for (confVector::iterator it2 = (it + 1); it2 != _ConfigServers.end(); it2++)
+		{
+			t_network net2 = it2->getNetwork();
+			if (net2 == net)
+				throw std::logic_error("error config: Same port and server name forbidden");
+		}
+	}
+}
+
 void			Parser::parseConf(void)
 {
 	for (stringVector::iterator it = _configfile.begin(); it != _configfile.end(); it++)
@@ -77,6 +91,7 @@ void			Parser::parseConf(void)
 		std::cout << confServer;
 		_ConfigServers.push_back(confServer);
 	}
+	checkConfig();
 	return ;
 }
 
