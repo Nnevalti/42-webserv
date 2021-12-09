@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 02:21:54 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 06:14:13 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,18 @@ Response::Response(Response const & src)
 
 Response::~Response(void) {}
 
-Response&	Response::operator=(const Response& rhs)
+Response &	Response::operator=(const Response &rhs)
 {
-	_response = rhs._response;
-	_code = rhs._code;
-	_server = rhs._server;
-	_request = rhs._request;
-	_errorMap = rhs._errorMap;
-	_directives = rhs._directives;
-
+	_config = rhs._config;
 	return (*this);
 }
 
-methodMap	Response::initMethods()
+std::string	Response::getResponse(void) const
+{
+	return (_response);
+}
+
+methodMap	Response::initMethods(void)
 {
 	methodMap map;
 
@@ -44,84 +43,130 @@ methodMap	Response::initMethods()
 
 methodMap Response::_method = Response::initMethods();
 
+stringMap	Response::initType()
+{
+	stringMap tmp;
+
+	tmp["html"] = "text/html";
+	tmp["css"] = "text/css";
+	tmp["js"] = "text/javascript";
+	tmp["jpeg"] = "image/jpeg";
+	tmp["jpg"] = "image/jpeg";
+	tmp["png"] = "image/png";
+	tmp["bmp"] = "image/bmp";
+	return (tmp);
+}
+
+stringMap Response::_typeMap = Response::initType();
+
+std::string	Response::findType(std::string contentlocation)
+{
+	std::string type(contentlocation.substr(contentlocation.rfind(".") + 1, contentlocation.size() - contentlocation.rfind(".")));
+	if (_typeMap.find(type) == _typeMap.end())
+		return "text/plain";
+	return _typeMap[type];
+}
+
 void	Response::initDirectives(void)
 {
-	_directives["_allow"] = "";
-	_directives["_contentLanguage"] = "";
-	_directives["_contentLength"] = "";
-	_directives["_contentLocation"] = "";
-	_directives["_contentType"] = "";
-	_directives["_date"] = "";
-	_directives["_lastModified"] = "";
-	_directives["_location"] = "";
-	_directives["_retryAfter"] = "";
-	_directives["_server"] = "";
-	_directives["_transferEncoding"] = "";
-	_directives["_wwwAuthenticate"] = "";
+	_directives["Allow"] = "";
+	_directives["Content-Language"] = "";
+	_directives["Content-Length"] = "";
+	_directives["Content-Location"] = "";
+	_directives["Content-Type"] = "";
+	_directives["Date"] = "";
+	_directives["Last-Modified"] = "";
+	_directives["Location"] = "";
+	_directives["Retry-After"] = "";
+	_directives["Server"] = "Webserv 0.1";
+	_directives["Transfer-Encoding"] = "identity";
+	_directives["WwwAuthenticate"] = "";
 }
 
-void	Response::setCode(int code)
+void			Response::initErrorMap(void)
 {
-	_code = code;
+	_errors[100] = "Continue";
+	_errors[200] = "OK";
+	_errors[201] = "Created";
+	_errors[204] = "No Content";
+	_errors[400] = "Bad Request";
+	_errors[403] = "Forbidden";
+	_errors[404] = "Not Found";
+	_errors[405] = "Method Not Allowed";
+	_errors[413] = "Payload Too Large";
+	_errors[500] = "Internal Server Error";
 }
 
-void	Response::setErrorMap(StringIntVectorMap page)
+void		Response::resetResponse(ConfigResponse& conf)
 {
-	for (StringIntVectorMap::const_iterator i = page.begin(); i != page.end(); i++)
+	_code = 200;
+	_header = "";
+	initDirectives();
+	_config = conf;
+}
+
+static std::string	getDate(void)
+{
+	char			buffer[100];
+	struct timeval	tv;
+	struct tm		*tm;
+
+	gettimeofday(&tv, NULL);
+	tm = gmtime(&tv.tv_sec);
+	strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
+	return (std::string(buffer));
+}
+
+static std::string	getLastModif(const std::string& path)
+{
+	char			buffer[100];
+	struct stat		stats;
+	struct tm		*tm;
+
+	if (stat(path.c_str(), &stats) == 0)
 	{
-		std::vector<int> tmp(i->second);
-
-		for ( std::vector<int>::iterator it = tmp.begin(); it != tmp.end(); i++)
-			_errorMap[*it] = i->first;
+		tm = gmtime(&stats.st_mtime);
+		strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
+		return (std::string(buffer));
 	}
+	return ("");
 }
 
-void	Response::setRequest(Request& request)
+void		Response::createHeader(int code)
 {
-	_request = request;
+	_header = "HTTP/1.1 " + (static_cast<std::ostringstream*>( &(std::ostringstream() << code) )->str());
+	_header = " " + _errors[code] + "\r\n";
+	_directives["Content-Language"] = _config.getLanguage();
+	//IF the error dont have a file
+	_directives["Content-Length"] = "0";
+	if (code != 404)
+		_directives["Content-Location"] = _config.getContentLocation();
+	_directives["Date"] = getDate();
+	_directives["Last-Modified"] = getLastModif(_config.getContentLocation());
+	_directives["Content-Type"] = "";
+	if (code == 503 || code == 429 || code == 301)
+		_directives["Retry-After"] = "2";
+	if (code == 401)
+		_directives["WwwAuthenticate"] = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
+	for (stringMap::const_iterator i = _directives.begin(); i != _directives.end(); i++)
+		if (i->second != "")
+			_header+= i->first + ": " + i->second + "\r\n";
+	_response = _header;
 }
 
-void	Response::setServer(Config& server)
+void		Response::InitResponseProcess(void)
 {
-	_server = server;
-}
-
-static int		checkPath(const std::string& path)
-{
-	struct stat s;
-	if (stat(path.c_str(), &s) == 0 )
-	{
-		if (s.st_mode & S_IFDIR)
-			return 2; // IS A DIRECTORY
-		else if (s.st_mode & S_IFREG)
-			return 1; //IS A REGULAR FILE
-		else
-			return 0; //SOMETHING ELSE
-	}
+	if (_config.getAllowMethod().find(_config.getRequest().getMethod()) == _config.getAllowMethod().end())
+		_code = 405;
+	else if (_config.getClientBodyBufferSize() < _config.getRequest().getBody().size())
+		_code = 413;
+	if (_code != 200)
+		createHeader(_code);
 	else
-		return (-1); //ERROR
+		(this->*Response::_method[_config.getRequest().getMethod()])();
 }
 
-void	Response::initResponse(void)
-{
-	if (_code == 200)
-		(this->*Response::_method[_request.getMethod()])();
-
-}
-void	Response::createBody(void)
+void		Response::getMethod(void)
 {
 
 }
-
-void	Response::createHeader(void)
-{
-
-}
-
-void	Response::getMethod(void)
-{
-
-}
-
-
-

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 01:19:36 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/08 20:48:23 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,18 @@
 # define MAX_EV 4096
 # define MAX_CLIENTS 1000
 
+# define IS_A_DIRECTORY 2
+# define IS_A_FILE 1
+# define IS_SOMETHING_ELSE 0
+
 # define stringVector				std::vector<std::string>
+# define errorMap					std::map<int, std::string>
 # define stringMap					std::map<std::string, std::string>
 # define netVector					std::vector<t_network>
 # define serverMap					std::map<std::string, Config>
 # define confVector					std::vector<Config>
 # define parseDirectiveMap			std::map<std::string, void (Parser::*)(Config&, stringVector)>
 # define methodMap					std::map<std::string, void (Response::*)(void)>
-# define StringIntVectorMap			std::map<std::string, std::vector<int> >
+# define stringIntVectorMap			std::map<std::string, std::vector<int> >
 # define pairStringIntVector		std::pair<std::string, std::vector<int> >
+# define stringSet					std::set<std::string>

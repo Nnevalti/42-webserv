@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 02:07:37 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 05:30:11 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "headers.hpp"
 # include "Config.hpp"
+# include "ConfigResponse.hpp"
 # include "Request.hpp"
 
 class Response {
@@ -28,31 +29,34 @@ class Response {
 
 		Response &	operator=(const Response &rhs);
 
+		void		resetResponse(ConfigResponse& conf);
+
+		void		createHeader(int code);
+
+		void		getMethod(void);
+
+		std::string	findType(std::string contentlocation);
+
+		void		InitResponseProcess(void);
 		void		initDirectives(void);
-		void		setCode(int code);
-		void		setErrorMap(StringIntVectorMap pages);
-		void		setServer(Config& server);
-		void		setRequest(Request& request);
+		void		initErrorMap(void);
 
-		void		initResponse(void);
-		void		createBody(void);
-		void		createHeader(void);
-
-		void		getMethod();
+		std::string	getResponse(void) const;
 
 	private:
 		static methodMap	initMethods(void);
 		static methodMap	_method;
 
+		static stringMap	_typeMap;
+		static stringMap	initType(void);
 
 	private:
-
-		std::string					_response;
-		int							_code;
-		Config						_server;
-		Request						_request;
-		std::map<int, std::string>	_errorMap;
-		stringMap					_directives;
+		ConfigResponse		_config;
+		errorMap			_errors;
+		int					_code;
+		stringMap			_directives;
+		std::string			_header;
+		std::string			_response;
 };
 
 

@@ -6,13 +6,14 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 02:11:18 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/08 20:46:33 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
-Config::Config(void): _client_body_buffer_size(0), _autoindex(false)
+Config::Config(void):
+_root(""), _client_body_buffer_size(0), _autoindex(false), _alias(""),_alias_set(false)
 {}
 
 Config::Config(Config const & src)
@@ -161,9 +162,14 @@ std::string		Config::getAlias(void)
 	return (_alias);
 }
 
-StringIntVectorMap	Config::getErrorPage(void)
+stringIntVectorMap	Config::getErrorPage(void)
 {
 	return (_error_page);
+}
+
+bool				Config::getisAliasSet(void)
+{
+	return (_alias_set);
 }
 
 std::ostream	&operator<<(std::ostream &out, const Config &server)
@@ -187,7 +193,7 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 	}
 
 	out << std::endl<< "error_page:" << std::endl;
-	for (StringIntVectorMap::const_iterator i = server._error_page.begin(); i != server._error_page.end(); i++)
+	for (stringIntVectorMap::const_iterator i = server._error_page.begin(); i != server._error_page.end(); i++)
 	{
 		out << "\t";
 		std::vector<int> tmp((*i).second);

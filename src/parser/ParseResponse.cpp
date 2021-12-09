@@ -6,20 +6,48 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/07 02:09:36 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/09 03:50:35 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parser.hpp"
 
-void					Parser::parseResponse(Request& request, Response& response, Config& server)
+Config		Parser::findLocation(Config& server, std::string& locationName)
 {
-	response.initDirectives();
-	response.setErrorMap(server.getErrorPage());
-	response.setServer(server);
-	if (std::find(server.getAllowedMethods().begin(), server.getAllowedMethods().end(), request.getMethod()) == server.getAllowedMethods().end())
-		response.setCode(405);
-	else if (server.getClientBodyBufferSize() < request.getBody().size())
-		response.setCode(413);
-	response.setCode(200);
+	serverMap locations(server.getLocation());
+
+	if (locationName.empty())
+		return server;
+	if (locations.empty())
+		return server;
+
+	for (serverMap::const_iterator i = locations.begin(); i != locations.end(); i++)
+		if (locationName == i->first)
+			return i->second;
+	return server;
+}
+
+void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Config& server)
+{
+	std::string	locationName(request.getPath());
+	Config		location(findLocation(server, locationName));
+
+	confResponse.setRequest(request);
+	confResponse.setServer(server);
+	confResponse.setLocationFile(request.getPath());
+	confResponse.setLocationPath(locationName);
+	confResponse.setLocation(location);
+	confResponse.setErrorMap(server.getErrorPage());
+	confResponse.setClientBodyBufferSize(location.getClientBodyBufferSize());
+	confResponse.setCgiParam(location.getCgiParam());
+	confResponse.setCgiPass(location.getCgiPass());
+	confResponse.setAllowMethod(location.getAllowedMethods());
+	confResponse.setLanguage(request.getHeader("Accept-Language"));
+	confResponse.setAutoIndex(server.getAutoIndex());
+	confResponse.setIndex(location.getIndex());
+
+	if (location.getisAliasSet())
+		confResponse.setContentLocation(location.getRoot() + location.getAlias() + request.getPath());
+	else
+		confResponse.setContentLocation(location.getRoot() + request.getPath());
 }
