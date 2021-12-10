@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 06:11:36 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/10 14:58:44 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ ConfigResponse&		ConfigResponse::operator=(const ConfigResponse& rhs)
 	_cgiParam = rhs._cgiParam;
 	_cgiPass = rhs._cgiPass;
 	_allowMethod = rhs._allowMethod;
+	_allow = rhs._allow;
 	_acceptLanguage = rhs._acceptLanguage;
 	_autoIndex = rhs._autoIndex;
 	_index = rhs._index;
@@ -130,6 +131,7 @@ void				ConfigResponse::setAllowMethod(stringVector allow)
 {
 	for (stringVector::const_iterator i = allow.begin(); i != allow.end(); i++)
 		_allowMethod.insert(*i);
+	_allow = allow;
 }
 
 void				ConfigResponse::setLanguage(std::string lang)
@@ -202,6 +204,11 @@ std::string			ConfigResponse::getCgiPass(void) const
 stringSet			ConfigResponse::getAllowMethod(void) const
 {
 	return (_allowMethod);
+}
+
+stringVector		ConfigResponse::getAllow(void) const
+{
+	return (_allow);
 }
 
 std::string			ConfigResponse::getLanguage(void) const

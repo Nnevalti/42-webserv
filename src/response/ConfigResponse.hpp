@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 05:55:14 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/10 14:56:55 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class ConfigResponse {
 		stringVector		getCgiParam(void) const;
 		std::string			getCgiPass(void) const;
 		stringSet			getAllowMethod(void) const;
+		stringVector		getAllow(void) const;
 		std::string			getLanguage(void) const;
 		bool				getAutoIndex(void) const;
 		stringVector		getIndex(void) const;
@@ -70,6 +71,7 @@ class ConfigResponse {
 		stringVector	_cgiParam;
 		std::string		_cgiPass;
 		stringSet		_allowMethod;
+		stringVector	_allow;
 		std::string		_acceptLanguage;
 		bool			_autoIndex;
 		stringVector	_index;

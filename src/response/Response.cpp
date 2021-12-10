@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 06:14:13 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/10 15:26:05 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,7 @@ void		Response::resetResponse(ConfigResponse& conf)
 {
 	_code = 200;
 	_header = "";
+	initErrorMap();
 	initDirectives();
 	_config = conf;
 }
@@ -134,8 +135,15 @@ static std::string	getLastModif(const std::string& path)
 
 void		Response::createHeader(int code)
 {
-	_header = "HTTP/1.1 " + (static_cast<std::ostringstream*>( &(std::ostringstream() << code) )->str());
-	_header = " " + _errors[code] + "\r\n";
+	stringVector tmp(_config.getAllow());
+
+	_header += "HTTP/1.1 " + (static_cast<std::ostringstream*>( &(std::ostringstream() << code) )->str());
+	_header += " " + _errors[code] + "\r\n";
+	for (stringVector::iterator i = tmp.begin(); i != tmp.end(); i++)
+		if (i + 1 == tmp.end())
+			_directives["Allow"] += *i;
+		else
+			_directives["Allow"] += *i + " ";
 	_directives["Content-Language"] = _config.getLanguage();
 	//IF the error dont have a file
 	_directives["Content-Length"] = "0";
@@ -147,16 +155,18 @@ void		Response::createHeader(int code)
 	if (code == 503 || code == 429 || code == 301)
 		_directives["Retry-After"] = "2";
 	if (code == 401)
-		_directives["WwwAuthenticate"] = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
+		_directives["WWW-Authenticate"] = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
 	for (stringMap::const_iterator i = _directives.begin(); i != _directives.end(); i++)
 		if (i->second != "")
 			_header+= i->first + ": " + i->second + "\r\n";
-	_response = _header;
+	_response = _header + "\r\n";
 }
 
 void		Response::InitResponseProcess(void)
 {
-	if (_config.getAllowMethod().find(_config.getRequest().getMethod()) == _config.getAllowMethod().end())
+	stringSet tmp(_config.getAllowMethod());
+
+	if (tmp.find(_config.getRequest().getMethod()) == tmp.end())
 		_code = 405;
 	else if (_config.getClientBodyBufferSize() < _config.getRequest().getBody().size())
 		_code = 413;

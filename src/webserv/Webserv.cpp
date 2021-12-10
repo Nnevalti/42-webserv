@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 06:12:39 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/10 14:33:24 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,12 +281,11 @@ void Webserv::run()
 				// forward request to the right server
 				getRightServer(_clients[_events_pool[j].data.fd]);
 				_parser.parseResponse(confResponse, _clients[_events_pool[j].data.fd].getRequests().front(), _clients[_events_pool[j].data.fd].getServer());
-				std::cout << confResponse.getRequest();
-				std::cout << confResponse;
-
+				std::cout << confResponse.getRequest() << std::endl;
 				classResponse.resetResponse(confResponse);
 				classResponse.InitResponseProcess();
 				response = classResponse.getResponse();
+				std::cout << response << std::endl;
 				// listen client again for other requests and wait for a close connection request
 				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
 					throw std::logic_error("error: send() failed");
