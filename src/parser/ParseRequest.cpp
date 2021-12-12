@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 03:53:23 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/11 14:56:53 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,10 @@ void			Parser::parseHeader(stringVector& header, Request& classRequest)
 		token = findtoken(*i);
 		value = findvalue(*i);
 		if (classRequest.getHeaders().count(token))
+		{
 			classRequest.setHeader(token, value);
+			classRequest.setEnvForCgi(token, value);
+		}
 	}
 }
 
