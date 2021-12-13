@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/08 20:48:23 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/13 19:24:48 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@
 # define BUFFER_SIZE 512
 # define MAX_EV 4096
 # define MAX_CLIENTS 1000
+
+# define DEFAULT "pages/default.conf"
 
 # define IS_A_DIRECTORY 2
 # define IS_A_FILE 1

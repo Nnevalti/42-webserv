@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 01:06:59 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/13 19:23:02 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ class Parser
  *========================================================================**/
 	public:
 		void					readConf(const char *file);
+		void					readConf();
 		void					parseConf(void);
 		void					checkConfig(void);
 		void					checkDirective(const char * expect, stringVector::iterator* actual);
@@ -45,6 +46,7 @@ class Parser
 
 	private:
 		stringVector			_configfile;
+		stringVector			_defaultConfigFile;
 		confVector				_ConfigServers;
 
 	private:

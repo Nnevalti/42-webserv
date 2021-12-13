@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/13 16:35:51 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/13 16:59:25 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,14 +210,19 @@ void		Response::createHeader(int code)
 
 	_header += "HTTP/1.1 " + (static_cast<std::ostringstream*>( &(std::ostringstream() << code) )->str());
 	_header += " " + _errors[code] + "\r\n";
-	for (stringVector::iterator i = tmp.begin(); i != tmp.end(); i++)
-		if (i + 1 == tmp.end())
-			_directives["Allow"] += *i;
-		else
-			_directives["Allow"] += *i + " ";
+	if(code == 405)
+	{
+		for (stringVector::iterator i = tmp.begin(); i != tmp.end(); i++)
+			if (i + 1 == tmp.end())
+				_directives["Allow"] += *i;
+			else
+				_directives["Allow"] += *i + " ";
+	}
 	_directives["Content-Language"] = _config.getLanguage();
-	//IF the error dont have a file
-	_directives["Content-Length"] = readFile(code);
+	if (code != 200)
+		_directives["Content-Length"] = readFile(code);
+	else
+		_directives["Content-Length"] = readFile(_config.getContentLocation());
 	if (code != 404)
 		_directives["Content-Location"] = _config.getContentLocation();
 	_directives["Date"] = getDate();
@@ -249,5 +254,5 @@ void		Response::InitResponseProcess(void)
 
 void		Response::getMethod(void)
 {
-
+	createHeader(200);
 }

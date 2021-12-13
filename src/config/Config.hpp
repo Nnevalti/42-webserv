@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/08 20:46:33 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/13 19:49:11 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class Config {
 		void				setAutoIndex(bool autoIndex);
 		void				setAlias(std::string alias);
 		void				setErrorPage(std::string page, std::vector<int> codes);
+		void				setErrorCode(std::string page, int code);
 
 		t_network			getNetwork(void);
 		stringVector		getServerName(void);
