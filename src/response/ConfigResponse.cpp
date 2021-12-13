@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/10 14:58:44 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/12 21:07:25 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void				ConfigResponse::setLocationFile(std::string path)
 void				ConfigResponse::setErrorMap(stringIntVectorMap map)
 {
 	for (stringIntVectorMap::iterator i = map.begin(); i != map.end(); i++)
-		for (std::vector<int>::iterator it = i->second.begin(); it != i->second.end(); i++)
+		for (std::vector<int>::iterator it = i->second.begin(); it != i->second.end(); it++)
 			_errorPage[*it] = i->first;
 }
 
@@ -184,6 +184,13 @@ std::string			ConfigResponse::getLocationFile(void) const
 errorMap			ConfigResponse::getErrorMap(void) const
 {
 	return (_errorPage);
+}
+
+std::string			ConfigResponse::getErrorPath(int code) const
+{
+	if (_errorPage.find(code) == _errorPage.end())
+		return ("");
+	return (_errorPage.at(code));
 }
 
 size_t				ConfigResponse::getClientBodyBufferSize(void) const

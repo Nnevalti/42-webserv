@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:17 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 06:09:58 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/11 14:56:08 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,15 @@ void										Request::setVersion(std::string version)
 void										Request::setHeader(std::string token, std::string value)
 {
 	_headers[token] = value;
+}
+
+void										Request::setEnvForCgi(std::string token, std::string value)
+{
+	std::transform(token.begin(), token.end(), token.begin(), ::toupper);
+	for (size_t i = 0 ; i < token.size() ; i++)
+		if (token[i] == '-')
+			token[i] = '_';
+	_env_for_cgi["HTTP_" + token] = value;
 }
 
 void										Request::setNetwork(std::string IpPort)

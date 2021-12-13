@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 05:30:11 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/11 15:31:19 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ class Response {
 
 		void		getMethod(void);
 
+		std::string	readFile(int code);
+		std::string readFile(std::string path);
+
 		std::string	findType(std::string contentlocation);
 
 		void		InitResponseProcess(void);
@@ -56,6 +59,7 @@ class Response {
 		int					_code;
 		stringMap			_directives;
 		std::string			_header;
+		std::string			_body;
 		std::string			_response;
 };
 

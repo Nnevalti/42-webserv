@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/08 20:46:33 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/12 21:08:34 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,13 +196,12 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 	for (stringIntVectorMap::const_iterator i = server._error_page.begin(); i != server._error_page.end(); i++)
 	{
 		out << "\t";
-		std::vector<int> tmp((*i).second);
-		for (std::vector<int>::const_iterator it = tmp.begin(); it != tmp.end(); i++)
+		std::vector<int> tmp(i->second);
+		for (std::vector<int>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
 		{
 			out << *it;
 			if (it != tmp.end() - 1)
 				out << " ";
-
 		}
 		out << i->first << std::endl;
 	}

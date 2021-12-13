@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/10 14:56:55 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/11 15:19:13 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ class ConfigResponse {
 		std::string			getLocationPath(void) const;
 		std::string			getLocationFile(void) const;
 		errorMap			getErrorMap(void) const;
+		std::string			getErrorPath(int code) const;
 		size_t				getClientBodyBufferSize(void) const;
 		stringVector		getCgiParam(void) const;
 		std::string			getCgiPass(void) const;

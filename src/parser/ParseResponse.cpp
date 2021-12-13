@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/09 03:50:35 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/12 20:49:29 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 	confResponse.setLocationFile(request.getPath());
 	confResponse.setLocationPath(locationName);
 	confResponse.setLocation(location);
-	confResponse.setErrorMap(server.getErrorPage());
+	confResponse.setErrorMap(location.getErrorPage());
 	confResponse.setClientBodyBufferSize(location.getClientBodyBufferSize());
 	confResponse.setCgiParam(location.getCgiParam());
 	confResponse.setCgiPass(location.getCgiPass());

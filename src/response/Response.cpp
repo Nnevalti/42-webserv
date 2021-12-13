@@ -6,11 +6,55 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/10 15:26:05 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/12 21:15:55 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+
+static int		checkPath(const std::string& path)
+{
+	struct stat s;
+
+	if (stat(path.c_str(), &s) == 0 )
+	{
+		if (s.st_mode & S_IFDIR)
+			return 2;
+		else if (s.st_mode & S_IFREG)
+			return 1;
+		else
+			return 0;
+	}
+	else
+		return 0;
+}
+
+static std::string	getDate(void)
+{
+	char			buffer[100];
+	struct timeval	tv;
+	struct tm		*tm;
+
+	gettimeofday(&tv, NULL);
+	tm = gmtime(&tv.tv_sec);
+	strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
+	return (std::string(buffer));
+}
+
+static std::string	getLastModif(const std::string& path)
+{
+	char			buffer[100];
+	struct stat		stats;
+	struct tm		*tm;
+
+	if (stat(path.c_str(), &stats) == 0)
+	{
+		tm = gmtime(&stats.st_mtime);
+		strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
+		return (std::string(buffer));
+	}
+	return ("");
+}
 
 Response::Response(void) {}
 
@@ -101,36 +145,63 @@ void		Response::resetResponse(ConfigResponse& conf)
 {
 	_code = 200;
 	_header = "";
+	_body = "";
 	initErrorMap();
 	initDirectives();
 	_config = conf;
 }
 
-static std::string	getDate(void)
+std::string			Response::readFile(int code)
 {
-	char			buffer[100];
-	struct timeval	tv;
-	struct tm		*tm;
+	std::string	path(_config.getErrorPath(code));
+	std::ofstream		file;
+	std::stringstream	buffer;
 
-	gettimeofday(&tv, NULL);
-	tm = gmtime(&tv.tv_sec);
-	strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
-	return (std::string(buffer));
+	if (checkPath(path) == 1)
+	{
+		file.open(path.c_str(), std::ifstream::in);
+		if (file.is_open() == false)
+		{
+			readFile("./pages/error_pages/404.html");
+			return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
+		}
+		buffer << file.rdbuf();
+		file.close();
+		_directives["Content-Type"] = "text/html";
+		_body = buffer.str();
+		return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
+	}
+	else
+		readFile("./pages/error_pages/404.html");
+	return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 }
 
-static std::string	getLastModif(const std::string& path)
+std::string			Response::readFile(std::string path)
 {
-	char			buffer[100];
-	struct stat		stats;
-	struct tm		*tm;
+	std::ofstream		file;
+	std::stringstream	buffer;
 
-	if (stat(path.c_str(), &stats) == 0)
+	if (checkPath(path) == 1)
 	{
-		tm = gmtime(&stats.st_mtime);
-		strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
-		return (std::string(buffer));
+		file.open(path.c_str(), std::ifstream::in);
+		if (file.is_open() == false)
+		{
+			_code = 404;
+			_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
+			return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
+		}
+		buffer << file.rdbuf();
+		file.close();
+		_directives["Content-Type"] = "text/html";
+		_body = buffer.str();
+		return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 	}
-	return ("");
+	else
+	{
+		_code = 404;
+		_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
+	}
+	return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 }
 
 void		Response::createHeader(int code)
@@ -146,12 +217,11 @@ void		Response::createHeader(int code)
 			_directives["Allow"] += *i + " ";
 	_directives["Content-Language"] = _config.getLanguage();
 	//IF the error dont have a file
-	_directives["Content-Length"] = "0";
+	_directives["Content-Length"] = readFile(code);
 	if (code != 404)
 		_directives["Content-Location"] = _config.getContentLocation();
 	_directives["Date"] = getDate();
 	_directives["Last-Modified"] = getLastModif(_config.getContentLocation());
-	_directives["Content-Type"] = "";
 	if (code == 503 || code == 429 || code == 301)
 		_directives["Retry-After"] = "2";
 	if (code == 401)
@@ -159,7 +229,7 @@ void		Response::createHeader(int code)
 	for (stringMap::const_iterator i = _directives.begin(); i != _directives.end(); i++)
 		if (i->second != "")
 			_header+= i->first + ": " + i->second + "\r\n";
-	_response = _header + "\r\n";
+	_response = _header + "\r\n" + _body;
 }
 
 void		Response::InitResponseProcess(void)
