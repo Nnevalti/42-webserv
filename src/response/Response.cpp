@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/12 21:15:55 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/13 16:35:51 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,9 +240,10 @@ void		Response::InitResponseProcess(void)
 		_code = 405;
 	else if (_config.getClientBodyBufferSize() < _config.getRequest().getBody().size())
 		_code = 413;
+
 	if (_code != 200)
 		createHeader(_code);
-	else
+	else if(_method.find(_config.getRequest().getMethod()) != _method.end())
 		(this->*Response::_method[_config.getRequest().getMethod()])();
 }
 
