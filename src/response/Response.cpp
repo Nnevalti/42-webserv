@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/11 16:02:10 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/12 21:15:55 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,6 +186,7 @@ std::string			Response::readFile(std::string path)
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 		{
+			_code = 404;
 			_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
 			return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 		}
@@ -196,7 +197,10 @@ std::string			Response::readFile(std::string path)
 		return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 	}
 	else
+	{
+		_code = 404;
 		_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
+	}
 	return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 }
 
