@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/12 20:49:29 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/14 14:34:47 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,9 @@ Config		Parser::findLocation(Config& server, std::string& locationName)
 		return server;
 
 	for (serverMap::const_iterator i = locations.begin(); i != locations.end(); i++)
-		if (locationName == i->first)
-			return i->second;
+		for (std::string tmp = locationName; tmp.empty(); tmp.resize(tmp.size() - 1))
+			if (tmp == i->first)
+				return i->second;
 	return server;
 }
 
@@ -46,6 +47,7 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 	confResponse.setAutoIndex(server.getAutoIndex());
 	confResponse.setIndex(location.getIndex());
 
+	std::cout << (location.getisAliasSet() ? "YES" : "NO") << std::endl;
 	if (location.getisAliasSet())
 		confResponse.setContentLocation(location.getRoot() + location.getAlias() + request.getPath());
 	else

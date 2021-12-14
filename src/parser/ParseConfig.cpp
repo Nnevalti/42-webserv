@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/01 15:47:42 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/14 14:15:05 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,34 @@ void			Parser::readConf(const char *file)
 	return ;
 }
 
+void			Parser::readConf()
+{
+	std::string	conf("");
+	std::string	whitespace(" \t\n\v\r\f");
+	char		stack[BUFFER_SIZE + 1];
+	int			fd;
+	int			ret;
+	size_t		start;
+	size_t		end(0);
+
+	if ((fd = open(DEFAULT, O_RDONLY)) <= 0)
+		throw std::runtime_error("Error Parsing: File does not exist...");
+
+	while ((ret = read(fd, stack, BUFFER_SIZE)) > 0 && !(stack[ret] = '\0'))
+		conf += stack;
+
+	if (ret < 0)
+		throw std::runtime_error("Error Parsing: Error meanwhile reading the file...");
+
+	conf += "\n";
+
+	while ((start = conf.find_first_not_of(whitespace, end)) != std::string::npos &&
+		(end = conf.find_first_of(whitespace, start)) != std::string::npos)
+		_defaultConfigFile.push_back(conf.substr(start, end - start));
+
+	return ;
+}
+
 void			Parser::checkDirective(const char* expect, stringVector::iterator* actual)
 {
 	std::string errormsg;
@@ -82,7 +110,16 @@ void			Parser::parseConf(void)
 	for (stringVector::iterator it = _configfile.begin(); it != _configfile.end(); it++)
 	{
 		Config	confServer;
-		std::cout << *it << std::endl;
+
+		for (stringVector::iterator i = _defaultConfigFile.begin(); i != _defaultConfigFile.end(); i++)
+		{
+			checkDirective("server", &i);
+			checkDirective("{", &i);
+			parseServer(&i, confServer);
+			if (*i != "}")
+				throw std::runtime_error("Error Parsing: Curly brackets not close at the end of server block in default.conf");
+		}
+
 		checkDirective("server", &it);
 		checkDirective("{", &it);
 		parseServer(&it, confServer);
@@ -242,6 +279,7 @@ void					Parser::parseErrorPage(Config& configServer,stringVector opts)
 	std::vector<int>	error_code;
 	int					code;
 	std::string			error_page("");
+	stringIntVectorMap	error_map(configServer.getErrorPage());
 
 	if(opts.empty())
 		throw std::runtime_error("Error Parsing: Missing error_page's directive arguments(root to page)");
@@ -258,6 +296,14 @@ void					Parser::parseErrorPage(Config& configServer,stringVector opts)
 		throw std::runtime_error("Error Parsing: Missing error_page's directive arguments(root to page)");
 	if(error_code.empty())
 		throw std::runtime_error("Error Parsing: Missing error_page's directive arguments(error code)");
+
+	if(error_map.find(error_page) != error_map.end())
+	{
+		for (std::vector<int>::iterator i = error_code.begin(); i != error_code.end(); i++)
+			configServer.setErrorCode(error_page, *i);
+		return ;
+	}
+
 	configServer.setErrorPage(error_page, error_code);
 }
 

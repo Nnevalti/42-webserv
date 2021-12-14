@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/13 16:35:51 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/13 22:43:28 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,8 @@ std::string			Response::readFile(int code)
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 		{
-			readFile("./pages/error_pages/404.html");
+			_code = 404;
+			readFile(_config.getErrorMap()[404]);
 			return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 		}
 		buffer << file.rdbuf();
@@ -172,7 +173,10 @@ std::string			Response::readFile(int code)
 		return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 	}
 	else
-		readFile("./pages/error_pages/404.html");
+	{
+		_code = 404;
+		readFile(_config.getErrorMap()[404]);
+	}
 	return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 }
 
@@ -204,28 +208,34 @@ std::string			Response::readFile(std::string path)
 	return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 }
 
-void		Response::createHeader(int code)
+void		Response::createHeader(void)
 {
 	stringVector tmp(_config.getAllow());
 
-	_header += "HTTP/1.1 " + (static_cast<std::ostringstream*>( &(std::ostringstream() << code) )->str());
-	_header += " " + _errors[code] + "\r\n";
-	for (stringVector::iterator i = tmp.begin(); i != tmp.end(); i++)
-		if (i + 1 == tmp.end())
-			_directives["Allow"] += *i;
-		else
-			_directives["Allow"] += *i + " ";
+	if(_code == 405)
+	{
+		for (stringVector::iterator i = tmp.begin(); i != tmp.end(); i++)
+			if (i + 1 == tmp.end())
+				_directives["Allow"] += *i;
+			else
+				_directives["Allow"] += *i + " ";
+	}
 	_directives["Content-Language"] = _config.getLanguage();
-	//IF the error dont have a file
-	_directives["Content-Length"] = readFile(code);
-	if (code != 404)
+	if (_code != 200)
+		_directives["Content-Length"] = readFile(_code);
+	else
+		_directives["Content-Length"] = readFile(_config.getContentLocation());
+	if (_code != 404)
 		_directives["Content-Location"] = _config.getContentLocation();
 	_directives["Date"] = getDate();
 	_directives["Last-Modified"] = getLastModif(_config.getContentLocation());
-	if (code == 503 || code == 429 || code == 301)
+	if (_code == 503 || _code == 429 || _code == 301)
 		_directives["Retry-After"] = "2";
-	if (code == 401)
+	if (_code == 401)
 		_directives["WWW-Authenticate"] = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
+
+	_header += "HTTP/1.1 " + (static_cast<std::ostringstream*>( &(std::ostringstream() << _code) )->str());
+	_header += " " + _errors[_code] + "\r\n";
 	for (stringMap::const_iterator i = _directives.begin(); i != _directives.end(); i++)
 		if (i->second != "")
 			_header+= i->first + ": " + i->second + "\r\n";
@@ -242,12 +252,12 @@ void		Response::InitResponseProcess(void)
 		_code = 413;
 
 	if (_code != 200)
-		createHeader(_code);
+		createHeader();
 	else if(_method.find(_config.getRequest().getMethod()) != _method.end())
 		(this->*Response::_method[_config.getRequest().getMethod()])();
 }
 
 void		Response::getMethod(void)
 {
-
+	createHeader();
 }

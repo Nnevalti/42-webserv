@@ -6,15 +6,15 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/12 21:08:34 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/13 19:54:36 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
-Config::Config(void):
-_root(""), _client_body_buffer_size(0), _autoindex(false), _alias(""),_alias_set(false)
-{}
+Config::Config(void): _root(""), _client_body_buffer_size(0), _autoindex(false), _alias(""),_alias_set(false)
+{
+}
 
 Config::Config(Config const & src)
 {
@@ -105,6 +105,12 @@ void		Config::setAlias(std::string alias)
 void		Config::setErrorPage(std::string page, std::vector<int> codes)
 {
 	_error_page.insert(std::pair<std::string, std::vector<int> >(page, codes));
+}
+
+void		Config::setErrorCode(std::string page, int code)
+{
+	if (std::find(_error_page[page].begin(), _error_page[page].end(), code) == _error_page[page].end())
+		_error_page[page].push_back(code);
 }
 
 t_network	Config::getNetwork(void)
