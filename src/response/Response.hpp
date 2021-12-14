@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/11 15:31:19 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/13 22:34:20 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class Response {
 
 		void		resetResponse(ConfigResponse& conf);
 
-		void		createHeader(int code);
+		void		createHeader();
 
 		void		getMethod(void);
 
