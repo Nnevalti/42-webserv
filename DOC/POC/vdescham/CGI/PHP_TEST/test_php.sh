@@ -33,5 +33,5 @@ export QUERY_STRING="name=John+Doe&age=42"
 export PATH_INFO="/CGI_TEST/script.php"
 export PATH_TRANSLATED="/mnt/nfs/homes/vdescham/Documents/42-webserv/DOC/POC/vdescham/CGI/PHP_TEST/script.php"
 
-php-cgi
-# /mnt/nfs/homes/vdescham/Documents/42-webserv/cgi/linux_phpcgi
+# php-cgi
+/mnt/nfs/homes/vdescham/Documents/42-webserv/cgi/linux_phpcgi
