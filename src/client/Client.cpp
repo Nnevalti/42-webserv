@@ -40,7 +40,7 @@ int Client::getSocket(void)
 	return _socket;
 }
 
-Client::listReq Client::getRequests(void)
+Client::listReq &Client::getRequests(void)
 {
 	return _requests;
 }
