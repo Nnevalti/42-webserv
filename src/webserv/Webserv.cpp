@@ -273,7 +273,7 @@ void Webserv::run()
 
 					_parser.parseRequest(request, classRequest);
 					_clients[_events_pool[j].data.fd].addRequest(classRequest);
-					std::cout << classRequest << std::endl;
+					// std::cout << classRequest << std::endl;
 				}
 			}
 			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
@@ -284,11 +284,16 @@ void Webserv::run()
 				// forward request to the right server
 				getRightServer(_clients[_events_pool[j].data.fd]);
 				_parser.parseResponse(confResponse, _clients[_events_pool[j].data.fd].getRequests().front(), _clients[_events_pool[j].data.fd].getServer());
-				//std::cout << _clients[_events_pool[j].data.fd].getRequests().front() << std::endl;
+				Client::listReq tmp = _clients[_events_pool[j].data.fd].getRequests();
+				for (Client::listReq::iterator it = tmp.begin(); it != tmp.end(); it++)
+				{
+					std::cout << it->getPath() << '\n';
+				}
+
 				classResponse.resetResponse(confResponse);
 				classResponse.InitResponseProcess();
 				response = classResponse.getResponse();
-				std::cout << response << std::endl;
+				// std::cout << response << std::endl;
 				_clients[_events_pool[j].data.fd].getRequests().clear();
 				// listen client again for other requests and wait for a close connection request
 				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)

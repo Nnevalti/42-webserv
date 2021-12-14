@@ -31,7 +31,7 @@ class Client
 
 		int			getSocket(void);
 		void		setSocket(int socket);
-		listReq		getRequests(void);
+		listReq		&getRequests(void);
 		void		addRequest(Request &request);
 		void		removeRequest(listReq::iterator it);
 		void		setServer(Config server);
