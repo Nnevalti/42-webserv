@@ -6,15 +6,14 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/14 20:24:01 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 17:45:34 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
 Config::Config(void): _root(""), _client_body_buffer_size(0), _autoindex(false), _alias(""),_alias_set(false)
-{
-}
+{}
 
 Config::Config(Config const & src)
 {

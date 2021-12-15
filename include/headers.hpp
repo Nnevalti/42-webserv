@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/13 19:24:48 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 18:11:25 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@
 # include "t_network.hpp"
 
 //* SHORTCUT
-# define BUFFER_SIZE 512
+# define BUFFER_SIZE 32000
 # define MAX_EV 4096
 # define MAX_CLIENTS 1000
 

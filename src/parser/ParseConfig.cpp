@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/15 02:33:47 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 17:52:14 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void			Parser::readConf(const char *file)
 
 	while ((ret = read(fd, stack, BUFFER_SIZE)) > 0 && !(stack[ret] = '\0'))
 		conf += stack;
+
+	close(fd);
 
 	if (ret < 0)
 		throw std::runtime_error("Error Parsing: Error meanwhile reading the file...");
@@ -100,7 +102,7 @@ void Parser::checkConfig(void)
 		{
 			t_network net2 = it2->getNetwork();
 			if (net2 == net)
-				throw std::logic_error("error config: Same port and server name forbidden");
+				throw std::runtime_error("error config: Same port and server name forbidden");
 		}
 	}
 }
@@ -242,6 +244,7 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 
 	std::string address(opts.front());
 
+	//* PORT ONLY
 	if (((colons = address.find(":")) == std::string::npos) && ((point = address.find(".")) == std::string::npos) && address != "localhost")
 	{
 		net.host.s_addr = 0;
@@ -249,13 +252,13 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 		configServer.setNetwork(net);
 		return ;
 	}
+	//* HOST ONLY
 	if(colons == std::string::npos && (point != std::string::npos || address == "localhost"))
 	{
 		if (address == "localhost")
 			host = "127.0.0.1";
 		else
 			host = address;
-		std::cout << "host: " << host <<std::endl;
 		net.host.s_addr = inet_addr(host.c_str());
 		net.port = 8080;
 		configServer.setNetwork(net);
@@ -341,6 +344,8 @@ void					Parser::parseServerName(Config& configServer,stringVector opts)
 {
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing server_name's directive arguments");
+	if (opts.size() > 1)
+		throw std::runtime_error("Error Parsing: too much server_name's directive");
 	configServer.setServerName(opts);
 }
 
@@ -355,6 +360,8 @@ void					Parser::parseAllowedMethods(Config& configServer,stringVector opts)
 void					Parser::parseClientBodyBufferSize(Config& configServer,stringVector opts){
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing Client_body_buffer_size's directive arguments");
+	if (opts.size() > 1)
+		throw std::runtime_error("Error Parsing: too much Client_body_buffer_size's directive arguments");
 	configServer.setClientBodyBufferSize(std::atoi(opts.front().c_str()));
 }
 
