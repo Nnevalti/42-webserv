@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/14 20:16:10 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 02:33:47 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,8 +158,18 @@ void			Parser::parseServer(stringVector::iterator* it, Config& server)
 				if ((**it) == "{" || (**it) == "}")
 					throw std::runtime_error("Error Parsing: Curly brackets misplace after location directive");
 
-				location_name = **it;
-				(*it) = (*it) + 2;
+				for (stringVector::iterator i = _defaultConfigFile.begin(); i != _defaultConfigFile.end(); i++)
+				{
+					checkDirective("server", &i);
+					checkDirective("{", &i);
+					parseServer(&i, location);
+					if (*i != "}")
+						throw std::runtime_error("Error Parsing: Curly brackets not close at the end of server block in default.conf");
+				}
+
+				location_name = (**it);
+				(*it)++;
+				checkDirective("{", it);
 				parseServer(it, location);
 				checkDirective("}", it);
 				server.setLocation(location_name, location);
