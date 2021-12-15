@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/13 19:23:02 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 05:01:53 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,12 @@ class Parser
  *========================================================================**/
 	public:
 		void					parseResponse(ConfigResponse& confResponse, Request& request, Config& server);
+
+	private:
 		Config					findLocation(Config& server, std::string& locationName);
+		std::string				setLanguage(std::string acceptLanguage);
+		std::string				checkContentLocation(std::string contentLocation);
+
 };
 
 

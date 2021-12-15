@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/13 22:43:28 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 04:50:01 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -259,5 +259,12 @@ void		Response::InitResponseProcess(void)
 
 void		Response::getMethod(void)
 {
+	std::string tmp(_config.getContentLocation());
+
+	//todo FIX NOT COMPLETE FIND THE RIGHT WAY TO GET INDEX
+	if (tmp[tmp.size() - 1] == '/')
+		_config.setContentLocation(tmp + _config.getIndex().front());
+	else if (checkPath(tmp) == 2)
+		_config.setContentLocation(tmp + "/" + _config.getIndex().front());
 	createHeader();
 }

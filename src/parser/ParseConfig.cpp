@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/14 14:15:05 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 02:33:47 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,6 @@ void			Parser::parseConf(void)
 		parseServer(&it, confServer);
 		if (*it != "}")
 			throw std::runtime_error("Error Parsing: Curly brackets not close at the end of server block");
-		std::cout << confServer;
 		_ConfigServers.push_back(confServer);
 	}
 	checkConfig();
@@ -138,7 +137,7 @@ void			Parser::parseServer(stringVector::iterator* it, Config& server)
 
 	while ((*it) != _configfile.end() && (**it) != "}")
 	{
-		if (Parser::_ParsingMap.find(**it) != Parser::_ParsingMap.end() && (**it) != "location")
+		if ((Parser::_ParsingMap.find(**it) != Parser::_ParsingMap.end()) && (**it) != "location")
 		{
 			std::string directive(**it);
 
@@ -157,13 +156,28 @@ void			Parser::parseServer(stringVector::iterator* it, Config& server)
 
 				(*it)++;
 				if ((**it) == "{" || (**it) == "}")
-					std::runtime_error("Error Parsing: Curly brackets misplace after location directive");
+					throw std::runtime_error("Error Parsing: Curly brackets misplace after location directive");
 
-				location_name = **it;
-				(*it) = (*it) + 2;
+				for (stringVector::iterator i = _defaultConfigFile.begin(); i != _defaultConfigFile.end(); i++)
+				{
+					checkDirective("server", &i);
+					checkDirective("{", &i);
+					parseServer(&i, location);
+					if (*i != "}")
+						throw std::runtime_error("Error Parsing: Curly brackets not close at the end of server block in default.conf");
+				}
+
+				location_name = (**it);
+				(*it)++;
+				checkDirective("{", it);
 				parseServer(it, location);
 				checkDirective("}", it);
 				server.setLocation(location_name, location);
+		}
+		else if (Parser::_ParsingMap.find(**it) == Parser::_ParsingMap.end())
+		{
+			std::string error("Error Parsing: Unknown Directive " + **it);
+			throw std::runtime_error(error.c_str());
 		}
 	}
 	return ;

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/14 14:51:48 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/14 20:21:31 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,12 +284,6 @@ void Webserv::run()
 				// forward request to the right server
 				getRightServer(_clients[_events_pool[j].data.fd]);
 				_parser.parseResponse(confResponse, _clients[_events_pool[j].data.fd].getRequests().front(), _clients[_events_pool[j].data.fd].getServer());
-				Client::listReq tmp = _clients[_events_pool[j].data.fd].getRequests();
-				for (Client::listReq::iterator it = tmp.begin(); it != tmp.end(); it++)
-				{
-					std::cout << it->getPath() << '\n';
-				}
-
 				classResponse.resetResponse(confResponse);
 				classResponse.InitResponseProcess();
 				response = classResponse.getResponse();

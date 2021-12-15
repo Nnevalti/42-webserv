@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/13 19:54:36 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/14 20:24:01 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,24 +25,19 @@ Config::~Config(void) {}
 
 Config &		Config::operator=(Config const &src)
 {
-
-	if (this != &src)
-	{
-		_network = src._network;
-		_root = src._root;
-		_server_name = src._server_name;
-		_error_page = src._error_page;
-		_client_body_buffer_size = src._client_body_buffer_size;
-		_cgi_param = src._cgi_param;
-		_cgi_pass = src._cgi_pass;
-		_location = src._location;
-		_allowed_methods = src._allowed_methods;
-		_autoindex = src._autoindex;
-		_index = src._index;
-		_alias = src._alias;
-		_alias_set = src._alias_set;
-	}
-
+	_network = src._network;
+	_root = src._root;
+	_server_name = src._server_name;
+	_error_page = src._error_page;
+	_client_body_buffer_size = src._client_body_buffer_size;
+	_cgi_param = src._cgi_param;
+	_cgi_pass = src._cgi_pass;
+	_location = src._location;
+	_allowed_methods = src._allowed_methods;
+	_autoindex = src._autoindex;
+	_index = src._index;
+	_alias = src._alias;
+	_alias_set = src._alias_set;
 	return *this;
 }
 
@@ -113,67 +108,67 @@ void		Config::setErrorCode(std::string page, int code)
 		_error_page[page].push_back(code);
 }
 
-t_network	Config::getNetwork(void)
+t_network&	Config::getNetwork(void)
 {
 	return (_network);
 }
 
-stringVector	Config::getServerName(void)
+stringVector&	Config::getServerName(void)
 {
 	return (_server_name);
 }
 
-std::string		Config::getRoot(void)
+std::string&		Config::getRoot(void)
 {
 	return (_root);
 }
 
-size_t			Config::getClientBodyBufferSize(void)
+size_t&			Config::getClientBodyBufferSize(void)
 {
 	return (_client_body_buffer_size);
 }
 
-stringVector	Config::getCgiParam(void)
+stringVector&	Config::getCgiParam(void)
 {
 	return (_cgi_param);
 }
 
-std::string		Config::getCgiPass(void)
+std::string&		Config::getCgiPass(void)
 {
 	return (_cgi_pass);
 }
 
-serverMap		Config::getLocation(void)
+serverMap&		Config::getLocation(void)
 {
 	return (_location);
 }
 
-stringVector	Config::getAllowedMethods(void)
+stringVector&	Config::getAllowedMethods(void)
 {
 	return (_allowed_methods);
 }
 
-stringVector	Config::getIndex(void)
+stringVector&	Config::getIndex(void)
 {
 	return(_index);
 }
 
-bool			Config::getAutoIndex(void)
+bool&			Config::getAutoIndex(void)
 {
 	return (_autoindex);
 }
 
-std::string		Config::getAlias(void)
+std::string&		Config::getAlias(void)
 {
 	return (_alias);
 }
 
-stringIntVectorMap	Config::getErrorPage(void)
+stringIntVectorMap&	Config::getErrorPage(void)
 {
 	return (_error_page);
 }
 
-bool				Config::getisAliasSet(void)
+bool&				Config::getisAliasSet(void)
 {
 	return (_alias_set);
 }
