@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/15 03:50:47 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 05:01:57 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,8 @@ Config		Parser::findLocation(Config& server, std::string& locationName)
 {
 	serverMap locations(server.getLocation());
 
-	std::cout << "Location name is : " <<locationName << std::endl;
-	for (serverMap::iterator i = locations.begin(); i != locations.end(); i++)
-		std::cout << i->first << ":" << i->second;
+	if (*locationName.end() == '/')
+		locationName.resize(locationName.size() - 1);
 
 	if (locationName.empty())
 		return server;
@@ -31,7 +30,7 @@ Config		Parser::findLocation(Config& server, std::string& locationName)
 			for (std::string tmp = locationName; !tmp.empty(); tmp.resize(tmp.size() - 1))
 				if (tmp == i->first)
 				{
-					locationName = tmp;
+					std::cout << tmp << std::endl;
 					return i->second;
 				}
 		}
@@ -55,10 +54,23 @@ std::string	Parser::setLanguage(std::string acceptLanguage)
 		return (acceptLanguage.substr(0, acceptLanguage.find_first_of('-')));
 }
 
+std::string				Parser::checkContentLocation(std::string content)
+{
+	size_t start;
+	size_t end = 0;
+
+	while ((start = content.find_first_of("/", end)) != std::string::npos &&
+		(end = content.find_first_of("/", start + 1)) != std::string::npos)
+		if (start == end - 1)
+		content.erase(start, end - start);
+	return (content);
+}
+
 void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Config& server)
 {
 	std::string	locationName(request.getPath());
 	Config		location(findLocation(server, locationName));
+	std::string	content;
 
 	confResponse.setRequest(request);
 	confResponse.setServer(server);
@@ -76,7 +88,11 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 
 	std::cout << location << std::endl;
 	if (!location.getAlias().empty() && *locationName.begin() != '*')
-		confResponse.setContentLocation(location.getAlias() + request.getPath().substr(locationName.size()));
+		content = location.getAlias() + checkContentLocation(request.getPath().substr(locationName.size()));
 	else
-		confResponse.setContentLocation(location.getRoot() + request.getPath().substr(locationName.size()));
+		content = location.getRoot() + checkContentLocation(request.getPath());
+
+	std::cout << "THIS IS "+content << std::endl;
+	confResponse.setContentLocation(content);
+
 }
