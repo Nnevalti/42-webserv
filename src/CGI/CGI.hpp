@@ -21,9 +21,9 @@ class CGI
 		CGI(CGI const & src);
 		~CGI(void);
 
-		CGI &	operator=(const CGI &rhs);
+		CGI 	&operator=(const CGI &rhs);
 
-		std::string execute(const std::string &scriptName)
+		std::string execute(void)
 
 	private:
 		void initEnv(Request &request, Config &config);
