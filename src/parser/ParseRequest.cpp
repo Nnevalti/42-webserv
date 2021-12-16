@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/11 14:56:53 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 18:38:32 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 
 	if ((end = first.find_first_of(' ')) == std::string::npos)
 	{
-		classRequest.setRet(500);
+		classRequest.setRet(400);
 		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
@@ -62,21 +62,21 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 
 	if (std::find(methods.begin(), methods.end(), classRequest.getMethod()) == methods.end())
 	{
-		classRequest.setRet(500);
+		classRequest.setRet(400);
 		std::cerr << RED << "Error parsing request: wrong method" << SET << std::endl;
 		return ;
 	}
 
 	if ((start = first.find_first_not_of(' ', end))  == std::string::npos)
 	{
-		classRequest.setRet(500);
+		classRequest.setRet(400);
 		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
 
 	if ((end = first.find_first_of(' ', start)) == std::string::npos)
 	{
-		classRequest.setRet(500);
+		classRequest.setRet(400);
 		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
@@ -84,7 +84,7 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 
 	if ((end = first.find_first_not_of(' ', end)) == std::string::npos)
 	{
-		classRequest.setRet(500);
+		classRequest.setRet(400);
 		std::cerr << RED << "Error parsing: missing first line element" << SET << std::endl;
 		return ;
 	}
@@ -98,7 +98,7 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 
 	if (version != "1.0" && version != "1.1")
 	{
-		classRequest.setRet(500);
+		classRequest.setRet(400);
 		std::cerr << RED << "Error parsing request: HTTP/" << version << " find in request header" << SET << std::endl;
 		return ;
 	}
@@ -120,7 +120,7 @@ void			Parser::parseHeader(stringVector& header, Request& classRequest)
 	std::string	token;
 	std::string	value;
 
-	if (classRequest.getCode() == 500)
+	if (classRequest.getCode() == 400)
 		return ;
 
 	for (stringVector::iterator i = header.begin() + 1; i != header.end(); i++)
@@ -147,7 +147,7 @@ void			Parser::parseRequest(const std::string& request, Request& classRequest)
 
 	parseHeader(header, classRequest);
 
-	if (classRequest.getCode() == 500)
+	if (classRequest.getCode() == 400)
 		return ;
 
 	if(classRequest.getMethod() == "POST")
@@ -155,7 +155,7 @@ void			Parser::parseRequest(const std::string& request, Request& classRequest)
 		body = request.substr(body_start);
 		if (std::atoi(classRequest.getHeader("Content-Length").c_str()) != (int)body.size())
 		{
-			classRequest.setRet(500);
+			classRequest.setRet(400);
 			std::cerr << RED << "Error parsing request: content length different from content real size" << SET << std::endl;
 			return ;
 		}

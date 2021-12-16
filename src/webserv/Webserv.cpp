@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/14 20:21:31 by sgah             ###   ########.fr       */
+/*   Updated: 2021/12/15 18:15:08 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,20 +33,12 @@ void	Webserv::setParser(Parser& parser)
 */
 void Webserv::initServers(confVector configServer)
 {
-	netVector				networkVector;
-	netVector::iterator		it2;
 	_servers = configServer;
 
 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		t_network net = it->getNetwork();
 
-		it2 = networkVector.begin();
-		while (it2 != networkVector.end() && net != *it2)
-			it2++;
-		if (it2 != networkVector.end())
-			continue ;
-		networkVector.push_back(net);
 		_servers_fd.push_back(init_socket(net));
 	}
 	return ;
@@ -137,10 +129,10 @@ void	Webserv::accept_new_client(int server)
 */
 void	Webserv::read_client_request(int clientSocket, std::string &request)
 {
-	char client_request[1025];
+	char client_request[BUFFER_SIZE + 1];
 	int ret = 0;
 
-	if ((ret = recv(clientSocket, &client_request, 1024, 0)) < 0)
+	if ((ret = recv(clientSocket, &client_request, BUFFER_SIZE, 0)) < 0)
 		throw std::logic_error("error: recv() failed");
 	else if (ret == 0)
 	{
@@ -153,7 +145,7 @@ void	Webserv::read_client_request(int clientSocket, std::string &request)
 	else
 	{
 		client_request[ret] = '\0';
-		std::cout << client_request << std::endl;
+		// std::cout << client_request << std::endl;
 		request = client_request;
 		_event.events = EPOLLOUT;
 		_event.data.fd = clientSocket;
