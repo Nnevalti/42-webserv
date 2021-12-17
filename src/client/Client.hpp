@@ -29,16 +29,23 @@ class Client
 
 		typedef std::list<Request> listReq;
 
-		int			getSocket(void);
 		void		setSocket(int socket);
+		int			getSocket(void);
 		listReq		&getRequests(void);
+		std::string	&getRequest(void);
+
 		void		addRequest(Request &request);
 		void		removeRequest(listReq::iterator it);
 		void		setServer(Config server);
 		Config&		getServer(void);
 
+		int		readRequest(void);
+		void		sendResponse(void);
 	private:
 		int			_socket;
+		std::string _request;
+		bool		_header_ready;
+
 		listReq		_requests;
 		Config		_server;
 };

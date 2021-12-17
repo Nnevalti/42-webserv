@@ -27,21 +27,33 @@ void	Webserv::setParser(Parser& parser)
 	_parser = parser;
 }
 
+void Webserv::init()
+{
+	_servers = _parser.getConfigServers();
+
+	epollCreate();
+	initServers();
+	epollInit();
+}
+
+void Webserv::epollCreate(void)
+{
+	_epfd = epoll_create1(0);
+	if (_epfd == -1)
+		throw std::runtime_error("Error: Could not initialised epoll");
+}
+
 /*
 	Takes the config vector and create the servers sockets that will listen for connection.
 	We avoid IP/Port pair duplication
 */
-void Webserv::initServers(confVector configServer)
+void Webserv::initServers(void)
 {
-	_servers = configServer;
-
 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		t_network net = it->getNetwork();
-
 		_servers_fd.push_back(init_socket(net));
 	}
-	return ;
 }
 
 /*
@@ -76,11 +88,10 @@ int Webserv::init_socket(t_network network)
 }
 
 /*
-	Init the epoll fd and add all the listening socket decriptor in the epoll list
+	Add all the listening socket decriptor in the epoll list
 */
-void Webserv::epoll_init(void)
+void Webserv::epollInit(void)
 {
-	_epfd = epoll_create1(0);
 	std::memset((struct epoll_event *)&_event, 0, sizeof(_event));
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 	{
@@ -127,6 +138,24 @@ void	Webserv::accept_new_client(int server)
 /*
 	Receive a client request and stores it in a string
 */
+// void handleRead(int client_fd)
+// {
+// 	// see if the fd correspond to a client
+// 	int readState = _clients[client_fd].readRequest();
+// 	if (readState == -1)
+// 	{
+// 		epoll_ctl(_epfd, EPOLL_CTL_DEL, clientSocket, NULL);
+// 		close(clientSocket);
+// 		_clients.erase(clientSocket);
+// 	}
+// 	else if (readState == 1)
+// 	{
+// 		_event.events = EPOLLOUT;
+// 		_event.data.fd = clientSocket;
+// 		epoll_ctl(_epfd, EPOLL_CTL_MOD, clientSocket, &_event);
+// 	}
+// }
+
 void	Webserv::read_client_request(int clientSocket, std::string &request)
 {
 	char client_request[BUFFER_SIZE + 1];
@@ -154,47 +183,10 @@ void	Webserv::read_client_request(int clientSocket, std::string &request)
 	return ;
 }
 
-bool	comparePath(std::string path, std::string root)
-{
-	std::string::iterator r_it = root.begin();
-	std::string::iterator r_it2;
-	std::string::iterator p_it;
-
-	for (; r_it != root.end(); r_it++)
-	{
-		r_it2 = r_it;
-		for (p_it = path.begin(); p_it != path.end(); p_it++, r_it2++)
-		{
-			if (*p_it != *r_it2)
-				break ;
-			if (r_it2 + 1 == root.end() || p_it + 1 == path.end())
-				return true;
-		}
-	}
-	return false;
-}
-
-bool compareMethod(std::string RequestMethod, stringVector allowedMethod)
-{
-	for (stringVector::iterator it = allowedMethod.begin(); it != allowedMethod.end(); it++)
-	{
-		if (RequestMethod == *it)
-			return true;
-	}
-	return false;
-}
-
 void	Webserv::getRightServer(Client &client)
 {
 	bool foundAConf = false;
 	Config rightConf;
-
-	// std::cout << "/*************************************************/" << '\n';
-	// std::cout << "/*                   getRightServer              */" << '\n';
-	// std::cout << "/*************************************************/" << '\n';
-	// if (!(client.getRequests().empty()))
-	// 	std::cout << "REQUEST:\nHOST/PORT:" << client.getRequests().front().getNetwork() << '\n';
-	// std::cout << '\n';
 
 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
@@ -202,16 +194,12 @@ void	Webserv::getRightServer(Client &client)
 		{
 			rightConf = *it;
 			foundAConf = true;
-			std::cout << "CONFIG:\nIP/PORT:" << it->getNetwork() << '\n';
+			// std::cout << "CONFIG:\nIP/PORT:" << it->getNetwork() << '\n';
 			break ;
 		}
 	}
 	if (!foundAConf)
 		std::cout << "No corresponding server" << '\n';
-	// std::cout << "/*************************************************/" << '\n';
-	// std::cout << "/*                          END                  */" << '\n';
-	// std::cout << "/*************************************************/" << '\n';
-	// std::cout << rightConf << '\n';
 	client.setServer(rightConf);
 }
 
@@ -227,8 +215,7 @@ void Webserv::run()
 	Response	classResponse;
 	std::string	request;
 
-	initServers(_parser.getConfigServers());
-	epoll_init();
+	init();
 	while (g_run)
 	{
 		errno = 0;

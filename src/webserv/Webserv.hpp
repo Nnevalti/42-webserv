@@ -56,10 +56,15 @@ class Webserv
 		struct epoll_event		_event;
 		struct epoll_event		_events_pool[MAX_EV];
 
-		void			initServers(confVector configServer);
-		void			verifConfig(void);
+		/*
+		**	INITILISATION
+		*/
+		void			init(void);
+		void			epollCreate(void);
+		void			initServers(void);
 		int				init_socket(t_network network);
-		void			epoll_init(void);
+		void			epollInit(void);
+
 		int				fd_is_server(int ready_fd);
 		void			accept_new_client(int server);
 		void			read_client_request(int client_Socket, std::string &request);

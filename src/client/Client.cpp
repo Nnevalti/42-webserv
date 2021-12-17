@@ -12,7 +12,7 @@
 
 #include "Client.hpp"
 
-Client::Client(void) {}
+Client::Client(void): _header_ready(false) {}
 
 Client::Client(Client const & src)
 {
@@ -30,20 +30,10 @@ Client&		Client::operator=(const Client &rhs)
 
 Client::~Client(void) {}
 
-void Client::setSocket(int socket)
-{
-	_socket = socket;
-}
-
-int Client::getSocket(void)
-{
-	return _socket;
-}
-
-Client::listReq &Client::getRequests(void)
-{
-	return _requests;
-}
+void Client::setSocket(int socket) { _socket = socket; }
+int Client::getSocket(void) { return _socket; }
+Client::listReq &Client::getRequests(void) { return _requests; }
+// std::string Client::getRequest(void) { return _request; }
 
 void Client::addRequest(Request &request)
 {
@@ -63,4 +53,41 @@ void Client::setServer(Config server)
 Config& Client::getServer(void)
 {
 	return _server;
+}
+
+// int Client::readRequest(void)
+// {
+// 	char client_request[BUFFER_SIZE + 1] = {0};
+// 	int ret = recv(_socket, &client_request, BUFFER_SIZE, 0);
+//
+// 	if (ret == -1)
+// 	{
+// 		std::cerr << "Error: recv failed, closing connection" << '\n';
+// 		return -1;
+// 	}
+// 	else if (ret == 0)
+// 	{
+// 		std::cout << "Closing connection request from clients" << '\n';
+// 		return -1;
+// 	}
+// 	else
+// 	{
+// 		_request += client_request;
+// 		if (_header_ready == false && _request.find(:\r\n\r\n) == std::string::npos)
+// 			return 2;
+// 		else
+// 		{
+// 			// get Method if it is post and the body is not ready return 2 else return 1
+// 			// Here parse Header partially and compare content-length to the body
+// 			// also chunked verification wil be done here
+// 		}
+// 		// std::cout << _request << std::endl;
+// 		return 2;
+// 	}
+// 	return ;
+//
+// }
+
+void Client::sendResponse()
+{
 }
