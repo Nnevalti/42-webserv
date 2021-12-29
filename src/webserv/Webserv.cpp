@@ -312,11 +312,23 @@ void Webserv::removeClient(int socket)
 
 bool Webserv::check_timeout(struct timeval last)
 {
+	// TEMPORARY PART
+	char			buffer[100];
+	struct tm		*tm;
+	// END
+
 	struct timeval now;
 	gettimeofday(&now, NULL);
 
-	if ((now.tv_sec - last.tv_sec) > CLIENT_TIMEOUT)
+	if ((now.tv_sec - last.tv_sec) >= CLIENT_TIMEOUT)
+	{
+		// DO NOT KEEP THIS COUT IT IS JUST FOR TEST ONLY
+		// tm = gmtime(&last.tv_sec);
+		// strftime(buffer, 100, "%F - %T", tm);
+		// std::cout << RED << "\nClient timed out, last connection: " << SET << buffer << "\n";
+		// END
 		return true;
+	}
 	return false;
 }
 
@@ -335,7 +347,6 @@ void Webserv::handle_timeout_clients(void)
 			//*****************************
 
 			removeClient((*it).first);
-			std::cout << RED << "\rClient timed out !        " << '\n';
 			return handle_timeout_clients();
 		}
 	}
@@ -383,5 +394,5 @@ void Webserv::run()
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 		close(*it);
 	close(_epfd);
-	std::cout << "\r" << "Serveur ending...       " << std::endl;
+	std::cout << "\r" << YELLOW << "Shutting down server...       " << std::endl;
 }
