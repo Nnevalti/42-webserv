@@ -104,12 +104,12 @@ void Webserv::epollInit(void)
 /*
 	Verify if the redy fd pass in parameters is a server listening socket and not a client socket
 */
-int	Webserv::fd_is_server(int ready_fd)
+bool	Webserv::fd_is_server(int ready_fd)
 {
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 		if (*it == ready_fd)
-			return *it;
-	return 0;
+			return true;
+	return false;
 }
 
 /*
@@ -181,20 +181,20 @@ void	Webserv::read_client_request(int clientSocket)
 			_clients[clientSocket].request.raw_request += client_request;
 		// std::cout << client_request << std::endl;
 		if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
-			&& _clients[clientSocket].header_ready == false)
+			&& _clients[clientSocket].request.header_ready == false)
 		{
 			std::cout << "**************HEADER READY" << '\n';
-			_clients[clientSocket].header_ready = true;
+			_clients[clientSocket].request.header_ready = true;
 			_parser.parseHeader(_clients[clientSocket].request);
 
 			if (_clients[clientSocket].request.getMethod() != "POST")
 			{
-				_clients[clientSocket].body_ready = true;
+				_clients[clientSocket].request.body_ready = true;
 				return ;
 			}
 
 		}
-		else if (_clients[clientSocket].header_ready == true)
+		else if (_clients[clientSocket].request.header_ready == true)
 		{
 			std::string body("");
 			body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
@@ -204,7 +204,7 @@ void	Webserv::read_client_request(int clientSocket)
 				std::cout << "**************Content Length Header: " << _clients[clientSocket].request.getHeader("Content-Length").c_str() << '\n';
 				std::cout << "**************Body Size: " << (int)body.size() << '\n';
 				_parser.parseBody(_clients[clientSocket].request);
-				_clients[clientSocket].body_ready = true;
+				_clients[clientSocket].request.body_ready = true;
 			}
 		}
 	}
@@ -217,7 +217,7 @@ void	Webserv::read_client_request(int clientSocket)
 void Webserv::handleRead(int client_fd)
 {
 	read_client_request(client_fd);
-	 if (_clients[client_fd].body_ready == true)
+	 if (_clients[client_fd].request.body_ready == true)
 	{
 		// std::cout << "BODY READY" << '\n';
 		// std::cout << _clients[client_fd].request << '\n';
@@ -261,8 +261,8 @@ void Webserv::handleWrite(int client_fd)
 	std::cout << "******************* REQUEST ENDED HERE" << '\n';
 
 	// clear clients request once response is done
-	_clients[client_fd].header_ready = false;
-	_clients[client_fd].body_ready = false;
+	_clients[client_fd].request.header_ready = false;
+	_clients[client_fd].request.body_ready = false;
 	_clients[client_fd].request.raw_request = "";
 	_clients[client_fd].request.header.clear();
 	// Create the function below and usr it to reset the class
@@ -299,12 +299,10 @@ void Webserv::run()
 			g_run = false;
 		for (int j = 0; j < nfds; j++)
 		{
-			int server = 0;
 			if (_events_pool[j].events & EPOLLERR || _events_pool[j].events & EPOLLHUP)
-				// an error occured, we close the connection
 				handleError(_events_pool[j].data.fd);
-			else if (_events_pool[j].events & EPOLLIN && (server = fd_is_server(_events_pool[j].data.fd)) > 0)
-				accept_new_client(server);
+			else if (_events_pool[j].events & EPOLLIN && fd_is_server(_events_pool[j].data.fd))
+				accept_new_client(_events_pool[j].data.fd);
 			else if (_events_pool[j].events & EPOLLIN)
 				handleRead(_events_pool[j].data.fd);
 			else if (_events_pool[j].events & EPOLLOUT)

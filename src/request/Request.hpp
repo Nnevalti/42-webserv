@@ -53,6 +53,7 @@ class Request {
 
 		std::string				raw_request;
 		stringVector			header;
+		
 		bool					header_ready;
 		bool					body_ready;
 

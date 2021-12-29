@@ -44,9 +44,6 @@ class Client
 
 		// request class we get from parsing
 		Request		request;
-		// move bool variable below in request class
-		bool		header_ready;
-		bool		body_ready;
 
 	private:
 		int			_socket;

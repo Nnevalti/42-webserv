@@ -12,7 +12,7 @@
 
 #include "Client.hpp"
 
-Client::Client(void): header_ready(false), body_ready(false) {}
+Client::Client(void) {}
 
 Client::Client(Client const & src)
 {
