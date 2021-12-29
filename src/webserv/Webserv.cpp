@@ -282,8 +282,6 @@ void Webserv::handleWrite(int client_fd)
 	// ***************************************************
 	std::cout << "*******************RESPONSE" << '\n';
 	std::cout << response << std::endl;
-	// Change the line below
-	_clients[client_fd].getRequests().clear();
 	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
 		throw std::logic_error("Error: send() failed");
@@ -350,7 +348,6 @@ void Webserv::run()
 {
 	int n = 0;
 	std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"};
-	// replace the variable below by a macro
 	int timeout = 200;
 	int nfds = 0;
 	std::string	request;
@@ -360,7 +357,6 @@ void Webserv::run()
 	{
 		errno = 0;
 
-		// Verify if a new connection is available
 		nfds = epoll_wait(_epfd, _events_pool, MAX_EV, timeout);
 		if (errno == EINVAL || errno == EFAULT || errno == EBADFD)
 			std::cerr << "Error: epoll_wait() failed: " << strerror(errno) << '\n';
