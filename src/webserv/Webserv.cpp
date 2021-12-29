@@ -67,11 +67,11 @@ int Webserv::init_socket(t_network network)
 	struct sockaddr_in servaddr;
 
 	if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-		throw std::logic_error("error: socket() failed");
+		throw std::logic_error("Error: socket() failed");
 	if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT | SO_REUSEADDR, &opt, sizeof(opt)))
-		throw std::logic_error("error: setsockopt() failed");
+		throw std::logic_error("Error: setsockopt() failed");
 	if (fcntl(listen_fd, F_SETFL, O_NONBLOCK) < 0)
-		throw std::logic_error("error: fcntl() failed");
+		throw std::logic_error("Error: fcntl() failed");
 
 	std::memset((char*)&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
@@ -79,11 +79,11 @@ int Webserv::init_socket(t_network network)
 	servaddr.sin_port = htons(network.port);
 
 	if (servaddr.sin_addr.s_addr == static_cast<in_addr_t>(-1))
-		throw std::logic_error("error: inet_addr: Invalid IP");
+		throw std::logic_error("Error: inet_addr: Invalid IP");
 	if (bind(listen_fd, (struct sockaddr*) &servaddr, sizeof(servaddr)) < 0)
-		throw std::logic_error("error: bind() failed");
+		throw std::logic_error("Error: bind() failed");
 	if (listen(listen_fd, MAX_CLIENTS) < 0)
-		throw std::logic_error("error: listen() failed");
+		throw std::logic_error("Error: listen() failed");
 	return listen_fd;
 }
 
@@ -158,26 +158,30 @@ void	Webserv::getRightServer(Client &client)
 	client.setServer(rightConf);
 }
 
-void	Webserv::read_client_request(int clientSocket)
+bool	Webserv::read_client_request(int clientSocket)
 {
 	char client_request[BUFFER_SIZE + 1];
 	int ret = 0;
 	std::string body("");
 
 	if ((ret = recv(clientSocket, &client_request, BUFFER_SIZE, 0)) < 0)
-		throw std::logic_error("error: recv() failed");
+		throw std::logic_error("Error: recv() failed");
 	else if (ret == 0)
 	{
-		std::cout << "Closing connection request from clients" << '\n';
-		epoll_ctl(_epfd, EPOLL_CTL_DEL, clientSocket, NULL);
-		close(clientSocket);
-		_clients.erase(clientSocket);
+		std::cout << RED << "\rClosing connection request from clients" << '\n';
+		// std::cout << "TETTETSTSTET" << clientSocket << '\n';
+		removeClient(clientSocket);
+		return false;
 	}
 	else
 	{
 		client_request[ret] = '\0';
 		if (_clients[clientSocket].request.raw_request.empty())
+		{
 			_clients[clientSocket].request.raw_request = client_request;
+			// handle timeout
+			gettimeofday(&_clients[clientSocket].last_request ,NULL);
+		}
 		else
 			_clients[clientSocket].request.raw_request += client_request;
 		// std::cout << client_request << std::endl;
@@ -191,7 +195,7 @@ void	Webserv::read_client_request(int clientSocket)
 			if (_clients[clientSocket].request.getMethod() != "POST")
 			{
 				_clients[clientSocket].request.body_ready = true;
-				return ;
+				return true;
 			}
 
 		}
@@ -236,7 +240,7 @@ void	Webserv::read_client_request(int clientSocket)
 			// }
 		}
 	}
-	return ;
+	return true;
 }
 
 /*
@@ -244,7 +248,8 @@ void	Webserv::read_client_request(int clientSocket)
 */
 void Webserv::handleRead(int client_fd)
 {
-	read_client_request(client_fd);
+	if (read_client_request(client_fd) == false)
+		return ;
 	if (_clients[client_fd].request.body_ready == true)
 	{
 		// std::cout << "BODY READY" << '\n';
@@ -281,7 +286,7 @@ void Webserv::handleWrite(int client_fd)
 	_clients[client_fd].getRequests().clear();
 	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
-		throw std::logic_error("error: send() failed");
+		throw std::logic_error("Error: send() failed");
 	// listen client again for other requests and wait for a close connection request
 	_event.events = EPOLLIN;
 	_event.data.fd = client_fd;
@@ -294,9 +299,50 @@ void Webserv::handleWrite(int client_fd)
 
 void Webserv::handleError(int socket)
 {
+	if (fd_is_server(socket))
+		throw std::logic_error("Error: epoll fatal error on a server stopping the server");
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, socket, NULL);
 	close(socket);
 }
+
+void Webserv::removeClient(int socket)
+{
+	_clients.erase(socket);
+	epoll_ctl(_epfd, EPOLL_CTL_DEL, socket, NULL);
+	close(socket);
+}
+
+bool Webserv::check_timeout(struct timeval last)
+{
+	struct timeval now;
+	gettimeofday(&now, NULL);
+
+	if ((now.tv_sec - last.tv_sec) > CLIENT_TIMEOUT)
+		return true;
+	return false;
+}
+
+void Webserv::handle_timeout_clients(void)
+{
+	for (mapClients::iterator it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (check_timeout((*it).second.last_request))
+		{
+
+			//************************** Handle this part more properly
+			// remove client and send 408 code status
+			std::string resp = "408";
+			if(send((*it).first, resp.c_str(), resp.size(), 0) < 0)
+				throw std::logic_error("Error: send() failed");
+			//*****************************
+
+			removeClient((*it).first);
+			std::cout << RED << "\rClient timed out !        " << '\n';
+			return handle_timeout_clients();
+		}
+	}
+}
+
 /*
 	Main function of the Webserv class, the server loop is here
 */
@@ -317,7 +363,7 @@ void Webserv::run()
 		// Verify if a new connection is available
 		nfds = epoll_wait(_epfd, _events_pool, MAX_EV, timeout);
 		if (errno == EINVAL || errno == EFAULT || errno == EBADFD)
-			std::cerr << "error: epoll_wait() failed: " << strerror(errno) << '\n';
+			std::cerr << "Error: epoll_wait() failed: " << strerror(errno) << '\n';
 		else if (errno == EINTR) // epoll interrupted by a signal (CTRL+C)
 			g_run = false;
 		for (int j = 0; j < nfds; j++)
@@ -334,7 +380,7 @@ void Webserv::run()
 		if (nfds == 0)
 		{
 			std::cout << "\r" << wait[(n++ % 6)] << GREEN << " waiting for connection" << SET << std::flush;
-			// garbage_collector();
+			handle_timeout_clients();
 		}
 
 	}

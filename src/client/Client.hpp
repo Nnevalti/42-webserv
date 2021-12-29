@@ -31,11 +31,8 @@ class Client
 
 		void		setSocket(int socket);
 		int			getSocket(void);
-		listReq		&getRequests(void);
 		std::string	&getRequest(void);
 
-		void		addRequest(Request &request);
-		void		removeRequest(listReq::iterator it);
 		void		setServer(Config server);
 		Config&		getServer(void);
 
@@ -44,12 +41,13 @@ class Client
 
 		// request class we get from parsing
 		Request		request;
+		// handle timeout
+		struct timeval last_request;
 
 	private:
 		int			_socket;
 		std::string _request;
 
-		listReq		_requests;
 		Config		_server;
 };
 

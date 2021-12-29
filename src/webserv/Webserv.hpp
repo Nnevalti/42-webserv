@@ -67,7 +67,7 @@ class Webserv
 		bool			fd_is_server(int ready_fd);
 		void			accept_new_client(int server);
 		// void			read_client_request(int client_Socket, std::string &request);
-		void			read_client_request(int client_Socket);
+		bool			read_client_request(int client_Socket);
 
 		void			getRightServer(Client &client);
 
@@ -75,6 +75,10 @@ class Webserv
 		void handleWrite(int client_fd);
 		void handleRead(int client_fd);
 		void handleError(int client_fd);
+
+		void removeClient(int socket);
+		void handle_timeout_clients(void);
+		bool check_timeout(struct timeval last);
 };
 
 
