@@ -28,6 +28,7 @@ class Request {
 		friend std::ostream	&operator<<(std::ostream &out, const Request &request);
 
 		void					resetDirective(void);
+		void					resetRequest(void);
 
 		std::string				getPath(void) const;
 		std::string				getMethod(void) const;
@@ -53,7 +54,7 @@ class Request {
 
 		std::string				raw_request;
 		stringVector			header;
-		
+
 		bool					header_ready;
 		bool					body_ready;
 

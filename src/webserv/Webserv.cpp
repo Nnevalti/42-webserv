@@ -175,7 +175,7 @@ void	Webserv::read_client_request(int clientSocket)
 	else
 	{
 		client_request[ret] = '\0';
-		if (_clients[clientSocket].request.raw_request == "")
+		if (_clients[clientSocket].request.raw_request.empty())
 			_clients[clientSocket].request.raw_request = client_request;
 		else
 			_clients[clientSocket].request.raw_request += client_request;
@@ -260,13 +260,8 @@ void Webserv::handleWrite(int client_fd)
 	epoll_ctl(_epfd, EPOLL_CTL_MOD, client_fd, &_event);
 	std::cout << "******************* REQUEST ENDED HERE" << '\n';
 
-	// clear clients request once response is done
-	_clients[client_fd].request.header_ready = false;
-	_clients[client_fd].request.body_ready = false;
-	_clients[client_fd].request.raw_request = "";
-	_clients[client_fd].request.header.clear();
-	// Create the function below and usr it to reset the class
-	// _clients[client_fd].request.resetRequest();
+	// Reset all request variables to reuse it if another request comes in
+	_clients[client_fd].request.resetRequest();
 }
 
 void Webserv::handleError(int socket)

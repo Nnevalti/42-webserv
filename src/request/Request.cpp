@@ -78,6 +78,14 @@ void				Request::resetDirective(void)
 	_headers["Connection"] = "Keep-Alive";
 }
 
+void										Request::resetRequest(void)
+{
+	header_ready = false;
+	body_ready = false;
+	raw_request.clear();
+	header.clear();
+}
+
 void										Request::setRet(int ret)
 {
 	_ret = ret;
