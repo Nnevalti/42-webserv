@@ -42,7 +42,6 @@ class Webserv
 		Webserv &	operator=(const Webserv &rhs);
 
 		Parser					_parser;
-
 		// Server config and fds
 		confVector				_servers;
 		fdVector				_servers_fd;
@@ -67,10 +66,15 @@ class Webserv
 
 		int				fd_is_server(int ready_fd);
 		void			accept_new_client(int server);
-		void			read_client_request(int client_Socket, std::string &request);
+		// void			read_client_request(int client_Socket, std::string &request);
+		void			read_client_request(int client_Socket);
 
 		void			getRightServer(Client &client);
 
+
+		void handleWrite(int client_fd);
+		void handleRead(int client_fd);
+		void handleError(int client_fd);
 };
 
 

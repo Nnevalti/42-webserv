@@ -27,64 +27,64 @@ stringVector		Parser::initMethods()
 
 stringVector	Parser::methods = Parser::initMethods();
 
-size_t			Parser::splitHeader(const std::string& request, stringVector& header)
+void			Parser::splitHeader(Request &request)
 {
 	std::string tmp;
 	size_t		start(0);
 	size_t		end;
 
-	while((end = request.find_first_of('\n', start)) != std::string::npos)
+	while((end = request.raw_request.find_first_of('\n', start)) != std::string::npos)
 	{
-		tmp = request.substr(start, end - start);
+		tmp = request.raw_request.substr(start, end - start);
 		if (tmp == "")
 			break;
 		if (tmp[tmp.size() - 1] == '\r' && tmp.size())
 			tmp.resize(tmp.size() - 1);
-		header.push_back(tmp);
+		request.header.push_back(tmp);
 		start = (end == std::string::npos) ? end : end + 1;
 	}
-	return (start);
+	return ;
 }
 
-void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
+void			Parser::parseFirstLine(Request &request)
 {
-	std::string	first(header.front());
+	std::string	first(request.header.front());
 	size_t		end;
 	size_t		start;
 
 	if ((end = first.find_first_of(' ')) == std::string::npos)
 	{
-		classRequest.setRet(400);
+		request.setRet(400);
 		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
-	classRequest.setMethod(first.substr(0, end));
+	request.setMethod(first.substr(0, end));
 
-	if (std::find(methods.begin(), methods.end(), classRequest.getMethod()) == methods.end())
+	if (std::find(methods.begin(), methods.end(), request.getMethod()) == methods.end())
 	{
-		classRequest.setRet(400);
+		request.setRet(400);
 		std::cerr << RED << "Error parsing request: wrong method" << SET << std::endl;
 		return ;
 	}
 
 	if ((start = first.find_first_not_of(' ', end))  == std::string::npos)
 	{
-		classRequest.setRet(400);
+		request.setRet(400);
 		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
 
 	if ((end = first.find_first_of(' ', start)) == std::string::npos)
 	{
-		classRequest.setRet(400);
+		request.setRet(400);
 		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
-	classRequest.setPath(first.substr(start, end - start));
+	request.setPath(first.substr(start, end - start));
 
 	if ((end = first.find_first_not_of(' ', end)) == std::string::npos)
 	{
-		classRequest.setRet(400);
+		request.setRet(400);
 		std::cerr << RED << "Error parsing: missing first line element" << SET << std::endl;
 		return ;
 	}
@@ -92,13 +92,13 @@ void			Parser::parseFirstLine(stringVector& header, Request& classRequest)
 	std::string version;
 
 	if (first.substr(end, 5).compare("HTTP/") == 0)
-		classRequest.setVersion((version = first.substr(end + 5, 3)));
+		request.setVersion((version = first.substr(end + 5, 3)));
 	else
 		return;
 
 	if (version != "1.0" && version != "1.1")
 	{
-		classRequest.setRet(400);
+		request.setRet(400);
 		std::cerr << RED << "Error parsing request: HTTP/" << version << " find in request header" << SET << std::endl;
 		return ;
 	}
@@ -114,53 +114,58 @@ static std::string	findvalue(std::string line)
 	return (line.substr(line.find_first_of(' ') + 1));
 }
 
-void			Parser::parseHeader(stringVector& header, Request& classRequest)
+void			Parser::parseHeader(Request &request)
 {
-	parseFirstLine(header, classRequest);
 	std::string	token;
 	std::string	value;
 
-	if (classRequest.getCode() == 400)
+	request.resetDirective();
+	splitHeader(request);
+	parseFirstLine(request);
+
+	if (request.getCode() == 400)
 		return ;
 
-	for (stringVector::iterator i = header.begin() + 1; i != header.end(); i++)
+	for (stringVector::iterator i = request.header.begin() + 1; i != request.header.end(); i++)
 	{
 		token = findtoken(*i);
 		value = findvalue(*i);
-		if (classRequest.getHeaders().count(token))
+		if (request.getHeaders().count(token))
 		{
-			classRequest.setHeader(token, value);
-			classRequest.setEnvForCgi(token, value);
+			request.setHeader(token, value);
+			request.setEnvForCgi(token, value);
 		}
 	}
 }
 
-void			Parser::parseRequest(const std::string& request, Request& classRequest)
+void			Parser::parseBody(Request& request)
 {
-	stringVector	header;
-	std::string		body("");
-	Request			ret;
+	std::string		body;
 	size_t			body_start(0);
 
-	classRequest.resetDirective();
-	body_start = splitHeader(request, header);
-
-	parseHeader(header, classRequest);
-
-	if (classRequest.getCode() == 400)
+	body_start = request.raw_request.find("\r\n\r\n");
+	// if ((body_start = request.raw_request.find("\r\n\r\n")) != std::string::npos)
+	// 	std::cout << "OK: " << body_start << '\n';
+	if (request.getCode() == 400)
 		return ;
 
-	if(classRequest.getMethod() == "POST")
+	body = request.raw_request.substr(body_start + 4); // +4 to skip the "\r\n\r\n"
+	std::cout << "**************REQUEST CONTENT" << '\n';
+	std::cout << request.raw_request << '\n';
+	std::cout << "**************REQUEST CONTENT END" << '\n';
+	std::cout << "**************BODY CONTENT" << '\n';
+	std::cout << body << '\n';
+	std::cout << "**************BODY CONTENT END" << '\n';
+	std::cout << "**************Content Length Header: " << request.getHeader("Content-Length").c_str() << '\n';
+	std::cout << "**************Body Size: " << (int)body.size() << '\n';
+	if (std::atoi(request.getHeader("Content-Length").c_str()) != (int)body.size())
 	{
-		body = request.substr(body_start);
-		if (std::atoi(classRequest.getHeader("Content-Length").c_str()) != (int)body.size())
-		{
-			classRequest.setRet(400);
-			std::cerr << RED << "Error parsing request: content length different from content real size" << SET << std::endl;
-			return ;
-		}
-		else
-			classRequest.setBody(body);
+		request.setRet(400);
+		std::cerr << RED << "Error parsing request: content length different from content real size" << SET << std::endl;
+		return ;
 	}
-	classRequest.setNetwork(classRequest.getHeader("Host"));
+	else
+		request.setBody(body);
+
+	request.setNetwork(request.getHeader("Host"));
 }

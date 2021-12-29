@@ -123,40 +123,42 @@ void	Webserv::accept_new_client(int server)
 	if ((new_socket = accept(server, NULL, NULL)) < 0)
 	{
 		if(errno != EWOULDBLOCK)
-			throw std::logic_error("error: accept() failed");
+			throw std::logic_error("Error: accept() failed");
 	}
 	std::cout << "\r" << "Client connected on server: " << server << std::endl;
 	if(fcntl(new_socket, F_SETFL, O_NONBLOCK) < 0)
-		throw std::logic_error("error: fcntl() failed");
+		throw std::logic_error("Error: fcntl() failed");
+
 	_event.data.fd = new_socket;
 	_event.events = EPOLLIN;
 	epoll_ctl(_epfd, EPOLL_CTL_ADD, new_socket, &_event);
+
 	client.setSocket(new_socket);
 	_clients[new_socket] = client;
 }
 
-/*
-	Receive a client request and stores it in a string
-*/
-// void handleRead(int client_fd)
-// {
-// 	// see if the fd correspond to a client
-// 	int readState = _clients[client_fd].readRequest();
-// 	if (readState == -1)
-// 	{
-// 		epoll_ctl(_epfd, EPOLL_CTL_DEL, clientSocket, NULL);
-// 		close(clientSocket);
-// 		_clients.erase(clientSocket);
-// 	}
-// 	else if (readState == 1)
-// 	{
-// 		_event.events = EPOLLOUT;
-// 		_event.data.fd = clientSocket;
-// 		epoll_ctl(_epfd, EPOLL_CTL_MOD, clientSocket, &_event);
-// 	}
-// }
 
-void	Webserv::read_client_request(int clientSocket, std::string &request)
+void	Webserv::getRightServer(Client &client)
+{
+	bool foundAConf = false;
+	Config rightConf;
+
+	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		if (client.request.getNetwork() == it->getNetwork())
+		{
+			rightConf = *it;
+			foundAConf = true;
+			std::cout << "CONFIG:\nIP/PORT:" << it->getNetwork() << '\n';
+			break ;
+		}
+	}
+	if (!foundAConf)
+		std::cout << "No corresponding server" << '\n';
+	client.setServer(rightConf);
+}
+
+void	Webserv::read_client_request(int clientSocket)
 {
 	char client_request[BUFFER_SIZE + 1];
 	int ret = 0;
@@ -169,40 +171,109 @@ void	Webserv::read_client_request(int clientSocket, std::string &request)
 		epoll_ctl(_epfd, EPOLL_CTL_DEL, clientSocket, NULL);
 		close(clientSocket);
 		_clients.erase(clientSocket);
-		request = "";
 	}
 	else
 	{
 		client_request[ret] = '\0';
+		if (_clients[clientSocket].request.raw_request == "")
+			_clients[clientSocket].request.raw_request = client_request;
+		else
+			_clients[clientSocket].request.raw_request += client_request;
 		// std::cout << client_request << std::endl;
-		request = client_request;
-		_event.events = EPOLLOUT;
-		_event.data.fd = clientSocket;
-		epoll_ctl(_epfd, EPOLL_CTL_MOD, clientSocket, &_event);
+		if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
+			&& _clients[clientSocket].header_ready == false)
+		{
+			std::cout << "**************HEADER READY" << '\n';
+			_clients[clientSocket].header_ready = true;
+			_parser.parseHeader(_clients[clientSocket].request);
+
+			if (_clients[clientSocket].request.getMethod() != "POST")
+			{
+				_clients[clientSocket].body_ready = true;
+				return ;
+			}
+
+		}
+		else if (_clients[clientSocket].header_ready == true)
+		{
+			std::string body("");
+			body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
+
+			if ((int)body.size() >= std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
+			{
+				std::cout << "**************Content Length Header: " << _clients[clientSocket].request.getHeader("Content-Length").c_str() << '\n';
+				std::cout << "**************Body Size: " << (int)body.size() << '\n';
+				_parser.parseBody(_clients[clientSocket].request);
+				_clients[clientSocket].body_ready = true;
+			}
+		}
 	}
 	return ;
 }
 
-void	Webserv::getRightServer(Client &client)
+/*
+	Receive a client request and stores it in a string
+*/
+void Webserv::handleRead(int client_fd)
 {
-	bool foundAConf = false;
-	Config rightConf;
-
-	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
+	read_client_request(client_fd);
+	 if (_clients[client_fd].body_ready == true)
 	{
-		if (client.getRequests().front().getNetwork() == it->getNetwork())
-		{
-			rightConf = *it;
-			foundAConf = true;
-			// std::cout << "CONFIG:\nIP/PORT:" << it->getNetwork() << '\n';
-			break ;
-		}
+		// std::cout << "BODY READY" << '\n';
+		// std::cout << _clients[client_fd].request << '\n';
+
+		// parse the body and set client to EPOLLOUT
+		_event.events = EPOLLOUT;
+		_event.data.fd = client_fd;
+		epoll_ctl(_epfd, EPOLL_CTL_MOD, client_fd, &_event);
 	}
-	if (!foundAConf)
-		std::cout << "No corresponding server" << '\n';
-	client.setServer(rightConf);
+
 }
 
+void Webserv::handleWrite(int client_fd)
+{
+	Response	classResponse;
+	ConfigResponse confResponse;
+	std::string	response;
+
+	// forward request to the right server
+	getRightServer(_clients[client_fd]);
+	// ***************************************************
+	// Try to make this four lines in a response::function
+	std::cout << "*******************CLIENT REQUEST" << '\n';
+	std::cout << _clients[client_fd].request << '\n';
+	_parser.parseResponse(confResponse, _clients[client_fd].request, _clients[client_fd].getServer());
+	classResponse.resetResponse(confResponse);
+	classResponse.InitResponseProcess();
+	response = classResponse.getResponse();
+	// ***************************************************
+	std::cout << "*******************RESPONSE" << '\n';
+	std::cout << response << std::endl;
+	// Change the line below
+	_clients[client_fd].getRequests().clear();
+	// Send response
+	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
+		throw std::logic_error("error: send() failed");
+	// listen client again for other requests and wait for a close connection request
+	_event.events = EPOLLIN;
+	_event.data.fd = client_fd;
+	epoll_ctl(_epfd, EPOLL_CTL_MOD, client_fd, &_event);
+	std::cout << "******************* REQUEST ENDED HERE" << '\n';
+
+	// clear clients request once response is done
+	_clients[client_fd].header_ready = false;
+	_clients[client_fd].body_ready = false;
+	_clients[client_fd].request.raw_request = "";
+	_clients[client_fd].request.header.clear();
+	// Create the function below and usr it to reset the class
+	// _clients[client_fd].request.resetRequest();
+}
+
+void Webserv::handleError(int socket)
+{
+	epoll_ctl(_epfd, EPOLL_CTL_DEL, socket, NULL);
+	close(socket);
+}
 /*
 	Main function of the Webserv class, the server loop is here
 */
@@ -210,9 +281,9 @@ void Webserv::run()
 {
 	int n = 0;
 	std::string  wait[] = {"⠋", "⠙", "⠸", "⠴", "⠦", "⠇"};
+	// replace the variable below by a macro
 	int timeout = 200;
 	int nfds = 0;
-	Response	classResponse;
 	std::string	request;
 
 	init();
@@ -226,56 +297,25 @@ void Webserv::run()
 			std::cerr << "error: epoll_wait() failed: " << strerror(errno) << '\n';
 		else if (errno == EINTR)
 			g_run = false;
-		if (nfds == 0)
-			std::cout << "\r" << wait[(n++ % 6)] << GREEN << " waiting for connection" << SET << std::flush;
-
 		for (int j = 0; j < nfds; j++)
 		{
 			int server = 0;
 			if (_events_pool[j].events & EPOLLERR || _events_pool[j].events & EPOLLHUP)
-			{
 				// an error occured, we close the connection
-				epoll_ctl(_epfd, EPOLL_CTL_DEL, _events_pool[j].data.fd, NULL);
-				close(_events_pool[j].data.fd);
-				continue ;
-			}
-			// If the server has a new connection ready
-			if (_events_pool[j].events & EPOLLIN && (server = fd_is_server(_events_pool[j].data.fd)) > 0)
+				handleError(_events_pool[j].data.fd);
+			else if (_events_pool[j].events & EPOLLIN && (server = fd_is_server(_events_pool[j].data.fd)) > 0)
 				accept_new_client(server);
-			else if (_events_pool[j].events & EPOLLIN) // EPOLLIN : read
-			{
-				read_client_request(_events_pool[j].data.fd, request);
-				if (!request.empty())
-				{
-
-					Request		classRequest;
-
-					_parser.parseRequest(request, classRequest);
-					_clients[_events_pool[j].data.fd].addRequest(classRequest);
-					// std::cout << classRequest << std::endl;
-				}
-			}
-			else if (_events_pool[j].events & EPOLLOUT) // EPOLLOUT : write
-			{
-				ConfigResponse confResponse;
-				std::string	response;
-
-				// forward request to the right server
-				getRightServer(_clients[_events_pool[j].data.fd]);
-				_parser.parseResponse(confResponse, _clients[_events_pool[j].data.fd].getRequests().front(), _clients[_events_pool[j].data.fd].getServer());
-				classResponse.resetResponse(confResponse);
-				classResponse.InitResponseProcess();
-				response = classResponse.getResponse();
-				// std::cout << response << std::endl;
-				_clients[_events_pool[j].data.fd].getRequests().clear();
-				// listen client again for other requests and wait for a close connection request
-				if(send(_events_pool[j].data.fd, response.c_str(), response.size(), 0) < 0)
-					throw std::logic_error("error: send() failed");
-				_event.events = EPOLLIN;
-				_event.data.fd = _events_pool[j].data.fd;
-				epoll_ctl(_epfd, EPOLL_CTL_MOD, _events_pool[j].data.fd, &_event);
-			}
+			else if (_events_pool[j].events & EPOLLIN)
+				handleRead(_events_pool[j].data.fd);
+			else if (_events_pool[j].events & EPOLLOUT)
+				handleWrite(_events_pool[j].data.fd);
 		}
+		if (nfds == 0)
+		{
+			std::cout << "\r" << wait[(n++ % 6)] << GREEN << " waiting for connection" << SET << std::flush;
+			// garbage_collector();
+		}
+
 	}
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 		close(*it);

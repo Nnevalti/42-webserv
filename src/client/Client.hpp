@@ -41,10 +41,16 @@ class Client
 
 		int		readRequest(void);
 		void		sendResponse(void);
+
+		// request class we get from parsing
+		Request		request;
+		// move bool variable below in request class
+		bool		header_ready;
+		bool		body_ready;
+
 	private:
 		int			_socket;
 		std::string _request;
-		bool		_header_ready;
 
 		listReq		_requests;
 		Config		_server;

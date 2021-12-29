@@ -12,7 +12,7 @@
 
 #include "Request.hpp"
 
-Request::Request(void): _method (""), _version(""), _ret(200), _body(""), _port(8080), _path("") {}
+Request::Request(void): raw_request(""), _method (""), _version(""), _ret(200), _body(""), _port(8080), _path("") {}
 
 Request::Request(Request const & src)
 {

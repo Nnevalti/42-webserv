@@ -51,6 +51,11 @@ class Request {
 		void					setNetwork(std::string IpPort);
 		void					setEnvForCgi(std::string token, std::string value);
 
+		std::string				raw_request;
+		stringVector			header;
+		bool					header_ready;
+		bool					body_ready;
+
 	private:
 
 		std::string				_method;

@@ -102,7 +102,7 @@ void Parser::checkConfig(void)
 		{
 			t_network net2 = it2->getNetwork();
 			if (net2 == net)
-				throw std::runtime_error("error config: Same port and server name forbidden");
+				throw std::runtime_error("Error config: Same port and server name forbidden");
 		}
 	}
 }

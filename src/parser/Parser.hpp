@@ -69,16 +69,16 @@ class Parser
  *                           PARSING REQUEST
  *========================================================================**/
 	public:
-		void					parseRequest(const std::string& request, Request& classRequest);
+		void					parseBody(Request &request);
+		void					parseHeader(Request &request);
 
 	private:
 		static stringVector		initMethods();
 		static stringVector		methods;
 
 	private:
-		size_t					splitHeader(const std::string& request, stringVector& hearder);
-		void					parseHeader(stringVector& hearder, Request& classRequest);
-		void					parseFirstLine(stringVector& header, Request& classRequest);
+		void					splitHeader(Request &request);
+		void					parseFirstLine(Request &request);
 
 /**========================================================================
  *                           PARSING RESPONSE
