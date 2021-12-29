@@ -136,6 +136,7 @@ void			Parser::parseHeader(Request &request)
 			request.setEnvForCgi(token, value);
 		}
 	}
+	request.setNetwork(request.getHeader("Host"));
 }
 
 void			Parser::parseBody(Request& request)
@@ -144,20 +145,17 @@ void			Parser::parseBody(Request& request)
 	size_t			body_start(0);
 
 	body_start = request.raw_request.find("\r\n\r\n");
-	// if ((body_start = request.raw_request.find("\r\n\r\n")) != std::string::npos)
-	// 	std::cout << "OK: " << body_start << '\n';
+	if ((body_start = request.raw_request.find("\r\n\r\n")) == std::string::npos)
+		std::cout << "ERROR in parse Body" << '\n';
 	if (request.getCode() == 400)
 		return ;
 
 	body = request.raw_request.substr(body_start + 4); // +4 to skip the "\r\n\r\n"
-	std::cout << "**************REQUEST CONTENT" << '\n';
-	std::cout << request.raw_request << '\n';
-	std::cout << "**************REQUEST CONTENT END" << '\n';
-	std::cout << "**************BODY CONTENT" << '\n';
-	std::cout << body << '\n';
-	std::cout << "**************BODY CONTENT END" << '\n';
-	std::cout << "**************Content Length Header: " << request.getHeader("Content-Length").c_str() << '\n';
-	std::cout << "**************Body Size: " << (int)body.size() << '\n';
+	// std::cout << "**************REQUEST CONTENT" << '\n';
+	// std::cout << request.raw_request << '\n';
+	// std::cout << "**************REQUEST CONTENT END" << '\n';
+	// std::cout << "**************Content Length Header: " << request.getHeader("Content-Length").c_str() << '\n';
+	// std::cout << "**************Body Size: " << (int)body.size() << '\n';
 	if (std::atoi(request.getHeader("Content-Length").c_str()) != (int)body.size())
 	{
 		request.setRet(400);
@@ -166,6 +164,4 @@ void			Parser::parseBody(Request& request)
 	}
 	else
 		request.setBody(body);
-
-	request.setNetwork(request.getHeader("Host"));
 }

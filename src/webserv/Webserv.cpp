@@ -162,6 +162,7 @@ void	Webserv::read_client_request(int clientSocket)
 {
 	char client_request[BUFFER_SIZE + 1];
 	int ret = 0;
+	std::string body("");
 
 	if ((ret = recv(clientSocket, &client_request, BUFFER_SIZE, 0)) < 0)
 		throw std::logic_error("error: recv() failed");
@@ -196,16 +197,43 @@ void	Webserv::read_client_request(int clientSocket)
 		}
 		else if (_clients[clientSocket].request.header_ready == true)
 		{
-			std::string body("");
-			body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
+			// if (_clients[clientSocket].request.getHeader("Transfer-Encoding") == "chunked")
+			// {
+			// 	if (_clients[clientSocket].request.raw_request.find("0\r\n\r\n") != std::string::npos)
+			// 	{
+			// 		std::cout << "CHUNKED" << std::endl;
+			// 		body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
+			// 		std::string tmp;
+			// 		long int chunk_size = 1;
+			// 		// parse chunked
+			// 		while (chunk_size)
+			// 		{
+			// 			size_t line_end = body.find_first_of("\r\n");
+			// 			if (line_end == std::string::npos)
+			// 				std::cout << "Error" << '\n';
+			// 			chunk_size = strtol(body.substr(0, line_end).c_str(), NULL, 16);
+			// 			body.erase(0, line_end + 2);
+			// 			tmp += _clients[clientSocket].request.raw_request.substr(0, chunk_size);
+			// 			body.erase(0, chunk_size + 2);
+			// 		}
+			// 		std::cout << "CHUNKED BODY" << '\n';
+			// 		std::cout << tmp << '\n';
+			// 		std::cout << "CHUNKED BODY END" << '\n';
+			// 		_clients[clientSocket].request.body_ready = true;
+			// 		_clients[clientSocket].request.setBody(tmp);
+			// 	}
+			// }
+			// else
+			// {
+				body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
 
-			if ((int)body.size() >= std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
-			{
-				std::cout << "**************Content Length Header: " << _clients[clientSocket].request.getHeader("Content-Length").c_str() << '\n';
-				std::cout << "**************Body Size: " << (int)body.size() << '\n';
-				_parser.parseBody(_clients[clientSocket].request);
-				_clients[clientSocket].request.body_ready = true;
-			}
+				if ((int)body.size() == std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
+				{
+					_parser.parseBody(_clients[clientSocket].request);
+					_clients[clientSocket].request.body_ready = true;
+				}
+				// handle content-length != of body size
+			// }
 		}
 	}
 	return ;
@@ -217,7 +245,7 @@ void	Webserv::read_client_request(int clientSocket)
 void Webserv::handleRead(int client_fd)
 {
 	read_client_request(client_fd);
-	 if (_clients[client_fd].request.body_ready == true)
+	if (_clients[client_fd].request.body_ready == true)
 	{
 		// std::cout << "BODY READY" << '\n';
 		// std::cout << _clients[client_fd].request << '\n';
@@ -290,7 +318,7 @@ void Webserv::run()
 		nfds = epoll_wait(_epfd, _events_pool, MAX_EV, timeout);
 		if (errno == EINVAL || errno == EFAULT || errno == EBADFD)
 			std::cerr << "error: epoll_wait() failed: " << strerror(errno) << '\n';
-		else if (errno == EINTR)
+		else if (errno == EINTR) // epoll interrupted by a signal (CTRL+C)
 			g_run = false;
 		for (int j = 0; j < nfds; j++)
 		{
