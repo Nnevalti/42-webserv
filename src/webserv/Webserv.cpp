@@ -125,7 +125,7 @@ void	Webserv::accept_new_client(int server)
 		if(errno != EWOULDBLOCK)
 			throw std::logic_error("Error: accept() failed");
 	}
-	std::cout << "\r" << "Client connected on server: " << server << std::endl;
+	// std::cout << "\r" << "Client connected on server: " << server << std::endl;
 	if(fcntl(new_socket, F_SETFL, O_NONBLOCK) < 0)
 		throw std::logic_error("Error: fcntl() failed");
 
@@ -149,7 +149,7 @@ void	Webserv::getRightServer(Client &client)
 		{
 			rightConf = *it;
 			foundAConf = true;
-			std::cout << "CONFIG:\nIP/PORT:" << it->getNetwork() << '\n';
+			// std::cout << "CONFIG:\nIP/PORT:" << it->getNetwork() << '\n';
 			break ;
 		}
 	}
@@ -168,7 +168,7 @@ bool	Webserv::read_client_request(int clientSocket)
 		throw std::logic_error("Error: recv() failed");
 	else if (ret == 0)
 	{
-		std::cout << RED << "\rClosing connection request from clients" << '\n';
+		// std::cout << RED << "\rClosing connection request from clients" << '\n';
 		// std::cout << "TETTETSTSTET" << clientSocket << '\n';
 		removeClient(clientSocket);
 		return false;
@@ -188,7 +188,7 @@ bool	Webserv::read_client_request(int clientSocket)
 		if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
 			&& _clients[clientSocket].request.header_ready == false)
 		{
-			std::cout << "**************HEADER READY" << '\n';
+			// std::cout << "**************HEADER READY" << '\n';
 			_clients[clientSocket].request.header_ready = true;
 			_parser.parseHeader(_clients[clientSocket].request);
 
@@ -201,43 +201,13 @@ bool	Webserv::read_client_request(int clientSocket)
 		}
 		else if (_clients[clientSocket].request.header_ready == true)
 		{
-			// if (_clients[clientSocket].request.getHeader("Transfer-Encoding") == "chunked")
-			// {
-			// 	if (_clients[clientSocket].request.raw_request.find("0\r\n\r\n") != std::string::npos)
-			// 	{
-			// 		std::cout << "CHUNKED" << std::endl;
-			// 		body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
-			// 		std::string tmp;
-			// 		long int chunk_size = 1;
-			// 		// parse chunked
-			// 		while (chunk_size)
-			// 		{
-			// 			size_t line_end = body.find_first_of("\r\n");
-			// 			if (line_end == std::string::npos)
-			// 				std::cout << "Error" << '\n';
-			// 			chunk_size = strtol(body.substr(0, line_end).c_str(), NULL, 16);
-			// 			body.erase(0, line_end + 2);
-			// 			tmp += _clients[clientSocket].request.raw_request.substr(0, chunk_size);
-			// 			body.erase(0, chunk_size + 2);
-			// 		}
-			// 		std::cout << "CHUNKED BODY" << '\n';
-			// 		std::cout << tmp << '\n';
-			// 		std::cout << "CHUNKED BODY END" << '\n';
-			// 		_clients[clientSocket].request.body_ready = true;
-			// 		_clients[clientSocket].request.setBody(tmp);
-			// 	}
-			// }
-			// else
-			// {
-				body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
+			body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
 
-				if ((int)body.size() == std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
-				{
-					_parser.parseBody(_clients[clientSocket].request);
-					_clients[clientSocket].request.body_ready = true;
-				}
-				// handle content-length != of body size
-			// }
+			if ((int)body.size() == std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
+			{
+				_parser.parseBody(_clients[clientSocket].request);
+				_clients[clientSocket].request.body_ready = true;
+			}
 		}
 	}
 	return true;
@@ -263,6 +233,29 @@ void Webserv::handleRead(int client_fd)
 
 }
 
+// ICI SHERCHRYST
+void parseBodyPost(Request &request)
+{
+	std::string boundary;
+	std::string body;
+	std::string content;
+	size_t start;
+	size_t end(0);
+
+	body = request.getBody();
+	boundary = "--" + request.getHeader("Content-Type").substr(request.getHeader("Content-Type").find("=") + 1);
+	while (body.substr(boundary.size(), 2) != "--")
+	{
+		start = body.find(boundary) + boundary.size() + 2;
+		end = body.find(boundary, start);
+		content = body.substr(start, (end - start - 1));
+		std::cout << "\nCONTENT *****************************" << '\n';
+		std::cout << content << '\n';
+		std::cout << "END CONTENT *****************************" << '\n';
+		body = body.substr(end);
+	}
+}
+
 void Webserv::handleWrite(int client_fd)
 {
 	Response	classResponse;
@@ -271,26 +264,34 @@ void Webserv::handleWrite(int client_fd)
 
 	// forward request to the right server
 	getRightServer(_clients[client_fd]);
+
+	// *****************************************************************
+	// Move in Response Class
+	if (_clients[client_fd].request.getMethod() == "POST")
+		parseBodyPost(_clients[client_fd].request);
+	// *****************************************************************
+
 	// ***************************************************
-	// Try to make this four lines in a response::function
-	std::cout << "*******************CLIENT REQUEST" << '\n';
-	std::cout << _clients[client_fd].request << '\n';
+	// std::cout << "*******************CLIENT REQUEST (RAW)" << '\n';
+	// std::cout << _clients[client_fd].request.raw_request << '\n';
+	// Try to make this four lines below in a response::function
 	_parser.parseResponse(confResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	classResponse.resetResponse(confResponse);
 	classResponse.InitResponseProcess();
 	response = classResponse.getResponse();
+	// verify in response if we need to use a cgi binary for the request
+	//  if so we will pass in a function to execute it
 	// ***************************************************
-	std::cout << "*******************RESPONSE" << '\n';
-	std::cout << response << std::endl;
+	// std::cout << "*******************RESPONSE" << '\n';
+	// std::cout << response << std::endl;
+
 	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
-		throw std::logic_error("Error: send() failed");
+		removeClient(client_fd);
 	// listen client again for other requests and wait for a close connection request
 	_event.events = EPOLLIN;
 	_event.data.fd = client_fd;
 	epoll_ctl(_epfd, EPOLL_CTL_MOD, client_fd, &_event);
-	std::cout << "******************* REQUEST ENDED HERE" << '\n';
-
 	// Reset all request variables to reuse it if another request comes in
 	_clients[client_fd].request.resetRequest();
 }
@@ -313,8 +314,8 @@ void Webserv::removeClient(int socket)
 bool Webserv::check_timeout(struct timeval last)
 {
 	// TEMPORARY PART
-	char			buffer[100];
-	struct tm		*tm;
+	// char			buffer[100];
+	// struct tm		*tm;
 	// END
 
 	struct timeval now;
@@ -342,10 +343,8 @@ void Webserv::handle_timeout_clients(void)
 			//************************** Handle this part more properly
 			// remove client and send 408 code status
 			std::string resp = "408";
-			if(send((*it).first, resp.c_str(), resp.size(), 0) < 0)
-				throw std::logic_error("Error: send() failed");
+			send((*it).first, resp.c_str(), resp.size(), 0);
 			//*****************************
-
 			removeClient((*it).first);
 			return handle_timeout_clients();
 		}

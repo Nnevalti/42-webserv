@@ -80,6 +80,7 @@ void				Request::resetDirective(void)
 
 void										Request::resetRequest(void)
 {
+	// resetDirective();
 	header_ready = false;
 	body_ready = false;
 	raw_request.clear();
