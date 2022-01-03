@@ -57,6 +57,7 @@ class Request {
 
 		bool					header_ready;
 		bool					body_ready;
+		int				contentSize;
 
 	private:
 

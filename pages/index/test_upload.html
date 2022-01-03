@@ -13,7 +13,7 @@
 		</form>
 
 		<h2>TEST IMAGE PNG/JPEG</h2>
-		<form action="http://localhost:8080" method="post"> <!-- DEFAULT enctype = application/x-www-form-urlencoded -->
+		<form action="http://localhost:8080" method="post" enctype="multipart/form-data"> <!-- DEFAULT enctype = application/x-www-form-urlencoded -->
 			<input type="file" name="image" accept="image/png, image/jpeg">
 			<button type="submit">Submit</button>
 		</form>

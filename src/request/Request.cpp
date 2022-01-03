@@ -12,7 +12,7 @@
 
 #include "Request.hpp"
 
-Request::Request(void): raw_request(""), header_ready(false), body_ready(false), _method (""), _version(""), _ret(200), _body(""), _port(8080), _path("")  {}
+Request::Request(void): raw_request(""), header_ready(false), body_ready(false), contentSize(0), _method (""), _version(""), _ret(200), _body(""), _port(8080), _path("")  {}
 
 Request::Request(Request const & src)
 {
@@ -83,6 +83,7 @@ void										Request::resetRequest(void)
 	// resetDirective();
 	header_ready = false;
 	body_ready = false;
+	contentSize = 0;
 	raw_request.clear();
 	header.clear();
 }

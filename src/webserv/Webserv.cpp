@@ -125,7 +125,7 @@ void	Webserv::accept_new_client(int server)
 		if(errno != EWOULDBLOCK)
 			throw std::logic_error("Error: accept() failed");
 	}
-	// std::cout << "\r" << "Client connected on server: " << server << std::endl;
+	std::cout << "\r" << "Client connected on server: " << server << std::endl;
 	if(fcntl(new_socket, F_SETFL, O_NONBLOCK) < 0)
 		throw std::logic_error("Error: fcntl() failed");
 
@@ -168,19 +168,20 @@ bool	Webserv::read_client_request(int clientSocket)
 		throw std::logic_error("Error: recv() failed");
 	else if (ret == 0)
 	{
-		// std::cout << RED << "\rClosing connection request from clients" << '\n';
+		std::cout << RED << "\rClosing connection request from clients" << '\n';
 		// std::cout << "TETTETSTSTET" << clientSocket << '\n';
 		removeClient(clientSocket);
 		return false;
 	}
 	else
 	{
+		_clients[clientSocket].request.contentSize += ret;
 		client_request[ret] = '\0';
 		if (_clients[clientSocket].request.raw_request.empty())
 		{
 			_clients[clientSocket].request.raw_request = client_request;
 			// handle timeout
-			gettimeofday(&_clients[clientSocket].last_request ,NULL);
+			gettimeofday(&_clients[clientSocket].last_request, NULL);
 		}
 		else
 			_clients[clientSocket].request.raw_request += client_request;
@@ -202,11 +203,14 @@ bool	Webserv::read_client_request(int clientSocket)
 		else if (_clients[clientSocket].request.header_ready == true)
 		{
 			body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
-
-			if ((int)body.size() == std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
+			std::string header = _clients[clientSocket].request.raw_request.substr(0, _clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
+			
+			if ((_clients[clientSocket].request.contentSize - header.size()) == (unsigned long)std::atol(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
 			{
+				std::cout << "CONTENT SIZE = " << _clients[clientSocket].request.contentSize - header.size() << " CONTENT LENGTH " << std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) << '\n';
 				_parser.parseBody(_clients[clientSocket].request);
 				_clients[clientSocket].request.body_ready = true;
+				std::cout << "REQUEST DONE" << '\n';
 			}
 		}
 	}
@@ -219,7 +223,12 @@ bool	Webserv::read_client_request(int clientSocket)
 void Webserv::handleRead(int client_fd)
 {
 	if (read_client_request(client_fd) == false)
+	{
+		std::cout << "BODY************************************************************************" << '\n';
+		std::cout << _clients[client_fd].request << '\n';
+		std::cout << "BODY END************************************************************************" << '\n';
 		return ;
+	}
 	if (_clients[client_fd].request.body_ready == true)
 	{
 		// std::cout << "BODY READY" << '\n';
@@ -343,6 +352,7 @@ void Webserv::handle_timeout_clients(void)
 			//************************** Handle this part more properly
 			// remove client and send 408 code status
 			std::string resp = "408";
+			std::cout << RED << "TIMED OUT" << '\n';
 			send((*it).first, resp.c_str(), resp.size(), 0);
 			//*****************************
 			removeClient((*it).first);
