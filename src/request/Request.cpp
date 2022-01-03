@@ -6,13 +6,13 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:17 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/11 14:56:08 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/03 18:42:43 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request(void): raw_request(""), header_ready(false), body_ready(false), contentSize(0), _method (""), _version(""), _ret(200), _body(""), _port(8080), _path("")  {}
+Request::Request(void): raw_request(""), header_ready(false), body_ready(false), contentSize(0), bodySize(0), _method (""), _version(""), _ret(200), _body(""), _port(8080), _path("")  {}
 
 Request::Request(Request const & src)
 {
@@ -23,6 +23,8 @@ Request::~Request(void) {}
 
 Request&	Request::operator=(const Request &rhs)
 {
+	contentSize = rhs.contentSize;
+	bodySize = rhs.bodySize;
 	_method = rhs._method;
 	_version = rhs._version;
 	_ret = rhs._ret;
@@ -83,6 +85,7 @@ void										Request::resetRequest(void)
 	// resetDirective();
 	header_ready = false;
 	body_ready = false;
+	bodySize = 0;
 	contentSize = 0;
 	raw_request.clear();
 	header.clear();
