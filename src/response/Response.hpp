@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/13 22:34:20 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/03 20:08:33 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ class Response {
 		void		createHeader();
 
 		void		getMethod(void);
+		void		deleteMethod(void);
 
 		std::string	readFile(int code);
 		std::string readFile(std::string path);
@@ -55,7 +56,7 @@ class Response {
 
 	private:
 		ConfigResponse		_config;
-		errorMap			_errors;
+		errorMap			status;
 		int					_code;
 		stringMap			_directives;
 		std::string			_header;

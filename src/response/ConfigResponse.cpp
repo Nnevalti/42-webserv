@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/12 21:07:25 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/03 18:47:27 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,6 +154,16 @@ void				ConfigResponse::setIndex(stringVector index)
 void				ConfigResponse::setContentLocation(std::string content)
 {
 	_contentLocation = content;
+}
+
+void				ConfigResponse::setCode(int code)
+{
+	_code = code;
+}
+
+int					ConfigResponse::getCode(void) const
+{
+	return (_code);
 }
 
 Request				ConfigResponse::getRequest(void) const

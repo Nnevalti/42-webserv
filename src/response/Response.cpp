@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/15 04:50:01 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/03 21:12:06 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,14 @@ static int		checkPath(const std::string& path)
 	if (stat(path.c_str(), &s) == 0 )
 	{
 		if (s.st_mode & S_IFDIR)
-			return 2;
+			return IS_A_DIRECTORY;
 		else if (s.st_mode & S_IFREG)
-			return 1;
+			return IS_A_FILE;
 		else
-			return 0;
+			return IS_SOMETHING_ELSE;
 	}
 	else
-		return 0;
+		return IS_SOMETHING_ELSE;
 }
 
 static std::string	getDate(void)
@@ -81,6 +81,7 @@ methodMap	Response::initMethods(void)
 	methodMap map;
 
 	map["GET"] = &Response::getMethod;
+	map["DELETE"] = &Response::deleteMethod;
 
 	return map;
 }
@@ -129,21 +130,22 @@ void	Response::initDirectives(void)
 
 void			Response::initErrorMap(void)
 {
-	_errors[100] = "Continue";
-	_errors[200] = "OK";
-	_errors[201] = "Created";
-	_errors[204] = "No Content";
-	_errors[400] = "Bad Request";
-	_errors[403] = "Forbidden";
-	_errors[404] = "Not Found";
-	_errors[405] = "Method Not Allowed";
-	_errors[413] = "Payload Too Large";
-	_errors[500] = "Internal Server Error";
+	status[100] = "Continue";
+	status[200] = "OK";
+	status[201] = "Created";
+	status[204] = "No Content";
+	status[400] = "Bad Request";
+	status[403] = "Forbidden";
+	status[404] = "Not Found";
+	status[405] = "Method Not Allowed";
+	status[408] = "Request Timeout";
+	status[413] = "Payload Too Large";
+	status[500] = "Internal Server Error";
 }
 
 void		Response::resetResponse(ConfigResponse& conf)
 {
-	_code = 200;
+	_code = conf.getCode();
 	_header = "";
 	_body = "";
 	initErrorMap();
@@ -157,7 +159,7 @@ std::string			Response::readFile(int code)
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (checkPath(path) == 1)
+	if (checkPath(path) == IS_A_FILE)
 	{
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
@@ -185,23 +187,25 @@ std::string			Response::readFile(std::string path)
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (checkPath(path) == 1)
+	if (checkPath(path) == IS_A_FILE)
 	{
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 		{
 			_code = 404;
+			_directives["Content-Type"] = "text/html";
 			_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
 			return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 		}
 		buffer << file.rdbuf();
 		file.close();
-		_directives["Content-Type"] = "text/html";
+		_directives["Content-Type"] = findType(path);
 		_body = buffer.str();
 		return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
 	}
 	else
 	{
+		_directives["Content-Type"] = "text/html";
 		_code = 404;
 		_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
 	}
@@ -221,10 +225,6 @@ void		Response::createHeader(void)
 				_directives["Allow"] += *i + " ";
 	}
 	_directives["Content-Language"] = _config.getLanguage();
-	if (_code != 200)
-		_directives["Content-Length"] = readFile(_code);
-	else
-		_directives["Content-Length"] = readFile(_config.getContentLocation());
 	if (_code != 404)
 		_directives["Content-Location"] = _config.getContentLocation();
 	_directives["Date"] = getDate();
@@ -235,7 +235,7 @@ void		Response::createHeader(void)
 		_directives["WWW-Authenticate"] = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
 
 	_header += "HTTP/1.1 " + (static_cast<std::ostringstream*>( &(std::ostringstream() << _code) )->str());
-	_header += " " + _errors[_code] + "\r\n";
+	_header += " " + status[_code] + "\r\n";
 	for (stringMap::const_iterator i = _directives.begin(); i != _directives.end(); i++)
 		if (i->second != "")
 			_header+= i->first + ": " + i->second + "\r\n";
@@ -248,11 +248,14 @@ void		Response::InitResponseProcess(void)
 
 	if (tmp.find(_config.getRequest().getMethod()) == tmp.end())
 		_code = 405;
-	else if (_config.getClientBodyBufferSize() < _config.getRequest().getBody().size())
+	else if (_config.getClientBodyBufferSize() < _config.getRequest().bodySize)
 		_code = 413;
 
 	if (_code != 200)
+	{
+		_directives["Content-Length"] = readFile(_code);
 		createHeader();
+	}
 	else if(_method.find(_config.getRequest().getMethod()) != _method.end())
 		(this->*Response::_method[_config.getRequest().getMethod()])();
 }
@@ -266,5 +269,24 @@ void		Response::getMethod(void)
 		_config.setContentLocation(tmp + _config.getIndex().front());
 	else if (checkPath(tmp) == 2)
 		_config.setContentLocation(tmp + "/" + _config.getIndex().front());
+	_directives["Content-Length"] = readFile(_config.getContentLocation());
+	createHeader();
+}
+
+void		Response::deleteMethod(void)
+{
+	std::string path(_config.getContentLocation());
+
+	if (checkPath(path) != IS_SOMETHING_ELSE)
+	{
+		if (remove(path.c_str()) == 0)
+			_code = 204;
+		else
+			_code = 403;
+	}
+	else
+		_code = 404;
+	if (_code != 204)
+		_directives["Content-Length"] = readFile(_code);
 	createHeader();
 }

@@ -3,19 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vdescham <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 12:36:53 by vdescham          #+#    #+#             */
-/*   Updated: 2021/12/07 12:36:53 by vdescham         ###   ########.fr       */
+/*   Updated: 2022/01/03 18:53:41 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 
 CGI::CGI(void) // decide which class we'll use for the cgi conf
-{
-	initCgiEnv();
-}
+{}
 
 CGI::CGI(CGI const & src)
 {
@@ -24,17 +22,17 @@ CGI::CGI(CGI const & src)
 
 CGI::~CGI(void) {}
 
-CGI &	operator=(const CGI &rhs)
+CGI &	CGI::operator=(const CGI &rhs)
 {
 	(void)rhs;
 	// don't forget this
 }
 
-void CGI::initEnv(Request &request, Config &config)
+void	CGI::initEnv(Request &request, Config &config)
 {
 	std::map<std::string, std::string>	headers = request.getHeaders();
 	if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
-		this->_env["AUTH_TYPE"] = headers["Authorization"];
+		_env["AUTH_TYPE"] = headers["Authorization"];
 
 	// madatory env to execute php cgi
 	_env["REDIRECT_STATUS"] = "200";
@@ -47,14 +45,13 @@ void CGI::initEnv(Request &request, Config &config)
 	_env["SCRIPT_NAME"] = ; // Path : http:://127.0.0.1/<path>?<query>
 	_env["PATH_TRANSLATED"] = "/mnt/nfs/homes/vdescham/Documents/42-webserv/DOC/POC/vdescham/CGI/PHP_TEST/test.php";
 	// full path to the ressource /usr/local/etc....
-	_env["QUERY_STRING"] = ;  // Query : http:://127.0.0.1/<path>?<query>
+	_env["QUERY_STRING"] = request.getPath();  // Query : http:://127.0.0.1/<path>?<query>
 
 	_env["REQUEST_METHOD"] = request.getMethod();
-	_env["CONTENT_LENGTH"] = std::itoa(this->_body.length());
+	_env["CONTENT_LENGTH"] = (static_cast<std::ostringstream*>( &(std::ostringstream() << this->_body.length()) )->str());
 	_env["CONTENT_TYPE"] = headers["Content-Type"];
 	_env["PATH_INFO"] = request.getPath();
 	_env["PATH_TRANSLATED"] = request.getPath();
-	_env["QUERY_STRING"] = request.getQuery();
 
 	// _env["REMOTEaddr"] = inet_ntoa(config.getNetwork().host);
 	// _env["REMOTE_IDENT"] = headers["Authorization"];
@@ -66,12 +63,12 @@ void CGI::initEnv(Request &request, Config &config)
 	// if (headers.find("Hostname") != headers.end())
 	// 	this->_env["SERVER_NAME"] = headers["Hostname"];
 	// else
-		_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
+		_env["SERVER_NAME"] = _env["REMOTEaddr"];
 
-	_env["SERVER_PORT"] = std::itoa(config.getNetwork().port);
+	_env["SERVER_PORT"] = (static_cast<std::ostringstream*>( &(std::ostringstream() << this->_body.length()) )->str());
 
 
-	_env.insert(config.getEnv().begin(), config.getEnv().end()); // env parameters from client request
+	_env.insert(request.getEnv().begin(), request.getEnv().end()); // env parameters from client request
 }
 
 char **CGI::mapToEnv(void)
@@ -102,8 +99,8 @@ std::string		CGI::execute(void)
 	long	fdOut = fileno(tmpOut);
 	std::string newBody;
 
-	cgiEnv = mapToEnv(mapCgiEnv);
-	std::string body = ; // open a file
+	cgiEnv = mapToEnv();
+	std::string body; // open a file
 
 	write(fdIn, body.c_str(), body.size());
 	lseek(fdIn, 0, SEEK_SET);
@@ -116,7 +113,7 @@ std::string		CGI::execute(void)
 
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		execve(_env["SCRIPT_NAME"], nll, cgiEnv);
+		execve(_env["SCRIPT_NAME"].c_str(), nll, cgiEnv);
 	}
 	else
 	{

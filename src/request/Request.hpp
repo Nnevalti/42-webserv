@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:16 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/11 14:39:22 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/03 19:18:56 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,8 @@ class Request {
 
 		bool					header_ready;
 		bool					body_ready;
-		int				contentSize;
+		int						contentSize;
+		unsigned long			bodySize;
 
 	private:
 

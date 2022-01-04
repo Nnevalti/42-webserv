@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/15 18:15:08 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/03 21:20:32 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,8 +168,7 @@ bool	Webserv::read_client_request(int clientSocket)
 		throw std::logic_error("Error: recv() failed");
 	else if (ret == 0)
 	{
-		std::cout << RED << "\rClosing connection request from clients" << '\n';
-		// std::cout << "TETTETSTSTET" << clientSocket << '\n';
+		std::cout << RED << "\rClosing connection request from clients" << SET << '\n';
 		removeClient(clientSocket);
 		return false;
 	}
@@ -204,7 +203,7 @@ bool	Webserv::read_client_request(int clientSocket)
 		{
 			body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
 			std::string header = _clients[clientSocket].request.raw_request.substr(0, _clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
-			
+
 			if ((_clients[clientSocket].request.contentSize - header.size()) == (unsigned long)std::atol(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
 			{
 				std::cout << "CONTENT SIZE = " << _clients[clientSocket].request.contentSize - header.size() << " CONTENT LENGTH " << std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) << '\n';
@@ -282,7 +281,7 @@ void Webserv::handleWrite(int client_fd)
 
 	// ***************************************************
 	// std::cout << "*******************CLIENT REQUEST (RAW)" << '\n';
-	// std::cout << _clients[client_fd].request.raw_request << '\n';
+	std::cout << _clients[client_fd].request.raw_request << '\n';
 	// Try to make this four lines below in a response::function
 	_parser.parseResponse(confResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	classResponse.resetResponse(confResponse);
@@ -292,7 +291,7 @@ void Webserv::handleWrite(int client_fd)
 	//  if so we will pass in a function to execute it
 	// ***************************************************
 	// std::cout << "*******************RESPONSE" << '\n';
-	// std::cout << response << std::endl;
+	std::cout << response << std::endl;
 
 	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
