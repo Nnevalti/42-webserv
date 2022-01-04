@@ -192,7 +192,7 @@ bool	Webserv::read_client_request(int clientSocket)
 			_clients[clientSocket].request.header_ready = true;
 			_parser.parseHeader(_clients[clientSocket].request);
 
-			if (_clients[clientSocket].request.getMethod() != "POST")
+			if (std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) == 0)
 			{
 				_clients[clientSocket].request.body_ready = true;
 				return true;
