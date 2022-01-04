@@ -125,7 +125,7 @@ void	Webserv::accept_new_client(int server)
 		if(errno != EWOULDBLOCK)
 			throw std::logic_error("Error: accept() failed");
 	}
-	std::cout << "\r" << "Client connected on server: " << server << std::endl;
+	// std::cout << "\rClient connected on server: " << server << std::endl;
 	if(fcntl(new_socket, F_SETFL, O_NONBLOCK) < 0)
 		throw std::logic_error("Error: fcntl() failed");
 
@@ -154,7 +154,7 @@ void	Webserv::getRightServer(Client &client)
 		}
 	}
 	if (!foundAConf)
-		std::cout << "No corresponding server" << '\n';
+		std::cout << "\rNo corresponding server" << '\n';
 	client.setServer(rightConf);
 }
 
@@ -165,10 +165,13 @@ bool	Webserv::read_client_request(int clientSocket)
 	std::string body("");
 
 	if ((ret = recv(clientSocket, &client_request, BUFFER_SIZE, 0)) < 0)
-		throw std::logic_error("Error: recv() failed");
+	{
+		removeClient(clientSocket);
+		std::cerr << RED << "\rError: recv() failed." << SET << '\n';
+	}
 	else if (ret == 0)
 	{
-		std::cout << RED << "\rClosing connection request from clients" << SET << '\n';
+		// std::cout << RED << "\rClosing connection request from clients" << SET << '\n';
 		removeClient(clientSocket);
 		return false;
 	}
@@ -222,17 +225,9 @@ bool	Webserv::read_client_request(int clientSocket)
 void Webserv::handleRead(int client_fd)
 {
 	if (read_client_request(client_fd) == false)
-	{
-		std::cout << "BODY************************************************************************" << '\n';
-		std::cout << _clients[client_fd].request << '\n';
-		std::cout << "BODY END************************************************************************" << '\n';
 		return ;
-	}
 	if (_clients[client_fd].request.body_ready == true)
 	{
-		// std::cout << "BODY READY" << '\n';
-		// std::cout << _clients[client_fd].request << '\n';
-
 		// parse the body and set client to EPOLLOUT
 		_event.events = EPOLLOUT;
 		_event.data.fd = client_fd;
@@ -264,6 +259,57 @@ void parseBodyPost(Request &request)
 	}
 }
 
+std::string	get_time_diff(struct timeval *last)
+{
+	if (last == 0)
+		return "        - ";
+	struct timeval end;
+	gettimeofday(&end, NULL);
+
+	size_t	usec = end.tv_usec - last->tv_usec;
+	size_t	sec = end.tv_sec - last->tv_sec;
+	bool	is_micro = false;
+	std::stringstream ss;
+
+	if (sec > 0)
+	{
+		ss << sec << " s";
+	}
+	else
+	{
+		if (usec >= 1000)
+		{
+			ss << usec / 1000 << " ms";
+		}
+		else
+		{
+			ss << usec << " μs";
+			is_micro = true;
+		}
+	}
+
+	std::string str = ss.str();
+	if (str.size() > 10)
+		return "eternity..";
+	return str.insert(0, (is_micro ? 11 : 10) - str.length(), ' ');
+}
+
+void displayInfo(Client &client, Response &response)
+{
+	char			buffer[100];
+	struct tm		*tm;
+
+	// request
+	tm = gmtime(&client.last_request.tv_sec);
+	strftime(buffer, 100, "%F - %T", tm);
+	std::cout << "\r[SERVER] " << buffer << " | " << client.request.getMethod()
+	<< " " << client.request.getPath() << " " << get_time_diff(&client.last_request)
+	<< " |" << response.getCode() << "|" << client.request.getNetwork();
+
+	// response
+
+}
+
 void Webserv::handleWrite(int client_fd)
 {
 	Response	classResponse;
@@ -281,7 +327,7 @@ void Webserv::handleWrite(int client_fd)
 
 	// ***************************************************
 	// std::cout << "*******************CLIENT REQUEST (RAW)" << '\n';
-	std::cout << _clients[client_fd].request.raw_request << '\n';
+	// std::cout << _clients[client_fd].request.raw_request << '\n';
 	// Try to make this four lines below in a response::function
 	_parser.parseResponse(confResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	classResponse.resetResponse(confResponse);
@@ -291,7 +337,12 @@ void Webserv::handleWrite(int client_fd)
 	//  if so we will pass in a function to execute it
 	// ***************************************************
 	// std::cout << "*******************RESPONSE" << '\n';
-	std::cout << response << std::endl;
+	// std::cout << response << std::endl;
+
+
+	displayInfo(_clients[client_fd], classResponse);
+
+
 
 	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
@@ -321,23 +372,11 @@ void Webserv::removeClient(int socket)
 
 bool Webserv::check_timeout(struct timeval last)
 {
-	// TEMPORARY PART
-	// char			buffer[100];
-	// struct tm		*tm;
-	// END
-
 	struct timeval now;
 	gettimeofday(&now, NULL);
 
 	if ((now.tv_sec - last.tv_sec) >= CLIENT_TIMEOUT)
-	{
-		// DO NOT KEEP THIS COUT IT IS JUST FOR TEST ONLY
-		// tm = gmtime(&last.tv_sec);
-		// strftime(buffer, 100, "%F - %T", tm);
-		// std::cout << RED << "\nClient timed out, last connection: " << SET << buffer << "\n";
-		// END
 		return true;
-	}
 	return false;
 }
 
@@ -347,13 +386,6 @@ void Webserv::handle_timeout_clients(void)
 	{
 		if (check_timeout((*it).second.last_request))
 		{
-
-			//************************** Handle this part more properly
-			// remove client and send 408 code status
-			std::string resp = "408";
-			std::cout << RED << "TIMED OUT" << '\n';
-			send((*it).first, resp.c_str(), resp.size(), 0);
-			//*****************************
 			removeClient((*it).first);
 			return handle_timeout_clients();
 		}

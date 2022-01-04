@@ -76,6 +76,11 @@ std::string	Response::getResponse(void) const
 	return (_response);
 }
 
+int Response::getCode(void) const
+{
+	return _code;
+}
+
 methodMap	Response::initMethods(void)
 {
 	methodMap map;

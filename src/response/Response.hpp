@@ -46,7 +46,7 @@ class Response {
 		void		initErrorMap(void);
 
 		std::string	getResponse(void) const;
-
+		int			getCode(void) const;
 	private:
 		static methodMap	initMethods(void);
 		static methodMap	_method;
