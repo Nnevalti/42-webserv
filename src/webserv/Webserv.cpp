@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/03 21:20:32 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/04 18:13:54 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -327,7 +327,7 @@ void Webserv::handleWrite(int client_fd)
 
 	// ***************************************************
 	// std::cout << "*******************CLIENT REQUEST (RAW)" << '\n';
-	// std::cout << _clients[client_fd].request.raw_request << '\n';
+	std::cout << _clients[client_fd].request.raw_request << '\n';
 	// Try to make this four lines below in a response::function
 	_parser.parseResponse(confResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	classResponse.resetResponse(confResponse);
@@ -337,13 +337,8 @@ void Webserv::handleWrite(int client_fd)
 	//  if so we will pass in a function to execute it
 	// ***************************************************
 	// std::cout << "*******************RESPONSE" << '\n';
-	// std::cout << response << std::endl;
-
-
+	std::cout << response << std::endl;
 	displayInfo(_clients[client_fd], classResponse);
-
-
-
 	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
 		removeClient(client_fd);

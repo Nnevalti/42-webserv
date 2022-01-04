@@ -6,12 +6,11 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:16 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/03 19:18:56 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/04 18:38:20 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef REQUEST_H
-# define REQUEST_H
+#pragma once
 
 # include "headers.hpp"
 
@@ -72,6 +71,3 @@ class Request {
 		stringMap				_env_for_cgi;
 		t_network				_network;
 };
-
-
-#endif

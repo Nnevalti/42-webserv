@@ -6,17 +6,15 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/03 20:08:33 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/04 21:00:11 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RESPONSE_H
 # define RESPONSE_H
 
-# include "headers.hpp"
-# include "Config.hpp"
-# include "ConfigResponse.hpp"
 # include "Request.hpp"
+# include "CgiHandler.hpp"
 
 class Response {
 

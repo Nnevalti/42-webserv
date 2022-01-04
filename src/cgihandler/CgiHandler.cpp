@@ -1,0 +1,182 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   CgiHandler.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/07 12:36:53 by vdescham          #+#    #+#             */
+/*   Updated: 2022/01/04 20:56:21 by sgah             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "CgiHandler.hpp"
+
+CgiHandler::CgiHandler(void)
+{
+	_body = "";
+	_method = "";
+	_contentSize = "";
+	_contentType = "";
+	_contentPath = "";
+	_contentFile = "";
+	_contentPathFile = "";
+	_exe = "";
+	_query = "";
+	_port = "";
+	_host = "";
+	_authorisation = "";
+	_protocol = "";
+	_serverName = "";
+}
+
+CgiHandler::CgiHandler(CgiHandler const & src)
+{
+	*this = src;
+}
+
+CgiHandler::~CgiHandler(void) {}
+
+CgiHandler &	CgiHandler::operator=(const CgiHandler &rhs)
+{
+	_body = rhs._body;
+	_method = rhs._method;
+	_contentSize = rhs._contentSize;
+	_contentType = rhs._contentType;
+	_contentPath = rhs._contentPath;
+	_contentFile = rhs._contentFile;
+	_contentPathFile = rhs._contentPathFile;
+	_exe = rhs._exe;
+	_query = rhs._query;
+	_port = rhs._port;
+	_host = rhs._host;
+	_authorisation = rhs._authorisation;
+	_protocol = rhs._protocol;
+	_serverName = rhs._serverName;
+	return (*this);
+}
+
+static std::string	ft_itoa(int nb)
+{
+	return (static_cast<std::ostringstream*>( &(std::ostringstream() << nb) )->str());
+}
+
+void			CgiHandler::initCgiHandler(ConfigResponse& Config)
+{
+	stringMap	headers(Config.getRequest().getHeaders());
+
+	_body = Config.getRequest().getBody();
+	_method = Config.getRequest().getMethod();
+	_contentSize = ft_itoa(Config.getRequest().contentSize);
+	_contentType = headers["Content-Type"];
+	_contentFile = Config.getLocationPath();
+	_contentPath = Config.getLocationFile();
+	_exe = Config.getLocation().getCgiPass();
+	_query = _contentPath.substr(_contentPath.find_first_of("?") + 1);
+	_contentPathFile = Config.getContentLocation();
+	_port = ft_itoa(Config.getServer().getNetwork().port);
+	_host = std::string(inet_ntoa(Config.getServer().getNetwork().host));
+	if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
+		_authorisation = headers["Authorization"];
+	_protocol = "HTTP/1.1";
+	_serverName = "Webserv";
+	_interface	= "CGI/1.1";
+	_status = "200";
+}
+
+void			CgiHandler::setEnv(void)
+{
+	_env["AUTH_TYPE"] = _authorisation;
+	_env["REDIRECT_STATUS"] = _status;
+	_env["GATEWAY_INTERFACE"] = _interface;
+	_env["SCRIPT_NAME"] = _exe;
+	_env["SCRIPT_FILENAME"] = _contentPathFile;
+	_env["REQUEST_METHOD"] = _method;
+	_env["CONTENT_LENGTH"] = _contentSize;
+	_env["CONTENT_TYPE"] = _contentType;
+	_env["PATH_INFO"] = _contentPath;
+	_env["PATH_TRANSLATED"] = _contentPath;
+	_env["QUERY_STRING"] = _query;
+	_env["REMOTEaddr"] = _host;
+	_env["REMOTE_IDENT"] = _authorisation;
+	_env["REMOTE_USER"] = _authorisation;
+	_env["REQUEST_URI"] = _contentPath;
+	_env["SERVER_NAME"] = _host;
+	_env["SERVER_PORT"] = _port;
+	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+	_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
+}
+
+char **CgiHandler::mapToEnv(void)
+{
+	char **CgiHandlerEnv = new char *[_env.size() + 1];
+	std::string tempStr;
+	int i = 0;
+
+	for (stringMap::iterator it = _env.begin(); it != _env.end(); it++, i++)
+	{
+		tempStr = it->first + "=" + it->second;
+		CgiHandlerEnv[i] = new char[tempStr.size() + 1];
+		CgiHandlerEnv[i] = std::strcpy(CgiHandlerEnv[i], tempStr.c_str());
+	}
+	return CgiHandlerEnv;
+}
+
+std::string		CgiHandler::execute(void)
+{
+	char		**CgiHandlerEnv = mapToEnv();
+	int			saveStdin = dup(STDIN_FILENO);
+	int			saveStdout = dup(STDOUT_FILENO);
+	FILE		*tmpIn = tmpfile();
+	FILE		*tmpOut = tmpfile();
+	int			In = fileno(tmpIn);
+	int			Out = fileno(tmpOut);
+	std::string	body;
+	pid_t		pid;
+
+
+	write(In, _body.c_str(), std::atoi(_contentSize.c_str()));
+	lseek(In, 0, SEEK_SET);
+
+	if ((pid = fork()) == -1)
+		return ("<!DOCTYPE html>\n<html>\n\t<title>500 Server Error</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>500 Server Error</H1>\n\t\t</div>\n\t</body>\t</html>");
+	else if (pid == 0)
+	{
+		char * const * nll = NULL;
+
+		dup2(In, STDIN_FILENO);
+		dup2(Out, STDOUT_FILENO);
+		execve(_env["SCRIPT_NAME"].c_str(), nll, CgiHandlerEnv);
+	}
+	else
+	{
+		char	buffer[BUFFER_SIZE + 1];
+
+		std::memset(buffer, 0, BUFFER_SIZE + 1);
+		waitpid(0, NULL, 0);
+		lseek(Out, 0, SEEK_SET);
+
+		int ret = 1;
+		while (ret > 0)
+		{
+			std::memset(buffer, 0, BUFFER_SIZE + 1);
+			ret = read(Out, buffer, BUFFER_SIZE);
+			body += buffer;
+		}
+	}
+	dup2(saveStdin, STDIN_FILENO);
+	dup2(saveStdout, STDOUT_FILENO);
+	fclose(tmpIn);
+	fclose(tmpOut);
+	close(In);
+	close(Out);
+	close(saveStdin);
+	close(saveStdout);
+
+	for (int i = 0;  CgiHandlerEnv[i]; i++)
+		delete CgiHandlerEnv[i];
+	delete [] CgiHandlerEnv;
+	if (pid == 0)
+		exit(0);
+	return body;
+}
