@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/05 16:34:00 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/05 17:38:49 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -330,4 +330,9 @@ void		Response::deleteMethod(void)
 	if (_code != 204)
 		_directives["Content-Length"] = readFile(_code);
 	createHeader();
+}
+
+void		Response::postMethod(void)
+{
+
 }

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/05 16:52:12 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/05 17:38:09 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,29 +241,6 @@ void Webserv::handleRead(int client_fd)
 
 }
 
-// ICI SHERCHRYST
-void parseBodyPost(Request &request)
-{
-	std::string boundary;
-	std::string body;
-	std::string content;
-	size_t start;
-	size_t end(0);
-
-	body = request.getBody();
-	boundary = "--" + request.getHeader("Content-Type").substr(request.getHeader("Content-Type").find("=") + 1);
-	while (body.substr(boundary.size(), 2) != "--")
-	{
-		start = body.find(boundary) + boundary.size() + 2;
-		end = body.find(boundary, start);
-		content = body.substr(start, (end - start - 1));
-		std::cout << "\nCONTENT *****************************" << '\n';
-		std::cout << content << '\n';
-		std::cout << "END CONTENT *****************************" << '\n';
-		body = body.substr(end);
-	}
-}
-
 std::string	get_time_diff(struct timeval *last)
 {
 	if (last == 0)
@@ -317,26 +294,18 @@ void displayInfo(Client &client, Response &response)
 
 void Webserv::handleWrite(int client_fd)
 {
-	Response	classResponse;
-	ConfigResponse confResponse;
 	std::string	response;
 
 	// forward request to the right server
 	getRightServer(_clients[client_fd]);
 
-	// *****************************************************************
-	// Move in Response Class
-	if (_clients[client_fd].request.getMethod() == "POST")
-		parseBodyPost(_clients[client_fd].request);
-	// *****************************************************************
-	// ***************************************************
 	// std::cout << "*******************CLIENT REQUEST (RAW)" << '\n';
 	// std::cout << _clients[client_fd].request.raw_request << '\n';
 	// Try to make this four lines below in a response::function
-	_parser.parseResponse(confResponse, _clients[client_fd].request, _clients[client_fd].getServer());
-	classResponse.resetResponse(confResponse);
-	classResponse.InitResponseProcess();
-	response = classResponse.getResponse();
+	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
+	_clients[client_fd].classResponse.resetResponse(_clients[client_fd].configResponse);
+	_clients[client_fd].classResponse.InitResponseProcess();
+	response = _clients[client_fd].classResponse.getResponse();
 	// verify in response if we need to use a cgi binary for the request
 	//  if so we will pass in a function to execute it
 	// ***************************************************
@@ -347,7 +316,7 @@ void Webserv::handleWrite(int client_fd)
 		removeClient(client_fd);
 	// timeout
 	_clients[client_fd].hadResponse = true;
-	displayInfo(_clients[client_fd], classResponse);
+	displayInfo(_clients[client_fd], _clients[client_fd].classResponse);
 	// listen client again for other requests and wait for a close connection request
 	_event.events = EPOLLIN;
 	_event.data.fd = client_fd;

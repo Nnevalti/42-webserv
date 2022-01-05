@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/25 13:49:50 by vdescham          #+#    #+#             */
-/*   Updated: 2021/12/06 20:36:05 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/05 17:27:12 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include "headers.hpp"
 # include "Request.hpp"
 # include "Config.hpp"
+# include "Response.hpp"
 
 class Client
 {
@@ -36,7 +37,7 @@ class Client
 		void		setServer(Config server);
 		Config&		getServer(void);
 
-		int		readRequest(void);
+		int			readRequest(void);
 		void		sendResponse(void);
 
 		// request class we get from parsing
@@ -45,10 +46,12 @@ class Client
 		struct timeval last_request;
 
 		bool		hadResponse;
+		ConfigResponse	configResponse;
+		Response		classResponse;
 
 	private:
-		int			_socket;
-		std::string _request;
+		int				_socket;
+		std::string		_request;
 
 		Config		_server;
 };
