@@ -44,6 +44,8 @@ class Client
 		// handle timeout
 		struct timeval last_request;
 
+		bool		hadResponse;
+
 	private:
 		int			_socket;
 		std::string _request;

@@ -120,6 +120,7 @@ char **Cgi::mapToTab(void)
 		CgiEnv[i] = new char[tempStr.size() + 1];
 		CgiEnv[i] = std::strcpy(CgiEnv[i], tempStr.c_str());
 	}
+	CgiEnv[i] = NULL;
 	return CgiEnv;
 }
 
@@ -134,7 +135,6 @@ std::string		Cgi::execute(void)
 	int			Out = fileno(tmpOut);
 	std::string	body;
 	pid_t		pid;
-
 
 	write(In, _body.c_str(), std::atoi(_contentSize.c_str()));
 	lseek(In, 0, SEEK_SET);
@@ -174,10 +174,10 @@ std::string		Cgi::execute(void)
 	close(saveStdin);
 	close(saveStdout);
 
+	if (pid == 0)
+		exit(0);
 	for (int i = 0;  CgiEnv[i]; i++)
 		delete CgiEnv[i];
 	delete [] CgiEnv;
-	if (pid == 0)
-		exit(0);
 	return body;
 }

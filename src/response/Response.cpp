@@ -265,23 +265,41 @@ void		Response::InitResponseProcess(void)
 		(this->*Response::_method[_config.getRequest().getMethod()])();
 }
 
+static std::string	ft_itoa(int nb)
+{
+	return (static_cast<std::ostringstream*>( &(std::ostringstream() << nb) )->str());
+}
+
 void		Response::parseCgiBody(std::string body)
 {
 	size_t	start;
 	size_t	startBody = 0;
 
-	std::cout << "body to parse\n" << body << "\nend of this" << std::endl;
+	// std::cout << "body to parse\n" << body << "\nend of this" << std::endl;
 
 	if((start = body.find("Status: ")) != std::string::npos)
 	{
 		_code = std::atoi(body.substr(start + 8, 3).c_str());
 		_directives["Content-Length"] = readFile(_code);
+		// std::cout << "Content-length " << _directives["Content-Length"] << '\n';
 	}
 	else if ((start = body.find("Content-type: ")) != std::string::npos)
 	{
 		std::string line = body.substr(start, (startBody = body.find("\r\n", start)) - start);
 
-		_directives["Content-Type"] = line.substr(start + 14 , body.size());
+		// std::cout << line << '\n';
+
+		_directives["Content-Type"] = line.substr(14);
+
+		size_t test = body.find("\r\n\r\n");
+		std::string body_r = body.substr(test + 4);
+
+		// std::cout << "BODY_R" << '\n';
+		// std::cout << body_r << '\n';
+		// std::cout << "BODY_R END " << body_r.size() << '\n';
+		// std::cout << "DIRECTIVE" <<  _directives["Content-Length"] << '\n';
+		_directives["Content-Length"] = ft_itoa(body_r.size());
+		// std::cout << "DIRECTIVE" <<  _directives["Content-Length"] << '\n';
 		_body = body.substr(startBody + 4);
 	}
 }
@@ -294,7 +312,6 @@ void		Response::getMethod(void)
 	{
 		Cgi cgi;
 		std::string tmpBody;
-
 		cgi.initCgiData(_config);
 		cgi.setEnv();
 		tmpBody = cgi.execute();

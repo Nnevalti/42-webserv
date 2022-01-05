@@ -154,7 +154,9 @@ void	Webserv::getRightServer(Client &client)
 		}
 	}
 	if (!foundAConf)
-		std::cout << "\rNo corresponding server" << '\n';
+	{
+		std::cout << "\rNo corresponding server " << _clients.size()<< '\n';
+	}
 	client.setServer(rightConf);
 }
 
@@ -224,6 +226,9 @@ bool	Webserv::read_client_request(int clientSocket)
 */
 void Webserv::handleRead(int client_fd)
 {
+	// timeout
+	if (_clients[client_fd].hadResponse == true)
+		_clients[client_fd].hadResponse = false;
 	if (read_client_request(client_fd) == false)
 		return ;
 	if (_clients[client_fd].request.body_ready == true)
@@ -324,10 +329,9 @@ void Webserv::handleWrite(int client_fd)
 	if (_clients[client_fd].request.getMethod() == "POST")
 		parseBodyPost(_clients[client_fd].request);
 	// *****************************************************************
-
 	// ***************************************************
 	// std::cout << "*******************CLIENT REQUEST (RAW)" << '\n';
-	std::cout << _clients[client_fd].request.raw_request << '\n';
+	// std::cout << _clients[client_fd].request.raw_request << '\n';
 	// Try to make this four lines below in a response::function
 	_parser.parseResponse(confResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	classResponse.resetResponse(confResponse);
@@ -337,11 +341,13 @@ void Webserv::handleWrite(int client_fd)
 	//  if so we will pass in a function to execute it
 	// ***************************************************
 	// std::cout << "*******************RESPONSE" << '\n';
-	std::cout << response << std::endl;
-	displayInfo(_clients[client_fd], classResponse);
+	// std::cout << response << std::endl;
 	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
 		removeClient(client_fd);
+	// timeout
+	_clients[client_fd].hadResponse = true;
+	displayInfo(_clients[client_fd], classResponse);
 	// listen client again for other requests and wait for a close connection request
 	_event.events = EPOLLIN;
 	_event.data.fd = client_fd;
@@ -381,8 +387,18 @@ void Webserv::handle_timeout_clients(void)
 	{
 		if (check_timeout((*it).second.last_request))
 		{
-			removeClient((*it).first);
-			return handle_timeout_clients();
+			if ((*it).second.hadResponse == true)
+			{
+				removeClient((*it).first);
+				return handle_timeout_clients();
+			}
+			else
+			{
+				(*it).second.request.setRet(408);
+				_event.events = EPOLLOUT;
+				_event.data.fd = (*it).first;
+				epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
+			}
 		}
 	}
 }
@@ -424,7 +440,6 @@ void Webserv::run()
 			std::cout << "\r" << wait[(n++ % 6)] << GREEN << " waiting for connection" << SET << std::flush;
 			handle_timeout_clients();
 		}
-
 	}
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 		close(*it);

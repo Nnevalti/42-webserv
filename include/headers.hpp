@@ -59,7 +59,7 @@
 # define BUFFER_SIZE 1000
 # define MAX_EV 4096
 # define MAX_CLIENTS 1000
-# define CLIENT_TIMEOUT 5
+# define CLIENT_TIMEOUT 10
 // ^ in seconds ^
 
 # define DEFAULT "pages/default.conf"
