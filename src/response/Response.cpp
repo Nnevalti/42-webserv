@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/04 21:04:07 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/05 03:32:36 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,16 +265,49 @@ void		Response::InitResponseProcess(void)
 		(this->*Response::_method[_config.getRequest().getMethod()])();
 }
 
+void		Response::parseCgiBody(std::string body)
+{
+	size_t	start;
+	size_t	startBody = 0;
+
+	std::cout << "body to parse\n" << body << "\nend of this" << std::endl;
+
+	if((start = body.find("Status: ")) != std::string::npos)
+	{
+		_code = std::atoi(body.substr(start + 8, 3).c_str());
+		_directives["Content-Length"] = readFile(_code);
+	}
+	else if ((start = body.find("Content-type: ")) != std::string::npos)
+	{
+		std::string line = body.substr(start, (startBody = body.find("\r\n", start)) - start);
+
+		_directives["Content-Type"] = line.substr(start + 14 , body.size());
+		_body = body.substr(startBody + 4);
+	}
+}
+
 void		Response::getMethod(void)
 {
 	std::string tmp(_config.getContentLocation());
 
-	//todo FIX NOT COMPLETE FIND THE RIGHT WAY TO GET INDEX
-	if (tmp[tmp.size() - 1] == '/')
-		_config.setContentLocation(tmp + _config.getIndex().front());
-	else if (checkPath(tmp) == 2)
-		_config.setContentLocation(tmp + "/" + _config.getIndex().front());
-	_directives["Content-Length"] = readFile(_config.getContentLocation());
+	if (_config.getCgiPass() != "")
+	{
+		Cgi cgi;
+		std::string tmpBody;
+
+		cgi.initCgiData(_config);
+		cgi.setEnv();
+		tmpBody = cgi.execute();
+		parseCgiBody(tmpBody);
+	}
+	else
+	{
+		if (tmp[tmp.size() - 1] == '/')
+			_config.setContentLocation(tmp + _config.getIndex().front());
+		else if (checkPath(tmp) == 2)
+			_config.setContentLocation(tmp + "/" + _config.getIndex().front());
+		_directives["Content-Length"] = readFile(_config.getContentLocation());
+	}
 	createHeader();
 }
 

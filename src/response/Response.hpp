@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/04 21:00:11 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/05 02:10:14 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define RESPONSE_H
 
 # include "Request.hpp"
-# include "CgiHandler.hpp"
+# include "Cgi.hpp"
 
 class Response {
 
@@ -30,6 +30,8 @@ class Response {
 		void		resetResponse(ConfigResponse& conf);
 
 		void		createHeader();
+
+		void		parseCgiBody(std::string body);
 
 		void		getMethod(void);
 		void		deleteMethod(void);

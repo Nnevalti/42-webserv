@@ -1,41 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CgiHandler.hpp                                            :+:      :+:    :+:   */
+/*   Cgi.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 12:36:53 by vdescham          #+#    #+#             */
-/*   Updated: 2022/01/03 18:03:02 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/05 01:41:00 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CgiHandler_H
-# define CgiHandler_H
+#ifndef Cgi_H
+# define Cgi_H
 
 # include "ConfigResponse.hpp"
 
-class CgiHandler
+class Cgi
 {
 	public:
-		CgiHandler(void);
-		CgiHandler(CgiHandler const & src);
-		~CgiHandler(void);
+		Cgi(void);
+		Cgi(Cgi const & src);
+		~Cgi(void);
 
-		CgiHandler		&operator=(const CgiHandler &rhs);
+		Cgi		&operator=(const Cgi &rhs);
 
 		std::string		execute(void);
-		char 			**mapToEnv(void);
+		char 			**mapToTab(void);
 		void			setEnv(void);
-		void			initCgiHandler(ConfigResponse& config);
+		void			initCgiData(ConfigResponse& config);
 
 
 	private:
 		stringMap		_env;
 		std::string		_body;
+		std::string		_cgiPass;
 		std::string		_method;
 		std::string		_contentSize;
-		std::string		_exe;
+		std::string		_toExe;
 		std::string		_contentType;
 		std::string		_contentPath;
 		std::string		_contentFile;

@@ -11,7 +11,7 @@ _Purple=\033[1;35m
 BUILD	= .build
 
 SRC_DIR	= ./src/
-DIR		= parser webserv config client t_network request response cgihandler
+DIR		= parser webserv config client t_network request response cgi
 DIRS	= $(addprefix $(BUILD)/, $(DIR))
 CLASSINC= $(addprefix -I $(SRC_DIR), $(DIR))
 
@@ -36,7 +36,7 @@ NET		= t_network.cpp
 
 RESPONSE= Response.cpp ConfigResponse.cpp
 
-CGI		= CgiHandler.cpp
+CGI		= Cgi.cpp
 
 SRC		= $(MAIN) \
 		  $(addprefix parser/, $(PARSER)) \
@@ -46,7 +46,7 @@ SRC		= $(MAIN) \
 		  $(addprefix t_network/,$(NET)) \
 		  $(addprefix request/, $(REQUEST)) \
 		  $(addprefix response/, $(RESPONSE)) \
-		  $(addprefix cgihandler/, $(CGI))
+		  $(addprefix cgi/, $(CGI))
 
 
 DEP		:= $(SRC:%.cpp=$(BUILD)/%.d)
