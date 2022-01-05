@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/04 18:13:54 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/05 16:46:20 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void	Webserv::accept_new_client(int server)
 		if(errno != EWOULDBLOCK)
 			throw std::logic_error("Error: accept() failed");
 	}
-	// std::cout << "\rClient connected on server: " << server << std::endl;
+	std::cout << "\rClient connected on server: " << server << " " << new_socket<< std::endl;
 	if(fcntl(new_socket, F_SETFL, O_NONBLOCK) < 0)
 		throw std::logic_error("Error: fcntl() failed");
 
@@ -387,18 +387,19 @@ void Webserv::handle_timeout_clients(void)
 	{
 		if (check_timeout((*it).second.last_request))
 		{
-			if ((*it).second.hadResponse == true)
-			{
+			// if ((*it).second.hadResponse == true)
+			// {
+			// 	std::cout << "COUCOU" << (*it).first << std::endl;
 				removeClient((*it).first);
 				return handle_timeout_clients();
-			}
-			else
-			{
-				(*it).second.request.setRet(408);
-				_event.events = EPOLLOUT;
-				_event.data.fd = (*it).first;
-				epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
-			}
+			// }
+			// else
+			// {
+			// 	(*it).second.request.setRet(408);
+			// 	_event.events = EPOLLOUT;
+			// 	_event.data.fd = (*it).first;
+			// 	epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
+			// }
 		}
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/05 03:32:36 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/05 16:34:00 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,32 +275,18 @@ void		Response::parseCgiBody(std::string body)
 	size_t	start;
 	size_t	startBody = 0;
 
-	// std::cout << "body to parse\n" << body << "\nend of this" << std::endl;
-
 	if((start = body.find("Status: ")) != std::string::npos)
 	{
 		_code = std::atoi(body.substr(start + 8, 3).c_str());
 		_directives["Content-Length"] = readFile(_code);
-		// std::cout << "Content-length " << _directives["Content-Length"] << '\n';
 	}
 	else if ((start = body.find("Content-type: ")) != std::string::npos)
 	{
 		std::string line = body.substr(start, (startBody = body.find("\r\n", start)) - start);
 
-		// std::cout << line << '\n';
-
-		_directives["Content-Type"] = line.substr(14);
-
-		size_t test = body.find("\r\n\r\n");
-		std::string body_r = body.substr(test + 4);
-
-		// std::cout << "BODY_R" << '\n';
-		// std::cout << body_r << '\n';
-		// std::cout << "BODY_R END " << body_r.size() << '\n';
-		// std::cout << "DIRECTIVE" <<  _directives["Content-Length"] << '\n';
-		_directives["Content-Length"] = ft_itoa(body_r.size());
-		// std::cout << "DIRECTIVE" <<  _directives["Content-Length"] << '\n';
 		_body = body.substr(startBody + 4);
+		_directives["Content-Type"] = line.substr(14);
+		_directives["Content-Length"] = ft_itoa(_body.size());
 	}
 }
 
