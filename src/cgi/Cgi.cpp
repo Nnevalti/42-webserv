@@ -154,15 +154,14 @@ std::string		Cgi::execute(void)
 	{
 		char	buffer[BUFFER_SIZE + 1];
 
-		std::memset(buffer, 0, BUFFER_SIZE + 1);
 		waitpid(0, NULL, 0);
 		lseek(Out, 0, SEEK_SET);
 
 		int ret = 1;
 		while (ret > 0)
 		{
-			std::memset(buffer, 0, BUFFER_SIZE + 1);
 			ret = read(Out, buffer, BUFFER_SIZE);
+			buffer[ret] = '\0';
 			body += buffer;
 		}
 	}
