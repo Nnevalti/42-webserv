@@ -13,7 +13,7 @@
 # include "t_network.hpp"
 # include <string>
 
-t_network::t_network(void) {}
+t_network::t_network(void): hostName("") {}
 
 t_network::~t_network(void) {}
 
@@ -28,6 +28,7 @@ t_network & t_network::operator=(const t_network &rhs)
 	{
 		this->host = rhs.host;
 		this->port = rhs.port;
+		this->hostName = rhs.hostName;
 	}
 	return (*this);
 
@@ -47,6 +48,9 @@ bool t_network::operator!=(t_network const &rhs)
 
 std::ostream	&operator<<(std::ostream &out, const t_network &net)
 {
-	out << "host: " << inet_ntoa(net.host) << " port: " << net.port <<std::endl;
+	if (net.hostName.empty())
+		out << "host: " << inet_ntoa(net.host) << " port: " << net.port <<std::endl;
+	else
+		out << "host: " << net.hostName << " port: " << net.port <<std::endl;
 	return out;
 }

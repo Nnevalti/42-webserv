@@ -33,6 +33,7 @@ class t_network
 
 		struct in_addr	host;
 		int				port;
+		std::string		hostName; // for request only
 
 	private:
 

@@ -89,6 +89,9 @@ void										Request::resetRequest(void)
 	contentSize = 0;
 	raw_request.clear();
 	header.clear();
+	_network.hostName.clear();
+	_network.host.s_addr = inet_addr("0");
+	_network.port = 0;
 }
 
 void										Request::setRet(int ret)
@@ -130,9 +133,16 @@ void										Request::setNetwork(std::string IpPort)
 	std::string	host;
 	size_t		colons = IpPort.find(":");
 
-	if ((host = IpPort.substr(0, colons)) == "localhost")
-		host = "127.0.0.1";
-	_network.host.s_addr = inet_addr(host.c_str());
+	host = IpPort.substr(0, colons);
+	if (host == "localhost")
+		_network.host.s_addr = inet_addr("127.0.0.1");
+	else if (host.find_first_not_of("0123456789.") != std::string::npos)
+	{
+		std::cout << host.c_str() << '\n';
+		_network.hostName = host.c_str();
+	}
+	else
+		_network.host.s_addr = inet_addr(host.c_str());
 	_network.port = std::atoi(IpPort.substr(++colons).c_str());
 }
 

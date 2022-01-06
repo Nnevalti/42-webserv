@@ -47,7 +47,13 @@ void		Config::setNetwork(t_network &net)
 
 void		Config::setServerName(stringVector Name)
 {
-	_server_name = Name;
+	if (_server_name.empty())
+		_server_name = Name;
+	else
+	{
+		for (stringVector::iterator it = Name.begin(); it != Name.end(); it++)
+			_server_name.push_back(*it);
+	}
 }
 
 void		Config::setRoot(std::string root)
