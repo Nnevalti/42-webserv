@@ -104,8 +104,8 @@ void			Cgi::setEnv(void)
 	_env["REQUEST_URI"] = _contentPath;
 	_env["SERVER_NAME"] = _host;
 	_env["SERVER_PORT"] = _port;
-	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
+	_env["SERVER_PROTOCOL"] = _protocol;
+	_env["SERVER_SOFTWARE"] = _serverName;
 }
 
 char **Cgi::mapToTab(void)

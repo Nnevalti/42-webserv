@@ -6,17 +6,37 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/05 17:38:49 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/07 15:23:50 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-static int		checkPath(const std::string& path)
+static int		checkReadPermission(const std::string &path)
 {
 	struct stat s;
 
-	if (stat(path.c_str(), &s) == 0 )
+	if (stat(path.c_str(), &s) == 0)
+		if(s.st_mode & S_IROTH)
+			return (1);
+	return (0);
+}
+
+static int		checkWritePermission(const std::string &path)
+{
+	struct stat s;
+
+	if (stat(path.c_str(), &s) == 0)
+		if(s.st_mode & S_IWOTH)
+			return (1);
+	return (0);
+}
+
+static int		checkPath(const std::string &path)
+{
+	struct stat s;
+
+	if (stat(path.c_str(), &s) == 0)
 	{
 		if (s.st_mode & S_IFDIR)
 			return IS_A_DIRECTORY;
@@ -192,7 +212,12 @@ std::string			Response::readFile(std::string path)
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (checkPath(path) == IS_A_FILE)
+	if (checkPath(path) == IS_A_FILE && checkReadPermission(path) == 0)
+	{
+		_code = 403;
+		return (readFile(_code));
+	}
+	else if (checkPath(path) == IS_A_FILE)
 	{
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
@@ -320,7 +345,7 @@ void		Response::deleteMethod(void)
 
 	if (checkPath(path) != IS_SOMETHING_ELSE)
 	{
-		if (remove(path.c_str()) == 0)
+		if (checkWritePermission(path) && remove(path.c_str()) == 0)
 			_code = 204;
 		else
 			_code = 403;
