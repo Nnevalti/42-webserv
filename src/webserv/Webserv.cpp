@@ -141,21 +141,38 @@ void	Webserv::accept_new_client(int server)
 void	Webserv::getRightServer(Client &client)
 {
 	bool foundAConf = false;
-	Config rightConf;
+	Config rightConf = (*(_servers.begin()));
 
 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
-		if (client.request.getNetwork() == it->getNetwork())
+		if (!(client.request.getNetwork().hostName.empty()))
 		{
-			rightConf = *it;
-			foundAConf = true;
-			// std::cout << "CONFIG:\nIP/PORT:" << it->getNetwork() << '\n';
-			break ;
+			stringVector serverNames = it->getServerName();
+			for (stringVector::iterator it2 = serverNames.begin(); it2 != serverNames.end(); it2++)
+			{
+				if (client.request.getNetwork().hostName == *it2 && it->getNetwork().port == client.request.getNetwork().port)
+				{
+					foundAConf = true;
+					rightConf = *it;
+					break ;
+				}
+			}
 		}
+		else
+		{
+			if (client.request.getNetwork() == it->getNetwork())
+			{
+				rightConf = *it;
+				foundAConf = true;
+			}
+		}
+		if (foundAConf)
+			break ;
 	}
 	if (!foundAConf)
 	{
-		std::cout << "\rNo corresponding server " << _clients.size()<< '\n';
+		std::cout << client.request.getNetwork().hostName << '\n';
+		std::cout << "\rNo corresponding server " << '\n';
 	}
 	client.setServer(rightConf);
 }

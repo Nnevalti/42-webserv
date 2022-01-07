@@ -93,16 +93,37 @@ void			Parser::checkDirective(const char* expect, stringVector::iterator* actual
 	(*actual)++;
 }
 
+bool checkServerName(stringVector s1, stringVector s2)
+{
+	for (stringVector::iterator it = s1.begin(); it != s1.end(); it++)
+	{
+		for (stringVector::iterator it2 = s2.begin(); it2 != s2.end(); it2++)
+		{
+			if (*it == *it2)
+				return true;
+		}
+	}
+	return false;
+}
+
 void Parser::checkConfig(void)
 {
 	for (confVector::iterator it = _ConfigServers.begin(); it != _ConfigServers.end(); it++)
 	{
 		t_network net = it->getNetwork();
+		std::string ip1 = inet_ntoa(net.host);
+		stringVector serverNames = it->getServerName();
+
 		for (confVector::iterator it2 = (it + 1); it2 != _ConfigServers.end(); it2++)
 		{
 			t_network net2 = it2->getNetwork();
-			if (net2 == net)
-				throw std::runtime_error("Error config: Same port and server name forbidden");
+			std::string ip2 = inet_ntoa(net2.host);
+			stringVector serverNames2 = it2->getServerName();
+
+			if (net2.port == net.port && ip1 != ip2)
+				throw std::runtime_error("Error config: Same port defined multiple time with different IP");
+			else if (net2 == net && checkServerName(serverNames, serverNames2))
+				throw std::runtime_error("Error: Same IP/Port and server names forbidden");
 		}
 	}
 }
@@ -344,8 +365,6 @@ void					Parser::parseServerName(Config& configServer,stringVector opts)
 {
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing server_name's directive arguments");
-	if (opts.size() > 1)
-		throw std::runtime_error("Error Parsing: too much server_name's directive");
 	configServer.setServerName(opts);
 }
 
