@@ -72,7 +72,7 @@ void			Cgi::initCgiData(ConfigResponse& Config)
 	_contentType = headers["Content-Type"];
 	_contentFile = Config.getLocationPath();
 	_contentPath = Config.getLocationFile();
-	_toExe = Config.getContentLocation() + _contentPath;
+	_toExe = Config.getContentLocation();
 	_query = _contentPath.substr(_contentPath.find_first_of("?") + 1);
 	_contentPathFile = Config.getContentLocation();
 	_port = ft_itoa(Config.getServer().getNetwork().port);

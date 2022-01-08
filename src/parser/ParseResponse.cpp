@@ -6,11 +6,28 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/03 18:53:41 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/08 14:25:44 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parser.hpp"
+
+static int		checkPath(const std::string &path)
+{
+	struct stat s;
+
+	if (stat(path.c_str(), &s) == 0)
+	{
+		if (s.st_mode & S_IFDIR)
+			return IS_A_DIRECTORY;
+		else if (s.st_mode & S_IFREG)
+			return IS_A_FILE;
+		else
+			return IS_SOMETHING_ELSE;
+	}
+	else
+		return IS_SOMETHING_ELSE;
+}
 
 Config		Parser::findLocation(Config& server, std::string& locationName)
 {
@@ -88,6 +105,11 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 		content = location.getAlias() + checkContentLocation(request.getPath().substr(locationName.size()));
 	else
 		content = location.getRoot() + checkContentLocation(request.getPath());
+
+	if (content[content.size() - 1] == '/')
+		content = content + location.getIndex().front();
+	else if (checkPath(content) == IS_A_DIRECTORY)
+		content = content + "/" + location.getIndex().front();
 
 	confResponse.setContentLocation(content);
 

@@ -6,11 +6,16 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/07 15:23:50 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/08 15:40:07 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+
+static std::string	ft_itoa(int nb)
+{
+	return (static_cast<std::ostringstream*>( &(std::ostringstream() << nb) )->str());
+}
 
 static int		checkReadPermission(const std::string &path)
 {
@@ -190,21 +195,24 @@ std::string			Response::readFile(int code)
 		if (file.is_open() == false)
 		{
 			_code = 404;
-			readFile(_config.getErrorMap()[404]);
-			return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
+			_directives["Content-Type"] = "text/html";
+			_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
+			return (ft_itoa(_body.size()));
 		}
 		buffer << file.rdbuf();
 		file.close();
 		_directives["Content-Type"] = "text/html";
 		_body = buffer.str();
-		return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
+		return (ft_itoa(_body.size()));
 	}
 	else
 	{
 		_code = 404;
-		readFile(_config.getErrorMap()[404]);
+		_directives["Content-Type"] = "text/html";
+		_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
+		return (ft_itoa(_body.size()));
 	}
-	return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
+	return (ft_itoa(_body.size()));
 }
 
 std::string			Response::readFile(std::string path)
@@ -212,34 +220,34 @@ std::string			Response::readFile(std::string path)
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (checkPath(path) == IS_A_FILE && checkReadPermission(path) == 0)
+	if (checkPath(path) == IS_A_FILE)
 	{
-		_code = 403;
-		return (readFile(_code));
-	}
-	else if (checkPath(path) == IS_A_FILE)
-	{
+
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 		{
 			_code = 404;
-			_directives["Content-Type"] = "text/html";
-			_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
-			return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
+			readFile(_code);
+			return (ft_itoa(_body.size()));
 		}
 		buffer << file.rdbuf();
 		file.close();
 		_directives["Content-Type"] = findType(path);
+		if (checkReadPermission(path) == 0)
+		{
+			_code = 403;
+			return (readFile(_code));
+		}
 		_body = buffer.str();
-		return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
+		return (ft_itoa(_body.size()));
 	}
 	else
 	{
-		_directives["Content-Type"] = "text/html";
 		_code = 404;
-		_body = "<!DOCTYPE html>\n<html>\n\t<title>404 Not Found</title>\n\t<body>\n\t\t<div>\n\t\t\t<H1>404 Not Found</H1>\n\t\t</div>\n\t</body>\t</html>";
+		readFile(_code);
+		return (ft_itoa(_body.size()));
 	}
-	return ((static_cast<std::ostringstream*>( &(std::ostringstream() << _body.size()) )->str()));
+	return (ft_itoa(_body.size()));
 }
 
 void		Response::createHeader(void)
@@ -264,7 +272,7 @@ void		Response::createHeader(void)
 	if (_code == 401)
 		_directives["WWW-Authenticate"] = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
 
-	_header += "HTTP/1.1 " + (static_cast<std::ostringstream*>( &(std::ostringstream() << _code) )->str());
+	_header += "HTTP/1.1 " + ft_itoa(_code);
 	_header += " " + status[_code] + "\r\n";
 	for (stringMap::const_iterator i = _directives.begin(); i != _directives.end(); i++)
 		if (i->second != "")
@@ -290,11 +298,6 @@ void		Response::InitResponseProcess(void)
 		(this->*Response::_method[_config.getRequest().getMethod()])();
 }
 
-static std::string	ft_itoa(int nb)
-{
-	return (static_cast<std::ostringstream*>( &(std::ostringstream() << nb) )->str());
-}
-
 void		Response::parseCgiBody(std::string body)
 {
 	size_t	start;
@@ -317,8 +320,6 @@ void		Response::parseCgiBody(std::string body)
 
 void		Response::getMethod(void)
 {
-	std::string tmp(_config.getContentLocation());
-
 	if (_config.getCgiPass() != "")
 	{
 		Cgi cgi;
@@ -329,13 +330,7 @@ void		Response::getMethod(void)
 		parseCgiBody(tmpBody);
 	}
 	else
-	{
-		if (tmp[tmp.size() - 1] == '/')
-			_config.setContentLocation(tmp + _config.getIndex().front());
-		else if (checkPath(tmp) == 2)
-			_config.setContentLocation(tmp + "/" + _config.getIndex().front());
 		_directives["Content-Length"] = readFile(_config.getContentLocation());
-	}
 	createHeader();
 }
 
