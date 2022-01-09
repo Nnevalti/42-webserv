@@ -12,7 +12,7 @@
 
 #include "Client.hpp"
 
-Client::Client(void)
+Client::Client(void) : hadResponse(false)
 {
 	// handle timeout
 	gettimeofday(&last_request, NULL);
@@ -29,8 +29,8 @@ Client&		Client::operator=(const Client &rhs)
 	{
 		request = rhs.request;
 		last_request = rhs.last_request;
+		hadResponse = rhs.hadResponse;
 		_socket = rhs._socket;
-		_request = rhs._request;
 		_server = rhs._server;
 	}
 	return *this;
@@ -40,7 +40,6 @@ Client::~Client(void) {}
 
 void Client::setSocket(int socket) { _socket = socket; }
 int Client::getSocket(void) { return _socket; }
-// std::string Client::getRequest(void) { return _request; }
 
 void Client::setServer(Config server)
 {

@@ -123,11 +123,18 @@ void	Webserv::accept_new_client(int server)
 	if ((new_socket = accept(server, NULL, NULL)) < 0)
 	{
 		if(errno != EWOULDBLOCK)
-			throw std::logic_error("Error: accept() failed");
+		{
+			std::cerr << "Error: accept() failed" << '\n';
+			return ;
+
+		}
 	}
-	std::cout << "\rClient connected on server: " << server << " " << new_socket<< std::endl;
+	// std::cout << "\rClient connected on server: " << server << " " << new_socket << std::endl;
 	if(fcntl(new_socket, F_SETFL, O_NONBLOCK) < 0)
-		throw std::logic_error("Error: fcntl() failed");
+	{
+		std::cerr << "Error: fcntl() failed" << '\n';
+		return ;
+	}
 
 	_event.data.fd = new_socket;
 	_event.events = EPOLLIN;
@@ -373,19 +380,20 @@ void Webserv::handle_timeout_clients(void)
 	{
 		if (check_timeout((*it).second.last_request))
 		{
-			// if ((*it).second.hadResponse == true)
-			// {
-			// 	std::cout << "COUCOU" << (*it).first << std::endl;
+			if ((*it).second.hadResponse == true)
+			{
+				std::cout << "TIMEOUT BUT HAD RESPONSE" << std::endl;
 				removeClient((*it).first);
 				return handle_timeout_clients();
-			// }
-			// else
-			// {
-			// 	(*it).second.request.setRet(408);
-			// 	_event.events = EPOLLOUT;
-			// 	_event.data.fd = (*it).first;
-			// 	epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
-			// }
+			}
+			else
+			{
+				std::cout << "TIMEOUT BUT HAD NO RESPONSE" << std::endl;
+				(*it).second.request.setRet(408);
+				_event.events = EPOLLOUT;
+				_event.data.fd = (*it).first;
+				epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
+			}
 		}
 	}
 }
@@ -431,5 +439,5 @@ void Webserv::run()
 	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
 		close(*it);
 	close(_epfd);
-	std::cout << "\r" << YELLOW << "Shutting down server...       " << std::endl;
+	std::cout << "\r" << YELLOW << "Shutting down server...       " << SET << std::endl;
 }

@@ -51,7 +51,6 @@ class Client
 
 	private:
 		int				_socket;
-		std::string		_request;
 
 		Config		_server;
 };
