@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 19:39:01 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 20:32:53 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,5 +66,6 @@ class Response {
 		std::string			_body;
 		std::string			_response;
 		int					_status;
-		int					_file;
+		size_t				_size;
+		FILE*				_file;
 };

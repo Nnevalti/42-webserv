@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 19:59:46 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 20:40:56 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ static std::string	getLastModif(const std::string& path)
 	return ("");
 }
 
-Response::Response(void): _status(END) {}
+Response::Response(void): _status(END),  _size(0) {}
 
 Response::Response(Response const & src)
 {
@@ -193,6 +193,7 @@ std::string			Response::readFile(int code)
 	std::ofstream		file;
 	std::stringstream	buffer;
 
+	_status = END;
 	if (checkPath(path) == IS_A_FILE)
 	{
 		file.open(path.c_str(), std::ifstream::in);
@@ -221,8 +222,8 @@ std::string			Response::readFile(int code)
 
 std::string			Response::readFile(std::string path)
 {
-	int					ret;
-	char				buffer[BUFFER_SIZE + 1];
+	size_t				ret;
+	char				buffer[BUFFER_SIZE + 1] = {0};
 
 	if (_status == END && checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex())
 	{
@@ -235,39 +236,39 @@ std::string			Response::readFile(std::string path)
 		if (_status == END)
 		{
 			_status = INIT;
-			_file = open(path.c_str(), O_RDONLY);
+			_file = fopen(path.c_str(), "r");
 			if (checkReadPermission(path) == 0)
 			{
 				_code = 403;
 				return (readFile(_code));
 			}
 		}
-		if (_status == INIT && _file == -1)
+		if (_status == INIT && _file == NULL)
 		{
 			_code = 404;
 			readFile(_code);
 			return (ft_itoa(_body.size()));
 		}
-		if ((ret = read(_file, buffer, BUFFER_SIZE)) > 0)
+		if ((ret = fread(buffer, 1, BUFFER_SIZE, _file)) > 0)
 		{
 			_status = PROCESS;
 			buffer[ret] = '\0';
-			_directives["Content-Type"] = findType(path);
-			_body += buffer;
+			_body.append(buffer);
 		}
 		else
 		{
-			_body += buffer;
-			close(_file);
+			_directives["Content-Type"] = findType(path);
+			fclose(_file);
 			_status = END;
 		}
-		return (ft_itoa(_body.size()));
+		_size += ret;
+		std::cout << "RET=" << ret << std::endl;
+		return (ft_itoa(_size));
 	}
 	else
 	{
 		_code = 404;
-		readFile(_code);
-		return (ft_itoa(_body.size()));
+		return readFile(_code);
 	}
 	return (ft_itoa(_body.size()));
 }
@@ -303,6 +304,7 @@ void		Response::createHeader(void)
 	_header = "";
 	_body = "";
 	_status = END;
+	_size = 0;
 }
 
 void		Response::InitResponseProcess(void)
