@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 14:55:32 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 19:38:16 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -329,7 +329,7 @@ void Webserv::handleWrite(int client_fd)
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	_clients[client_fd].classResponse.resetResponse(_clients[client_fd].configResponse);
 	_clients[client_fd].classResponse.InitResponseProcess();
-	if (_clients[client_fd].classResponse.getStatus() == false)
+	if (_clients[client_fd].classResponse.getStatus() == PROCESS)
 		return ;
 	response = _clients[client_fd].classResponse.getResponse();
 	// verify in response if we need to use a cgi binary for the request

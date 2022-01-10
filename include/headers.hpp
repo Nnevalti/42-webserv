@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 13:19:05 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 19:23:50 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,10 @@
 // ^ in seconds ^
 
 # define DEFAULT "pages/default.conf"
+
+# define INIT 1
+# define PROCESS 2
+# define END 3
 
 # define IS_A_DIRECTORY 2
 # define IS_A_FILE 1

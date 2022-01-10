@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 17:32:04 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 19:59:46 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ static std::string	getLastModif(const std::string& path)
 	return ("");
 }
 
-Response::Response(void) {}
+Response::Response(void): _status(END) {}
 
 Response::Response(Response const & src)
 {
@@ -106,7 +106,7 @@ int			Response::getCode(void) const
 	return _code;
 }
 
-bool		Response::getStatus(void) const
+int			Response::getStatus(void) const
 {
 	return (_status);
 }
@@ -182,11 +182,9 @@ void		Response::resetResponse(ConfigResponse& conf)
 {
 	_code = conf.getCode();
 	_header = "";
-	_body = "";
 	initErrorMap();
 	initDirectives();
 	_config = conf;
-	_status = false;
 }
 
 std::string			Response::readFile(int code)
@@ -223,33 +221,46 @@ std::string			Response::readFile(int code)
 
 std::string			Response::readFile(std::string path)
 {
-	std::ofstream		file;
-	std::stringstream	buffer;
+	int					ret;
+	char				buffer[BUFFER_SIZE + 1];
 
-	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex())
+	if (_status == END && checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex())
 	{
 		_body = createAutoindexPage(_config.getContentLocation());
+		_status = true;
 		return (ft_itoa(_body.size()));
 	}
 	else if (checkPath(path) == IS_A_FILE)
 	{
-
-		file.open(path.c_str(), std::ifstream::in);
-		if (file.is_open() == false)
+		if (_status == END)
+		{
+			_status = INIT;
+			_file = open(path.c_str(), O_RDONLY);
+			if (checkReadPermission(path) == 0)
+			{
+				_code = 403;
+				return (readFile(_code));
+			}
+		}
+		if (_status == INIT && _file == -1)
 		{
 			_code = 404;
 			readFile(_code);
 			return (ft_itoa(_body.size()));
 		}
-		buffer << file.rdbuf();
-		file.close();
-		_directives["Content-Type"] = findType(path);
-		if (checkReadPermission(path) == 0)
+		if ((ret = read(_file, buffer, BUFFER_SIZE)) > 0)
 		{
-			_code = 403;
-			return (readFile(_code));
+			_status = PROCESS;
+			buffer[ret] = '\0';
+			_directives["Content-Type"] = findType(path);
+			_body += buffer;
 		}
-		_body = buffer.str();
+		else
+		{
+			_body += buffer;
+			close(_file);
+			_status = END;
+		}
 		return (ft_itoa(_body.size()));
 	}
 	else
@@ -289,7 +300,9 @@ void		Response::createHeader(void)
 		if (i->second != "")
 			_header+= i->first + ": " + i->second + "\r\n";
 	_response = _header + "\r\n" + _body;
-	_status = true;
+	_header = "";
+	_body = "";
+	_status = END;
 }
 
 void		Response::InitResponseProcess(void)
@@ -332,13 +345,16 @@ void		Response::parseCgiBody(std::string body)
 
 void		Response::getMethod(void)
 {
-	if(checkPath(_config.getContentLocation()) == IS_A_DIRECTORY &&
-	_config.getContentLocation() == (_config.getLocation().getRoot() + _config.getLocation().getAlias()))
-		_config.setContent(_config.getContentLocation() + "/" + _config.getIndex());
-	else
-		_config.setContent(_config.getContentLocation());
+	if (_status == END)
+	{
+		if(checkPath(_config.getContentLocation()) == IS_A_DIRECTORY &&
+		_config.getContentLocation() == (_config.getLocation().getRoot() + _config.getLocation().getAlias()))
+			_config.setContent(_config.getContentLocation() + "/" + _config.getIndex());
+		else
+			_config.setContent(_config.getContentLocation());
+	}
 
-	if (_config.getCgiPass() != "")
+	if (_status == END && _config.getCgiPass() != "")
 	{
 		Cgi cgi;
 		std::string tmpBody;
@@ -346,10 +362,12 @@ void		Response::getMethod(void)
 		cgi.setEnv();
 		tmpBody = cgi.execute();
 		parseCgiBody(tmpBody);
+		_status = END;
 	}
 	else
 		_directives["Content-Length"] = readFile(_config.getContent());
-	createHeader();
+	if(_status == END)
+		createHeader();
 }
 
 void		Response::deleteMethod(void)
