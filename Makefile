@@ -11,7 +11,7 @@ _Purple=\033[1;35m
 BUILD	= .build
 
 SRC_DIR	= ./src/
-DIR		= parser webserv config client t_network request response cgi
+DIR		= parser webserv config client t_network request response autoindex cgi
 DIRS	= $(addprefix $(BUILD)/, $(DIR))
 CLASSINC= $(addprefix -I $(SRC_DIR), $(DIR))
 
@@ -36,6 +36,8 @@ NET		= t_network.cpp
 
 RESPONSE= Response.cpp ConfigResponse.cpp
 
+AUTOINDEX= autoindex.cpp
+
 CGI		= Cgi.cpp
 
 SRC		= $(MAIN) \
@@ -46,6 +48,7 @@ SRC		= $(MAIN) \
 		  $(addprefix t_network/,$(NET)) \
 		  $(addprefix request/, $(REQUEST)) \
 		  $(addprefix response/, $(RESPONSE)) \
+		  $(addprefix autoindex/, $(AUTOINDEX)) \
 		  $(addprefix cgi/, $(CGI))
 
 
