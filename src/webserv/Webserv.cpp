@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/05 17:38:09 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 12:44:26 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -329,6 +329,8 @@ void Webserv::handleWrite(int client_fd)
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	_clients[client_fd].classResponse.resetResponse(_clients[client_fd].configResponse);
 	_clients[client_fd].classResponse.InitResponseProcess();
+	if (_clients[client_fd].classResponse.getStatus() == false)
+		return ;
 	response = _clients[client_fd].classResponse.getResponse();
 	// verify in response if we need to use a cgi binary for the request
 	//  if so we will pass in a function to execute it
@@ -380,20 +382,22 @@ void Webserv::handle_timeout_clients(void)
 	{
 		if (check_timeout((*it).second.last_request))
 		{
-			if ((*it).second.hadResponse == true)
-			{
-				std::cout << "TIMEOUT BUT HAD RESPONSE" << std::endl;
-				removeClient((*it).first);
-				return handle_timeout_clients();
-			}
-			else
-			{
-				std::cout << "TIMEOUT BUT HAD NO RESPONSE" << std::endl;
-				(*it).second.request.setRet(408);
-				_event.events = EPOLLOUT;
-				_event.data.fd = (*it).first;
-				epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
-			}
+			removeClient((*it).first);
+			return handle_timeout_clients();
+			// if ((*it).second.hadResponse == true)
+			// {
+			// 	std::cout << "TIMEOUT BUT HAD RESPONSE" << std::endl;
+			// 	removeClient((*it).first);
+			// 	return handle_timeout_clients();
+			// }
+			// else
+			// {
+			// 	std::cout << "TIMEOUT BUT HAD NO RESPONSE" << std::endl;
+			// 	(*it).second.request.setRet(408);
+			// 	_event.events = EPOLLOUT;
+			// 	_event.data.fd = (*it).first;
+			// 	epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
+			// }
 		}
 	}
 }

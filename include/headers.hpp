@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/05 03:52:10 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 13:19:05 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,11 @@
 # define YELLOW "\033[33m"
 # define SET "\033[0m"
 
-// *STRUCT
+// *CLASS
 # include "t_network.hpp"
 
 //* SHORTCUT
-# define BUFFER_SIZE 1000
+# define BUFFER_SIZE 5000
 # define MAX_EV 4096
 # define MAX_CLIENTS 1000
 # define CLIENT_TIMEOUT 10

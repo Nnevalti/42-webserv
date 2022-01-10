@@ -6,12 +6,11 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/05 17:36:08 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 12:28:34 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef RESPONSE_H
-# define RESPONSE_H
+#pragma once
 
 # include "Request.hpp"
 # include "Cgi.hpp"
@@ -48,6 +47,8 @@ class Response {
 
 		std::string	getResponse(void) const;
 		int			getCode(void) const;
+		bool		getStatus(void) const;
+
 	private:
 		static methodMap	initMethods(void);
 		static methodMap	_method;
@@ -63,7 +64,5 @@ class Response {
 		std::string			_header;
 		std::string			_body;
 		std::string			_response;
+		bool				_status;
 };
-
-
-#endif

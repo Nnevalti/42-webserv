@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/08 15:40:07 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 12:44:43 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,14 @@ std::string	Response::getResponse(void) const
 	return (_response);
 }
 
-int Response::getCode(void) const
+int			Response::getCode(void) const
 {
 	return _code;
+}
+
+bool		Response::getStatus(void) const
+{
+	return (_status);
 }
 
 methodMap	Response::initMethods(void)
@@ -181,6 +186,7 @@ void		Response::resetResponse(ConfigResponse& conf)
 	initErrorMap();
 	initDirectives();
 	_config = conf;
+	_status = false;
 }
 
 std::string			Response::readFile(int code)
@@ -278,6 +284,7 @@ void		Response::createHeader(void)
 		if (i->second != "")
 			_header+= i->first + ": " + i->second + "\r\n";
 	_response = _header + "\r\n" + _body;
+	_status = true;
 }
 
 void		Response::InitResponseProcess(void)
@@ -314,7 +321,7 @@ void		Response::parseCgiBody(std::string body)
 
 		_body = body.substr(startBody + 4);
 		_directives["Content-Type"] = line.substr(14);
-		_directives["Content-Length"] = ft_itoa(_body.size());
+		_directives["Content-Length"] = ft_itoa(_body.size());;
 	}
 }
 
