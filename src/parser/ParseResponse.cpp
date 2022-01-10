@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 14:52:43 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 15:40:04 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,10 +129,14 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 	std::cout << request.getPath() << std::endl;
 	std::cout << checkContentLocation(request.getPath().substr(locationName.size()))<< std::endl;
 	if (!location.getAlias().empty() && *locationName.begin() != '*')
-		content = location.getAlias() + checkContentLocation(request.getPath().substr(locationName.size() - 1));
+	{
+		content = location.getAlias() + request.getPath().substr(locationName.size());
+	}
 	else
-		content = location.getRoot() + checkContentLocation(request.getPath());
+		content = location.getRoot() + request.getPath();
 
+	std::cout << content << std::endl;
+	checkContentLocation(content);
 	std::cout << content << std::endl;
 
 	confResponse.setContentLocation(content);
