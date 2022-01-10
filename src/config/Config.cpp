@@ -6,13 +6,13 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 14:10:27 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 18:08:08 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
-Config::Config(void): _root(""), _client_body_buffer_size(0), _cgi_pass(""), _index(""), _autoindex(false), _alias("")
+Config::Config(void): extension(false), _root(""), _client_body_buffer_size(0), _cgi_pass(""), _index(""), _autoindex(false), _alias("")
 {}
 
 Config::Config(Config const & src)
@@ -36,6 +36,7 @@ Config &		Config::operator=(Config const &src)
 	_autoindex = src._autoindex;
 	_index = src._index;
 	_alias = src._alias;
+	extension = src.extension;
 	return *this;
 }
 

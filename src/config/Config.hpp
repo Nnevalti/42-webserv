@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 14:09:56 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 18:02:18 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ class Config {
 		bool&				getAutoIndex(void);
 		std::string&		getAlias(void);
 		stringIntVectorMap&	getErrorPage(void);
+		bool				extension;
 
 	private:
 		t_network			_network;
