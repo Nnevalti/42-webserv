@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 12:44:26 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 14:55:32 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -335,8 +335,8 @@ void Webserv::handleWrite(int client_fd)
 	// verify in response if we need to use a cgi binary for the request
 	//  if so we will pass in a function to execute it
 	// ***************************************************
-	// std::cout << "*******************RESPONSE" << '\n';
-	// std::cout << response << std::endl;
+	std::cout << "*******************RESPONSE" << '\n';
+	std::cout << response << std::endl;
 	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
 		removeClient(client_fd);

@@ -6,28 +6,28 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/08 14:25:44 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 14:52:43 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parser.hpp"
 
-static int		checkPath(const std::string &path)
-{
-	struct stat s;
+// static int		checkPath(const std::string &path)
+// {
+// 	struct stat s;
 
-	if (stat(path.c_str(), &s) == 0)
-	{
-		if (s.st_mode & S_IFDIR)
-			return IS_A_DIRECTORY;
-		else if (s.st_mode & S_IFREG)
-			return IS_A_FILE;
-		else
-			return IS_SOMETHING_ELSE;
-	}
-	else
-		return IS_SOMETHING_ELSE;
-}
+// 	if (stat(path.c_str(), &s) == 0)
+// 	{
+// 		if (s.st_mode & S_IFDIR)
+// 			return IS_A_DIRECTORY;
+// 		else if (s.st_mode & S_IFREG)
+// 			return IS_A_FILE;
+// 		else
+// 			return IS_SOMETHING_ELSE;
+// 	}
+// 	else
+// 		return IS_SOMETHING_ELSE;
+// }
 
 Config		Parser::findLocation(Config& server, std::string& locationName)
 {
@@ -46,7 +46,10 @@ Config		Parser::findLocation(Config& server, std::string& locationName)
 		{
 			for (std::string tmp = locationName; !tmp.empty(); tmp.resize(tmp.size() - 1))
 				if (tmp == i->first)
+				{
+					locationName = tmp;
 					return i->second;
+				}
 		}
 		else
 		{
@@ -70,14 +73,36 @@ std::string	Parser::setLanguage(std::string acceptLanguage)
 
 std::string				Parser::checkContentLocation(std::string content)
 {
-	size_t start;
-	size_t end = 0;
+	const char	*tmp = content.c_str();
+	std::string	ret;
+	int			i = 0;
+	bool		was = false;
 
-	while ((start = content.find_first_of("/", end)) != std::string::npos &&
-		(end = content.find_first_of("/", start + 1)) != std::string::npos)
-		if (start == end - 1)
-		content.erase(start, end - start);
-	return (content);
+	while(tmp[i++])
+	{
+		if (tmp[i] == '/')
+		{
+			if (was == false)
+				ret.push_back(tmp[i]);
+			was = true;
+		}
+		else
+		{
+			ret.push_back(tmp[i]);
+			was = false;
+		}
+	}
+	return (ret);
+}
+
+std::string				Parser::findIndex(ConfigResponse& confResponse)
+{
+	(void)confResponse;
+	// if (content[content.size() - 1] == '/')
+	// 	content = content + location.getIndex().front();
+	// else if (checkPath(content) == IS_A_DIRECTORY)
+	// 	content = content + "/" + location.getIndex().front();
+	return ("");
 }
 
 void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Config& server)
@@ -101,15 +126,14 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 	confResponse.setAutoIndex(location.getAutoIndex());
 	confResponse.setIndex(location.getIndex());
 
+	std::cout << request.getPath() << std::endl;
+	std::cout << checkContentLocation(request.getPath().substr(locationName.size()))<< std::endl;
 	if (!location.getAlias().empty() && *locationName.begin() != '*')
-		content = location.getAlias() + checkContentLocation(request.getPath().substr(locationName.size()));
+		content = location.getAlias() + checkContentLocation(request.getPath().substr(locationName.size() - 1));
 	else
 		content = location.getRoot() + checkContentLocation(request.getPath());
 
-	if (content[content.size() - 1] == '/')
-		content = content + location.getIndex().front();
-	else if (checkPath(content) == IS_A_DIRECTORY)
-		content = content + "/" + location.getIndex().front();
+	std::cout << content << std::endl;
 
 	confResponse.setContentLocation(content);
 
