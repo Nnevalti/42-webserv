@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 17:31:18 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 18:21:44 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,12 @@ Config		Parser::findLocation(Config& server, std::string& locationName)
 		{
 			std::string suffix(i->first.substr(1));
 			if (locationName.size() > suffix.size() && !locationName.compare(locationName.size() - suffix.size(), suffix.size(), suffix))
-				return i->second;
+			{
+				Config ret(i->second);
+
+				ret.extension = true;
+				return ret;
+			}
 		}
 
 	return server;
@@ -100,14 +105,15 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 	confResponse.setAutoIndex(location.getAutoIndex());
 	confResponse.setIndex(location.getIndex());
 
-	if (!location.getAlias().empty() && *locationName.begin() != '*')
-	{
+	if (!location.getAlias().empty() && location.extension == false)
 		content = location.getRoot() + location.getAlias() + request.getPath().substr(locationName.size());
-	}
+	else if (!location.getAlias().empty() && location.extension)
+		content = location.getRoot() + location.getAlias() + locationName;
 	else
 		content = location.getRoot() + request.getPath();
 
 	content = checkContentLocation(content);
+	std::cout << content <<std::endl;
 
 	confResponse.setContentLocation(content);
 
