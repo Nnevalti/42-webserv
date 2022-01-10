@@ -6,28 +6,11 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 15:40:04 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 17:31:18 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parser.hpp"
-
-// static int		checkPath(const std::string &path)
-// {
-// 	struct stat s;
-
-// 	if (stat(path.c_str(), &s) == 0)
-// 	{
-// 		if (s.st_mode & S_IFDIR)
-// 			return IS_A_DIRECTORY;
-// 		else if (s.st_mode & S_IFREG)
-// 			return IS_A_FILE;
-// 		else
-// 			return IS_SOMETHING_ELSE;
-// 	}
-// 	else
-// 		return IS_SOMETHING_ELSE;
-// }
 
 Config		Parser::findLocation(Config& server, std::string& locationName)
 {
@@ -78,11 +61,11 @@ std::string				Parser::checkContentLocation(std::string content)
 	int			i = 0;
 	bool		was = false;
 
-	while(tmp[i++])
+	while(tmp[i])
 	{
 		if (tmp[i] == '/')
 		{
-			if (was == false)
+			if (was == false && tmp[i + 1])
 				ret.push_back(tmp[i]);
 			was = true;
 		}
@@ -91,18 +74,9 @@ std::string				Parser::checkContentLocation(std::string content)
 			ret.push_back(tmp[i]);
 			was = false;
 		}
+		i++;
 	}
 	return (ret);
-}
-
-std::string				Parser::findIndex(ConfigResponse& confResponse)
-{
-	(void)confResponse;
-	// if (content[content.size() - 1] == '/')
-	// 	content = content + location.getIndex().front();
-	// else if (checkPath(content) == IS_A_DIRECTORY)
-	// 	content = content + "/" + location.getIndex().front();
-	return ("");
 }
 
 void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Config& server)
@@ -126,18 +100,14 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 	confResponse.setAutoIndex(location.getAutoIndex());
 	confResponse.setIndex(location.getIndex());
 
-	std::cout << request.getPath() << std::endl;
-	std::cout << checkContentLocation(request.getPath().substr(locationName.size()))<< std::endl;
 	if (!location.getAlias().empty() && *locationName.begin() != '*')
 	{
-		content = location.getAlias() + request.getPath().substr(locationName.size());
+		content = location.getRoot() + location.getAlias() + request.getPath().substr(locationName.size());
 	}
 	else
 		content = location.getRoot() + request.getPath();
 
-	std::cout << content << std::endl;
-	checkContentLocation(content);
-	std::cout << content << std::endl;
+	content = checkContentLocation(content);
 
 	confResponse.setContentLocation(content);
 

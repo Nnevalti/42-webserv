@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 14:11:20 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 16:46:14 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class ConfigResponse {
 		void				setIndex(std::string index);
 		void				setContentLocation(std::string content);
 		void				setCode(int code);
+		void				setContent(std::string content);
 
 		int					getCode(void) const;
 		Request				getRequest(void) const;
@@ -62,6 +63,7 @@ class ConfigResponse {
 		bool				getAutoIndex(void) const;
 		std::string			getIndex(void) const;
 		std::string			getContentLocation(void) const;
+		std::string			getContent(void) const;
 
 	private:
 		Request			_request;
@@ -79,6 +81,7 @@ class ConfigResponse {
 		bool			_autoIndex;
 		std::string		_index;
 		std::string		_contentLocation;
+		std::string		_content;
 		int				_code;
 };
 

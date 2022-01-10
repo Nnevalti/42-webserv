@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 12:28:34 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 17:04:03 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 # include "Request.hpp"
 # include "Cgi.hpp"
+# include "autoindex.hpp"
 
 class Response {
 

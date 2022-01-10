@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 12:44:43 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 17:32:04 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,7 @@ void	Response::initDirectives(void)
 	_directives["Last-Modified"] = "";
 	_directives["Location"] = "";
 	_directives["Retry-After"] = "";
-	_directives["Server"] = "Webserv 0.1";
+	_directives["Server"] = "Webserv";
 	_directives["Transfer-Encoding"] = "identity";
 	_directives["WwwAuthenticate"] = "";
 }
@@ -226,7 +226,12 @@ std::string			Response::readFile(std::string path)
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (checkPath(path) == IS_A_FILE)
+	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex())
+	{
+		_body = createAutoindexPage(_config.getContentLocation());
+		return (ft_itoa(_body.size()));
+	}
+	else if (checkPath(path) == IS_A_FILE)
 	{
 
 		file.open(path.c_str(), std::ifstream::in);
@@ -327,6 +332,12 @@ void		Response::parseCgiBody(std::string body)
 
 void		Response::getMethod(void)
 {
+	if(checkPath(_config.getContentLocation()) == IS_A_DIRECTORY &&
+	_config.getContentLocation() == (_config.getLocation().getRoot() + _config.getLocation().getAlias()))
+		_config.setContent(_config.getContentLocation() + "/" + _config.getIndex());
+	else
+		_config.setContent(_config.getContentLocation());
+
 	if (_config.getCgiPass() != "")
 	{
 		Cgi cgi;
@@ -337,7 +348,7 @@ void		Response::getMethod(void)
 		parseCgiBody(tmpBody);
 	}
 	else
-		_directives["Content-Length"] = readFile(_config.getContentLocation());
+		_directives["Content-Length"] = readFile(_config.getContent());
 	createHeader();
 }
 

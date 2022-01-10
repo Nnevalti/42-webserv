@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 14:18:18 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 16:08:22 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ class Parser
 		void					parseResponse(ConfigResponse& confResponse, Request& request, Config& server);
 
 	private:
-		std::string				findIndex(ConfigResponse& confResponse);
 		Config					findLocation(Config& server, std::string& locationName);
 		std::string				setLanguage(std::string acceptLanguage);
 		std::string				checkContentLocation(std::string contentLocation);

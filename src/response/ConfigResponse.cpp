@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 14:13:01 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 16:46:11 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,11 @@ void				ConfigResponse::setCode(int code)
 	_code = code;
 }
 
+void				ConfigResponse::setContent(std::string content)
+{
+	_content = content;
+}
+
 int					ConfigResponse::getCode(void) const
 {
 	return (_code);
@@ -240,4 +245,9 @@ std::string			ConfigResponse::getIndex(void) const
 std::string			ConfigResponse::getContentLocation(void) const
 {
 	return (_contentLocation);
+}
+
+std::string			ConfigResponse::getContent(void) const
+{
+	return (_content);
 }
