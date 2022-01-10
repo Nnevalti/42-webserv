@@ -1,13 +1,16 @@
-#include <dirent.h>
-#include <sys/types.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/sysmacros.h>
-#include <unistd.h>
-#include <time.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   autoindex.cpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vdescham <vdescham@student.42.fr           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/07 12:36:53 by vdescham          #+#    #+#             */
+/*   Updated: 2022/01/05 01:41:00 by vdescham         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include <iostream>
-#include <iomanip>
+#include "autoindex.hpp"
 
 std::string setLink(std::string dname)
 {
@@ -89,7 +92,7 @@ std::string createAutoindexPage(std::string path)
 	struct dirent *dir;
 
 
-	if (path.back() != '/')
+	if (path[path.size() - 1] != '/')
 		path += '/';
 
 	if ((dirp = opendir(path.c_str())) == NULL)
@@ -117,16 +120,17 @@ std::string createAutoindexPage(std::string path)
 	closedir(dirp);
 	return page;
 }
-int main(int ac, char const **av)
-{
-	if (ac != 2)
-	{
-		std::cerr << "Usage: ./a.out [dir_to_display]" << '\n';
-		return 0;
-	}
-	std::string page;
-	page = createAutoindexPage(av[1]);
-	if (!page.empty())
-		std::cout << page << '\n';
-	return 0;
-}
+
+// int main(int ac, char const **av)
+// {
+// 	if (ac != 2)
+// 	{
+// 		std::cerr << "Usage: ./a.out [dir_to_display]" << '\n';
+// 		return 0;
+// 	}
+// 	std::string page;
+// 	page = createAutoindexPage(av[1]);
+// 	if (!page.empty())
+// 		std::cout << page << '\n';
+// 	return 0;
+// }

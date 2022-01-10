@@ -16,6 +16,9 @@
 # include <unistd.h>
 # include <errno.h>
 # include <fcntl.h>
+# include <dirent.h>
+# include <sys/types.h>
+# include <sys/sysmacros.h>
 
 //* C NETWORK
 # include <sys/types.h>
@@ -28,6 +31,7 @@
 
 //* CPP LIBRARY
 # include <iostream>
+# include <iomanip>
 # include <sstream>
 # include <cstring>
 # include <cstdlib>
