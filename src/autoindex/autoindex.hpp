@@ -22,6 +22,6 @@ std::string		setModificationTime(struct stat &buf);
 std::string 	createDirList(std::string path, std::string dname);
 std::string		createFirstPart(std::string &path);
 
-std::string		createAutoindexPage(std::string path);
+std::string		createAutoindexPage(std::string path, std::string url);
 
 #endif
