@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/03 18:45:47 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 14:11:20 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ class ConfigResponse {
 		void				setAllowMethod(stringVector allow);
 		void				setLanguage(std::string lang);
 		void				setAutoIndex(bool Index);
-		void				setIndex(stringVector index);
+		void				setIndex(std::string index);
 		void				setContentLocation(std::string content);
 		void				setCode(int code);
 
@@ -60,7 +60,7 @@ class ConfigResponse {
 		stringVector		getAllow(void) const;
 		std::string			getLanguage(void) const;
 		bool				getAutoIndex(void) const;
-		stringVector		getIndex(void) const;
+		std::string			getIndex(void) const;
 		std::string			getContentLocation(void) const;
 
 	private:
@@ -77,7 +77,7 @@ class ConfigResponse {
 		stringVector	_allow;
 		std::string		_acceptLanguage;
 		bool			_autoIndex;
-		stringVector	_index;
+		std::string		_index;
 		std::string		_contentLocation;
 		int				_code;
 };

@@ -6,13 +6,13 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/03 16:48:43 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 14:10:27 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
-Config::Config(void): _root(""), _client_body_buffer_size(0), _cgi_pass(""), _autoindex(false), _alias(""),_alias_set(false)
+Config::Config(void): _root(""), _client_body_buffer_size(0), _cgi_pass(""), _index(""), _autoindex(false), _alias("")
 {}
 
 Config::Config(Config const & src)
@@ -36,7 +36,6 @@ Config &		Config::operator=(Config const &src)
 	_autoindex = src._autoindex;
 	_index = src._index;
 	_alias = src._alias;
-	_alias_set = src._alias_set;
 	return *this;
 }
 
@@ -86,7 +85,7 @@ void		Config::setAllowedMethods(stringVector methods)
 	_allowed_methods = methods;
 }
 
-void		Config::setIndex(stringVector index)
+void		Config::setIndex(std::string index)
 {
 	_index = index;
 }
@@ -99,7 +98,6 @@ void		Config::setAutoIndex(bool autoIndex)
 void		Config::setAlias(std::string alias)
 {
 	_alias = alias;
-	_alias_set = true;
 }
 
 void		Config::setErrorPage(std::string page, std::vector<int> codes)
@@ -153,7 +151,7 @@ stringVector&	Config::getAllowedMethods(void)
 	return (_allowed_methods);
 }
 
-stringVector&	Config::getIndex(void)
+std::string&	Config::getIndex(void)
 {
 	return(_index);
 }
@@ -171,11 +169,6 @@ std::string&		Config::getAlias(void)
 stringIntVectorMap&	Config::getErrorPage(void)
 {
 	return (_error_page);
-}
-
-bool&				Config::getisAliasSet(void)
-{
-	return (_alias_set);
 }
 
 std::ostream	&operator<<(std::ostream &out, const Config &server)
@@ -231,11 +224,7 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 
 	out << "autoindex " << (server._autoindex ? "on" : "off") << std::endl;
 
-	out << "index: ";
-	for (stringVector::const_iterator i = server._index.begin(); i != server._index.end(); i++)
-		out << *i << " ";
-
-	out << std::endl;
+	out << "index: " << server._index << std::endl;
 
 	out << "alias: " << server._alias << std::endl;
 

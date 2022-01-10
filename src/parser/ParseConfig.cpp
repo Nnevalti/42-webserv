@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/15 17:52:14 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 14:02:09 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,7 +248,9 @@ void			Parser::parseIndex(Config& configServer,stringVector opts)
 {
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing Index's directive arguments");
-	configServer.setIndex(opts);
+	if (opts.size() > 2)
+		throw std::runtime_error("Error Parsing: Too much Index's directive arguments");
+	configServer.setIndex(opts.front());
 }
 
 void			Parser::parseNetwork(Config& configServer,stringVector opts)
@@ -293,6 +295,7 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 	configServer.setNetwork(net);
 }
 
+//TODO DELETE THIS SHIT!!
 void					Parser::parseCgiPass(Config& configServer,stringVector opts)
 {
 	if (opts.size() > 1)
@@ -365,6 +368,8 @@ void					Parser::parseServerName(Config& configServer,stringVector opts)
 {
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing server_name's directive arguments");
+	if (opts.size() > 2)
+		throw std::runtime_error("Error Parsing: Too much server_name's directive arguments");
 	configServer.setServerName(opts);
 }
 

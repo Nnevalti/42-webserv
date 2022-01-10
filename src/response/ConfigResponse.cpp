@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/03 18:47:27 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 14:13:01 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,7 @@ std::ostream	&operator<<(std::ostream &out, const ConfigResponse &conf)
 
 	out << "Accept Language : " << conf._acceptLanguage << std::endl;
 	out << "Auto index is :" << ((conf._autoIndex) ? "on" : "off") << std::endl;
-
-	out << "Index : ";
-	for (stringVector::const_iterator i = conf._index.begin(); i != conf._index.end(); i++)
-		out << *i + " ";
-
+	out << "Index : " << conf._index << std::endl;
 	out << "Content Location: " << conf._contentLocation << std::endl;
 	return (out);
 }
@@ -144,11 +140,9 @@ void				ConfigResponse::setAutoIndex(bool index)
 	_autoIndex = index;
 }
 
-void				ConfigResponse::setIndex(stringVector index)
+void				ConfigResponse::setIndex(std::string index)
 {
-	for (stringVector::iterator i = index.begin(); i != index.end(); i++)
-		if (std::find(_index.begin(), _index.end(), *i) == _index.end())
-			_index.push_back(*i);
+	_index = index;
 }
 
 void				ConfigResponse::setContentLocation(std::string content)
@@ -238,7 +232,7 @@ bool				ConfigResponse::getAutoIndex(void) const
 	return (_autoIndex);
 }
 
-stringVector		ConfigResponse::getIndex(void) const
+std::string			ConfigResponse::getIndex(void) const
 {
 	return (_index);
 }

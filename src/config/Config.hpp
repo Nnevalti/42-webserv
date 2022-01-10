@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/14 19:25:57 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/10 14:09:56 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class Config {
 		void				setCgiPass(std::string cgiPass);
 		void				setLocation(std::string location_name, Config location);
 		void				setAllowedMethods(stringVector methods);
-		void				setIndex(stringVector index);
+		void				setIndex(std::string index);
 		void				setAutoIndex(bool autoIndex);
 		void				setAlias(std::string alias);
 		void				setErrorPage(std::string page, std::vector<int> codes);
@@ -49,10 +49,9 @@ class Config {
 		std::string&		getCgiPass(void);
 		serverMap&			getLocation(void);
 		stringVector&		getAllowedMethods(void);
-		stringVector&		getIndex(void);
+		std::string&			getIndex(void);
 		bool&				getAutoIndex(void);
 		std::string&		getAlias(void);
-		bool&				getisAliasSet(void);
 		stringIntVectorMap&	getErrorPage(void);
 
 	private:
@@ -61,14 +60,13 @@ class Config {
 		stringVector		_server_name;
 		stringIntVectorMap	_error_page;
 		size_t				_client_body_buffer_size;
-		stringVector		_cgi_param;
+		stringVector		_cgi_param; //TODO Delete this shit
 		std::string			_cgi_pass;
 		serverMap			_location;
 		stringVector		_allowed_methods;
-		stringVector		_index;
+		std::string			_index;
 		bool				_autoindex;
 		std::string			_alias;
-		bool				_alias_set;
 };
 
 
