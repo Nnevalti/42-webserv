@@ -12,11 +12,13 @@
 
 #include "autoindex.hpp"
 
-std::string setLink(std::string dname)
+std::string setLink(std::string dname, std::string url)
 {
 	std::ostringstream output;
-
-	output << "<td><a href=\"" << dname << "\">" << dname << "</a></td>";
+	// if (url.size() > 1)
+		output << "<td><a href=\"" << url << dname << "\">" << dname << "</a></td>";
+	// else
+		// output << "<td><a href=\"" << url << '/' << dname << "\">" << dname << "</a></td>";
 	return output.str();
 }
 
@@ -48,7 +50,7 @@ std::string setModificationTime(struct stat &buf)
 	return output.str();
 }
 
-std::string 		createDirList(std::string path, std::string dname)
+std::string 		createDirList(std::string path, std::string dname, std::string url)
 {
 	std::string output;
 	std::string info = path + dname;
@@ -59,7 +61,7 @@ std::string 		createDirList(std::string path, std::string dname)
 		throw std::runtime_error("Error: lstat failed");
 
 	output += "<tr>";
-	output += setLink(dname);
+	output += setLink(dname, url);
 	output += setSize(buf);
 	output += setCreationTime(buf);
 	output += setModificationTime(buf);
@@ -83,7 +85,7 @@ std::string createFirstPart(std::string &path)
 	return output.str();
 }
 
-std::string createAutoindexPage(std::string path)
+std::string createAutoindexPage(std::string path, std::string url)
 {
 	std::string page;
 	// opendir
@@ -101,10 +103,10 @@ std::string createAutoindexPage(std::string path)
 		return "";
 	}
 
-	std::string test = path.substr(0, path.size() - 1);
+	std::string pathClean = path.substr(0, path.size() - 1);
 	try
 	{
-		page += createFirstPart(test);
+		page += createFirstPart(pathClean);
 	}
 	catch (std::exception &e)
 	{
@@ -115,7 +117,7 @@ std::string createAutoindexPage(std::string path)
 	page += "<a href=\"..\">↵ Return to parent directory</a>";
 	while ((dir = readdir(dirp)) != NULL)
 		if (dir->d_name[0] != '.')
-			page += createDirList(path, dir->d_name);
+			page += createDirList(path, dir->d_name, url);
 	page += "</tbody></table></body></html>";
 	closedir(dirp);
 	return page;

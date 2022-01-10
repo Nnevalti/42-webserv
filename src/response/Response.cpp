@@ -228,7 +228,7 @@ std::string			Response::readFile(std::string path)
 
 	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex())
 	{
-		_body = createAutoindexPage(_config.getContentLocation());
+		_body = createAutoindexPage(_config.getContentLocation(), _config.getRequest().getPath());
 		return (ft_itoa(_body.size()));
 	}
 	else if (checkPath(path) == IS_A_FILE)
