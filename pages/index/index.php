@@ -1,7 +1,7 @@
 <?php
 
-// echo "try";
-phpinfo()
+echo "try";
+// phpinfo()
 
 //Call getenv() function without argument
 // $env_array =getenv();

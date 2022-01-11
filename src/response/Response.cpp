@@ -134,6 +134,7 @@ stringMap	Response::initType()
 	tmp["jpg"] = "image/jpeg";
 	tmp["png"] = "image/png";
 	tmp["bmp"] = "image/bmp";
+	tmp["gif"] = "image/gif";
 	return (tmp);
 }
 
@@ -226,11 +227,9 @@ std::string			Response::readFile(std::string path)
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex())
-	{
+	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex()
+		&& (_config.getIndex()).compare(path.substr(path.find_last_of("/") + 1)))
 		_body = createAutoindexPage(_config.getContentLocation(), _config.getRequest().getPath());
-		return (ft_itoa(_body.size()));
-	}
 	else if (checkPath(path) == IS_A_FILE)
 	{
 
@@ -238,8 +237,7 @@ std::string			Response::readFile(std::string path)
 		if (file.is_open() == false)
 		{
 			_code = 404;
-			readFile(_code);
-			return (ft_itoa(_body.size()));
+			return (readFile(_code));
 		}
 		buffer << file.rdbuf();
 		file.close();
@@ -250,13 +248,11 @@ std::string			Response::readFile(std::string path)
 			return (readFile(_code));
 		}
 		_body = buffer.str();
-		return (ft_itoa(_body.size()));
 	}
 	else
 	{
 		_code = 404;
 		readFile(_code);
-		return (ft_itoa(_body.size()));
 	}
 	return (ft_itoa(_body.size()));
 }
@@ -314,6 +310,7 @@ void		Response::parseCgiBody(std::string body)
 {
 	size_t	start;
 	size_t	startBody = 0;
+	size_t sepSize = 0;
 
 	if((start = body.find("Status: ")) != std::string::npos)
 	{
@@ -322,9 +319,14 @@ void		Response::parseCgiBody(std::string body)
 	}
 	else if ((start = body.find("Content-type: ")) != std::string::npos)
 	{
-		std::string line = body.substr(start, (startBody = body.find("\r\n", start)) - start);
+		if ((startBody = body.find("\r\n\r\n", start)) != std::string::npos)
+			sepSize = 4;
+		else if((startBody = body.find("\n\n", start)) != std::string::npos)
+			sepSize = 2;
 
-		_body = body.substr(startBody + 4);
+		std::string line = body.substr(start, startBody - start);
+
+		_body = body.substr(startBody + sepSize);
 		_directives["Content-Type"] = line.substr(14);
 		_directives["Content-Length"] = ft_itoa(_body.size());;
 	}
@@ -338,7 +340,7 @@ void		Response::getMethod(void)
 	else
 		_config.setContent(_config.getContentLocation());
 
-	if (_config.getCgiPass() != "")
+	if (!_config.getCgiPass().empty())
 	{
 		Cgi cgi;
 		std::string tmpBody;

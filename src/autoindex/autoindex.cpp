@@ -12,13 +12,18 @@
 
 #include "autoindex.hpp"
 
-std::string setLink(std::string dname, std::string url)
+std::string setLink(struct stat &buf, std::string dname, std::string url)
 {
 	std::ostringstream output;
-	// if (url.size() > 1)
-		output << "<td><a href=\"" << url << dname << "\">" << dname << "</a></td>";
-	// else
-		// output << "<td><a href=\"" << url << '/' << dname << "\">" << dname << "</a></td>";
+	if (url.at(url.size() - 1) != '/')
+		url += '/';
+	switch (buf.st_mode & S_IFMT)
+	{
+		case S_IFDIR: output << "<td><a href=\"" << url << dname << "/\">" << dname << "/</a></td>";
+			break;
+		default:      output << "<td><a href=\"" << url << dname << "\">" << dname << "</a></td>";
+			break;
+	}
 	return output.str();
 }
 
@@ -61,7 +66,7 @@ std::string 		createDirList(std::string path, std::string dname, std::string url
 		throw std::runtime_error("Error: lstat failed");
 
 	output += "<tr>";
-	output += setLink(dname, url);
+	output += setLink(buf, dname, url);
 	output += setSize(buf);
 	output += setCreationTime(buf);
 	output += setModificationTime(buf);
@@ -73,7 +78,7 @@ std::string createFirstPart(std::string &path)
 {
 	std::ostringstream output;
 
-	output << "<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>";
+	output << "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>";
 	output << "<style media=\"screen\">:root{background-color: #dddddd;font: message-box;}body{border: 1px solid #999999;border-radius: 10px;padding: 3em;min-width: 30em;max-width: 65em;margin: 4em auto;background-color: #fefefe;}h1{font-size: 160%;margin: 0 0 .6em;border-bottom: 1px solid #999999;font-weight: normal;}table{width: 90%;margin: 0 auto;}thead{font-size: 130%;}th{text-align: start;}td{white-space: nowrap;}a{text-decoration: none;}</style>";
 	output << "<body><h1>Index of ";
 	if (path.find_last_of("/") != std::string::npos)

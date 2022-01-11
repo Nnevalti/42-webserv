@@ -79,6 +79,8 @@ class Webserv
 		void removeClient(int socket);
 		void handle_timeout_clients(void);
 		bool check_timeout(struct timeval last);
+
+		void closeServersSocket(void);
 };
 
 

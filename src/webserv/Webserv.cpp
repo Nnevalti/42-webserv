@@ -67,11 +67,20 @@ int Webserv::init_socket(t_network network)
 	struct sockaddr_in servaddr;
 
 	if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	{
+		closeServersSocket();
 		throw std::logic_error("Error: socket() failed");
+	}
 	if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT | SO_REUSEADDR, &opt, sizeof(opt)))
+	{
+		closeServersSocket();
 		throw std::logic_error("Error: setsockopt() failed");
+	}
 	if (fcntl(listen_fd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		closeServersSocket();
 		throw std::logic_error("Error: fcntl() failed");
+	}
 
 	std::memset((char*)&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
@@ -79,11 +88,20 @@ int Webserv::init_socket(t_network network)
 	servaddr.sin_port = htons(network.port);
 
 	if (servaddr.sin_addr.s_addr == static_cast<in_addr_t>(-1))
+	{
+		closeServersSocket();
 		throw std::logic_error("Error: inet_addr: Invalid IP");
+	}
 	if (bind(listen_fd, (struct sockaddr*) &servaddr, sizeof(servaddr)) < 0)
+	{
+		closeServersSocket();
 		throw std::logic_error("Error: bind() failed");
+	}
 	if (listen(listen_fd, MAX_CLIENTS) < 0)
+	{
+		closeServersSocket();
 		throw std::logic_error("Error: listen() failed");
+	}
 	return listen_fd;
 }
 
@@ -320,12 +338,8 @@ void Webserv::handleWrite(int client_fd)
 {
 	std::string	response;
 
-	// forward request to the right server
 	getRightServer(_clients[client_fd]);
 
-	// std::cout << "*******************CLIENT REQUEST (RAW)" << '\n';
-	// std::cout << _clients[client_fd].request.raw_request << '\n';
-	// Try to make this four lines below in a response::function
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	_clients[client_fd].classResponse.resetResponse(_clients[client_fd].configResponse);
 	_clients[client_fd].classResponse.InitResponseProcess();
@@ -335,8 +349,8 @@ void Webserv::handleWrite(int client_fd)
 	// verify in response if we need to use a cgi binary for the request
 	//  if so we will pass in a function to execute it
 	// ***************************************************
-	std::cout << "*******************RESPONSE" << '\n';
-	std::cout << response << std::endl;
+	// std::cout << "*******************RESPONSE" << '\n';
+	// std::cout << response << std::endl;
 	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
 		removeClient(client_fd);
@@ -354,7 +368,10 @@ void Webserv::handleWrite(int client_fd)
 void Webserv::handleError(int socket)
 {
 	if (fd_is_server(socket))
-		throw std::logic_error("Error: epoll fatal error on a server stopping the server");
+	{
+		closeServersSocket();
+		throw std::logic_error("Error: epoll: fatal error on a server stopping the server");
+	}
 	epoll_ctl(_epfd, EPOLL_CTL_DEL, socket, NULL);
 	close(socket);
 }
@@ -402,6 +419,12 @@ void Webserv::handle_timeout_clients(void)
 	}
 }
 
+void Webserv::closeServersSocket()
+{
+	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
+		close(*it);
+	close(_epfd);
+}
 /*
 	Main function of the Webserv class, the server loop is here
 */
@@ -440,8 +463,6 @@ void Webserv::run()
 			handle_timeout_clients();
 		}
 	}
-	for (fdVector::iterator it = _servers_fd.begin(); it != _servers_fd.end(); it++)
-		close(*it);
-	close(_epfd);
+	closeServersSocket();
 	std::cout << "\r" << YELLOW << "Shutting down server...       " << SET << std::endl;
 }
