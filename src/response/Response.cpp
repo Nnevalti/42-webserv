@@ -228,11 +228,7 @@ std::string			Response::readFile(std::string path)
 
 	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex()
 		&& (_config.getIndex()).compare(path.substr(path.find_last_of("/") + 1)))
-	{
-		std::cout << "PATH=" << path << " " << 	_config.getIndex() << '\n';
-		_body = createAutoindexPage(_config.getContentLocation());
-		return (ft_itoa(_body.size()));
-	}
+		_body = createAutoindexPage(_config.getContentLocation(), _config.getRequest().getPath());
 	else if (checkPath(path) == IS_A_FILE)
 	{
 
@@ -240,8 +236,7 @@ std::string			Response::readFile(std::string path)
 		if (file.is_open() == false)
 		{
 			_code = 404;
-			readFile(_code);
-			return (ft_itoa(_body.size()));
+			return (readFile(_code));
 		}
 		buffer << file.rdbuf();
 		file.close();
@@ -252,13 +247,11 @@ std::string			Response::readFile(std::string path)
 			return (readFile(_code));
 		}
 		_body = buffer.str();
-		return (ft_itoa(_body.size()));
 	}
 	else
 	{
 		_code = 404;
 		readFile(_code);
-		return (ft_itoa(_body.size()));
 	}
 	return (ft_itoa(_body.size()));
 }
