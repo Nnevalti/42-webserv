@@ -12,13 +12,17 @@
 
 #include "autoindex.hpp"
 
-std::string setLink(std::string dname, std::string url)
+std::string setLink(struct stat &buf, std::string dname)
 {
 	std::ostringstream output;
-	// if (url.size() > 1)
-		output << "<td><a href=\"" << url << dname << "\">" << dname << "</a></td>";
-	// else
-		// output << "<td><a href=\"" << url << '/' << dname << "\">" << dname << "</a></td>";
+
+	switch (buf.st_mode & S_IFMT)
+	{
+		case S_IFDIR: output << "<td><a href=\"" << dname << "/\">" << dname << "/</a></td>";
+			break;
+		default:      output << "<td><a href=\"" << dname << "\">" << dname << "</a></td>";
+			break;
+	}
 	return output.str();
 }
 
@@ -50,7 +54,7 @@ std::string setModificationTime(struct stat &buf)
 	return output.str();
 }
 
-std::string 		createDirList(std::string path, std::string dname, std::string url)
+std::string 		createDirList(std::string path, std::string dname)
 {
 	std::string output;
 	std::string info = path + dname;
@@ -61,7 +65,7 @@ std::string 		createDirList(std::string path, std::string dname, std::string url
 		throw std::runtime_error("Error: lstat failed");
 
 	output += "<tr>";
-	output += setLink(dname, url);
+	output += setLink(buf, dname);
 	output += setSize(buf);
 	output += setCreationTime(buf);
 	output += setModificationTime(buf);
@@ -85,7 +89,7 @@ std::string createFirstPart(std::string &path)
 	return output.str();
 }
 
-std::string createAutoindexPage(std::string path, std::string url)
+std::string createAutoindexPage(std::string path)
 {
 	std::string page;
 	// opendir
@@ -117,7 +121,7 @@ std::string createAutoindexPage(std::string path, std::string url)
 	page += "<a href=\"..\">↵ Return to parent directory</a>";
 	while ((dir = readdir(dirp)) != NULL)
 		if (dir->d_name[0] != '.')
-			page += createDirList(path, dir->d_name, url);
+			page += createDirList(path, dir->d_name);
 	page += "</tbody></table></body></html>";
 	closedir(dirp);
 	return page;
