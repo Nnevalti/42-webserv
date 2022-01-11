@@ -226,8 +226,10 @@ std::string			Response::readFile(std::string path)
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex())
+	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex()
+		&& (_config.getIndex()).compare(path.substr(path.find_last_of("/") + 1)))
 	{
+		std::cout << "PATH=" << path << " " << 	_config.getIndex() << '\n';
 		_body = createAutoindexPage(_config.getContentLocation());
 		return (ft_itoa(_body.size()));
 	}
