@@ -137,10 +137,7 @@ void										Request::setNetwork(std::string IpPort)
 	if (host == "localhost")
 		_network.host.s_addr = inet_addr("127.0.0.1");
 	else if (host.find_first_not_of("0123456789.") != std::string::npos)
-	{
-		std::cout << host.c_str() << '\n';
 		_network.hostName = host.c_str();
-	}
 	else
 		_network.host.s_addr = inet_addr(host.c_str());
 	_network.port = std::atoi(IpPort.substr(++colons).c_str());

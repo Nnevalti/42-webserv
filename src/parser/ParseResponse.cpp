@@ -113,7 +113,6 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 		content = location.getRoot() + request.getPath();
 
 	content = checkContentLocation(content);
-	std::cout << content <<std::endl;
 
 	confResponse.setContentLocation(content);
 

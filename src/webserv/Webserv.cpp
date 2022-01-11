@@ -43,6 +43,14 @@ void Webserv::epollCreate(void)
 		throw std::runtime_error("Error: Could not initialised epoll");
 }
 
+bool Webserv::is_already_launch(confVector::iterator it_v)
+{
+	for (confVector::iterator it = _servers.begin(); it != it_v; it++)
+		if (it_v->getNetwork() == it->getNetwork())
+			return true;
+	return false;
+}
+
 /*
 	Takes the config vector and create the servers sockets that will listen for connection.
 	We avoid IP/Port pair duplication
@@ -52,7 +60,8 @@ void Webserv::initServers(void)
 	for (confVector::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		t_network net = it->getNetwork();
-		_servers_fd.push_back(init_socket(net));
+		if (!is_already_launch(it))
+			_servers_fd.push_back(init_socket(net));
 	}
 }
 
@@ -194,11 +203,6 @@ void	Webserv::getRightServer(Client &client)
 		if (foundAConf)
 			break ;
 	}
-	if (!foundAConf)
-	{
-		std::cout << client.request.getNetwork().hostName << '\n';
-		std::cout << "\rNo corresponding server " << '\n';
-	}
 	client.setServer(rightConf);
 }
 
@@ -322,17 +326,25 @@ void displayInfo(Client &client, Response &response)
 {
 	char			buffer[100];
 	struct tm		*tm;
+	std::string path = client.request.getPath();
 
 	// request
 	tm = gmtime(&client.last_request.tv_sec);
 	strftime(buffer, 100, "%F - %T", tm);
-	std::cout << "\r[SERVER] " << buffer << " | " << client.request.getMethod()
-	<< " " << client.request.getPath() << " " << get_time_diff(&client.last_request)
-	<< " |" << response.getCode() << "|" << client.request.getNetwork();
+
+	std::cout << "\r[WEBSERVER] " << buffer << " | " << client.request.getMethod()
+	<< " ";
+	if (path.size() >= 40)
+		std::cout << std::left << std::setw(37) << path.substr(0, 37) << "...";
+	else
+		std::cout << std::left << std::setw(40) << client.request.getPath();
+	std::cout << " " << get_time_diff(&client.last_request)
+	<< " | " << response.getCode() << " | " << client.request.getNetwork();
 
 	// response
 
 }
+
 
 void Webserv::handleWrite(int client_fd)
 {
