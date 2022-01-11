@@ -338,12 +338,8 @@ void Webserv::handleWrite(int client_fd)
 {
 	std::string	response;
 
-	// forward request to the right server
 	getRightServer(_clients[client_fd]);
 
-	// std::cout << "*******************CLIENT REQUEST (RAW)" << '\n';
-	// std::cout << _clients[client_fd].request.raw_request << '\n';
-	// Try to make this four lines below in a response::function
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	_clients[client_fd].classResponse.resetResponse(_clients[client_fd].configResponse);
 	_clients[client_fd].classResponse.InitResponseProcess();

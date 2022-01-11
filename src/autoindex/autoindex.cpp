@@ -78,7 +78,7 @@ std::string createFirstPart(std::string &path)
 {
 	std::ostringstream output;
 
-	output << "<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>";
+	output << "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>";
 	output << "<style media=\"screen\">:root{background-color: #dddddd;font: message-box;}body{border: 1px solid #999999;border-radius: 10px;padding: 3em;min-width: 30em;max-width: 65em;margin: 4em auto;background-color: #fefefe;}h1{font-size: 160%;margin: 0 0 .6em;border-bottom: 1px solid #999999;font-weight: normal;}table{width: 90%;margin: 0 auto;}thead{font-size: 130%;}th{text-align: start;}td{white-space: nowrap;}a{text-decoration: none;}</style>";
 	output << "<body><h1>Index of ";
 	if (path.find_last_of("/") != std::string::npos)

@@ -134,6 +134,7 @@ stringMap	Response::initType()
 	tmp["jpg"] = "image/jpeg";
 	tmp["png"] = "image/png";
 	tmp["bmp"] = "image/bmp";
+	tmp["gif"] = "image/gif";
 	return (tmp);
 }
 
@@ -309,6 +310,7 @@ void		Response::parseCgiBody(std::string body)
 {
 	size_t	start;
 	size_t	startBody = 0;
+	size_t sepSize = 0;
 
 	if((start = body.find("Status: ")) != std::string::npos)
 	{
@@ -317,9 +319,14 @@ void		Response::parseCgiBody(std::string body)
 	}
 	else if ((start = body.find("Content-type: ")) != std::string::npos)
 	{
-		std::string line = body.substr(start, (startBody = body.find("\r\n", start)) - start);
+		if ((startBody = body.find("\r\n\r\n", start)) != std::string::npos)
+			sepSize = 4;
+		else if((startBody = body.find("\n\n", start)) != std::string::npos)
+			sepSize = 2;
 
-		_body = body.substr(startBody + 4);
+		std::string line = body.substr(start, startBody - start);
+
+		_body = body.substr(startBody + sepSize);
 		_directives["Content-Type"] = line.substr(14);
 		_directives["Content-Length"] = ft_itoa(_body.size());;
 	}
@@ -333,7 +340,7 @@ void		Response::getMethod(void)
 	else
 		_config.setContent(_config.getContentLocation());
 
-	if (_config.getCgiPass() != "")
+	if (!_config.getCgiPass().empty())
 	{
 		Cgi cgi;
 		std::string tmpBody;
