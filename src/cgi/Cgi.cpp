@@ -73,7 +73,7 @@ void			Cgi::initCgiData(ConfigResponse& Config)
 	_contentFile = Config.getLocationPath();
 	_contentPath = Config.getLocationFile();
 	_toExe = Config.getContent();
-	_query = _contentPath.substr(_contentPath.find_first_of("?") + 1);
+	_query = Config.getRequest().getQuery();
 	_contentPathFile = Config.getContentLocation();
 	_port = ft_itoa(Config.getServer().getNetwork().port);
 	_host = std::string(inet_ntoa(Config.getServer().getNetwork().host));
