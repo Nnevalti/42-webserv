@@ -235,7 +235,6 @@ bool	Webserv::read_client_request(int clientSocket)
 		}
 		else
 			_clients[clientSocket].request.raw_request += client_request;
-		// std::cout << client_request << std::endl;
 		if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
 			&& _clients[clientSocket].request.header_ready == false)
 		{
@@ -255,6 +254,7 @@ bool	Webserv::read_client_request(int clientSocket)
 
 			if ((_clients[clientSocket].request.contentSize - header.size()) == (unsigned long)std::atol(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
 			{
+				// std::cout << "CONTENT SIZE = " << _clients[clientSocket].request.contentSize - header.size() << " CONTENT LENGTH " << std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) << '\n';
 				_parser.parseBody(_clients[clientSocket].request);
 				_clients[clientSocket].request.body_ready = true;
 			}
