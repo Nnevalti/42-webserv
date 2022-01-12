@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 14:55:32 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/12 19:38:14 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,7 +226,6 @@ bool	Webserv::read_client_request(int clientSocket)
 	else
 	{
 		_clients[clientSocket].request.contentSize += ret;
-		client_request[ret] = '\0';
 		if (_clients[clientSocket].request.raw_request.empty())
 		{
 			_clients[clientSocket].request.raw_request = client_request;
@@ -234,7 +233,7 @@ bool	Webserv::read_client_request(int clientSocket)
 			gettimeofday(&_clients[clientSocket].last_request, NULL);
 		}
 		else
-			_clients[clientSocket].request.raw_request += client_request;
+			_clients[clientSocket].request.raw_request += std::string(client_request);
 		// std::cout << client_request << std::endl;
 		if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
 			&& _clients[clientSocket].request.header_ready == false)

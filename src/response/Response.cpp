@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/12 16:21:35 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/12 19:47:10 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -430,6 +430,10 @@ void		Response::postMethod(void)
 		tmpBody = cgi.execute();
 		parseCgiBody(tmpBody);
 	}
-
+	else
+	{
+		_code = 204;
+		_directives["Content-Length"] = readFile(_code);
+	}
 	createHeader();
 }
