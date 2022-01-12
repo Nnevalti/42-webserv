@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 17:32:04 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/11 18:49:32 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,7 @@ methodMap	Response::initMethods(void)
 
 	map["GET"] = &Response::getMethod;
 	map["DELETE"] = &Response::deleteMethod;
+	map["POST"] = &Response::postMethod;
 
 	return map;
 }
@@ -415,5 +416,16 @@ void		Response::deleteMethod(void)
 
 void		Response::postMethod(void)
 {
+	if (!_config.getCgiPass().empty())
+	{
+		Cgi cgi;
+		std::string tmpBody;
+		cgi.initCgiData(_config);
+		cgi.setEnv();
+		tmpBody = cgi.execute();
+		parseCgiBody(tmpBody);
+	}
+	else
 
+	createHeader();
 }
