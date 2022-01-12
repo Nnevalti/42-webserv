@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/12 15:49:43 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/12 16:21:35 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -416,6 +416,11 @@ void		Response::deleteMethod(void)
 
 void		Response::postMethod(void)
 {
+	if(checkPath(_config.getContentLocation()) == IS_A_DIRECTORY &&
+	_config.getContentLocation() == (_config.getLocation().getRoot() + _config.getLocation().getAlias()))
+		_config.setContent(_config.getContentLocation() + "/" + _config.getIndex());
+	else
+		_config.setContent(_config.getContentLocation());
 	if (!_config.getCgiPass().empty())
 	{
 		Cgi cgi;
