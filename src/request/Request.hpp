@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:16 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/04 18:38:20 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/12 15:46:55 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class Request {
 		int						getCode(void) const;
 		int						getPort(void) const;
 		t_network				getNetwork(void) const;
+		std::string				getQuery(void) const;
 
 		void					setMethod(std::string method);
 		void					setPath(std::string path);
@@ -67,6 +68,7 @@ class Request {
 		std::string				_body;
 		int						_port;
 		std::string				_path;
+		std::string				_query;
 		stringMap				_headers;
 		stringMap				_env_for_cgi;
 		t_network				_network;

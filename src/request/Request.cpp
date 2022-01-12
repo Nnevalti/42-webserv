@@ -6,13 +6,13 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:17 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/03 18:42:43 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/12 15:47:43 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-Request::Request(void): raw_request(""), header_ready(false), body_ready(false), contentSize(0), bodySize(0), _method (""), _version(""), _ret(200), _body(""), _port(8080), _path("")  {}
+Request::Request(void): raw_request(""), header_ready(false), body_ready(false), contentSize(0), bodySize(0), _method (""), _version(""), _ret(200), _body(""), _port(8080), _path(""), _query("")  {}
 
 Request::Request(Request const & src)
 {
@@ -31,6 +31,7 @@ Request&	Request::operator=(const Request &rhs)
 	_body = rhs._body;
 	_port = rhs._port;
 	_path = rhs._path;
+	_query = rhs._query;
 	_headers = rhs._headers;
 	_env_for_cgi = rhs._env_for_cgi;
 	_network = rhs._network;
@@ -56,6 +57,7 @@ void				Request::resetDirective(void)
 	_body = "";
 	_port = 8080;
 	_path = "";
+	_query = "";
 	_headers.clear();
 	_headers["Accept-Charsets"] = "";
 	_headers["Accept-Language"] = "";
@@ -82,7 +84,6 @@ void				Request::resetDirective(void)
 
 void										Request::resetRequest(void)
 {
-	// resetDirective();
 	header_ready = false;
 	body_ready = false;
 	bodySize = 0;
@@ -106,7 +107,13 @@ void										Request::setMethod(std::string method)
 
 void										Request::setPath(std::string path)
 {
-	_path = path;
+	size_t start;
+
+	if ((start = path.find_first_of("?")) == std::string::npos)
+		_path = path;
+	else
+		_path = path.substr(0, start - 1);
+	_query = path.substr(start + 1);
 }
 
 void										Request::setVersion(std::string version)
@@ -201,4 +208,9 @@ std::map<std::string, std::string>	Request::getHeaders(void) const
 std::string		Request::getHeader(std::string str)
 {
 	return (_headers[str]);
+}
+
+std::string		Request::getQuery(void) const
+{
+	return (_query);
 }
