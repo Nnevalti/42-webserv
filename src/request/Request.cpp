@@ -112,7 +112,7 @@ void										Request::setPath(std::string path)
 	if ((start = path.find_first_of("?")) == std::string::npos)
 		_path = path;
 	else
-		_path = path.substr(0, start - 1);
+		_path = path.substr(0, start);
 	_query = path.substr(start + 1);
 }
 

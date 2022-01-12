@@ -352,6 +352,8 @@ void Webserv::handleWrite(int client_fd)
 
 	getRightServer(_clients[client_fd]);
 
+	std::cout << "RAW REQUEST" << '\n';
+	std::cout << _clients[client_fd].request.raw_request << '\n';
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	_clients[client_fd].classResponse.resetResponse(_clients[client_fd].configResponse);
 	_clients[client_fd].classResponse.InitResponseProcess();
