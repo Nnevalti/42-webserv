@@ -154,7 +154,7 @@ void			Parser::parseBody(Request& request)
 	// std::cout << "**************REQUEST CONTENT END" << '\n';
 	// std::cout << "**************Content Length Header: " << request.getHeader("Content-Length").c_str() << '\n';
 	// std::cout << "**************Body Size: " << (int)body.size() << '\n';
-
+	request.bodySize = request.contentSize - body_start - 4;
 	if ((unsigned long)std::atol(request.getHeader("Content-Length").c_str()) != request.contentSize - body_start - 4)
 	{
 		request.setRet(400);
