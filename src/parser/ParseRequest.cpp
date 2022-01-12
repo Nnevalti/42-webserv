@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/15 18:38:32 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/11 19:15:06 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,7 @@ stringVector		Parser::initMethods()
 	stringVector	methods;
 
 	methods.push_back("GET");
-	methods.push_back("HEAD");
 	methods.push_back("POST");
-	methods.push_back("PUT");
 	methods.push_back("DELETE");
 
 	return methods;
