@@ -242,25 +242,21 @@ bool	Webserv::read_client_request(int clientSocket)
 			// std::cout << "**************HEADER READY" << '\n';
 			_clients[clientSocket].request.header_ready = true;
 			_parser.parseHeader(_clients[clientSocket].request);
-
 			if (std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) == 0)
 			{
 				_clients[clientSocket].request.body_ready = true;
 				return true;
 			}
-
 		}
-		else if (_clients[clientSocket].request.header_ready == true)
+		if (_clients[clientSocket].request.header_ready == true)
 		{
 			body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
 			std::string header = _clients[clientSocket].request.raw_request.substr(0, _clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
 
 			if ((_clients[clientSocket].request.contentSize - header.size()) == (unsigned long)std::atol(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
 			{
-				std::cout << "CONTENT SIZE = " << _clients[clientSocket].request.contentSize - header.size() << " CONTENT LENGTH " << std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) << '\n';
 				_parser.parseBody(_clients[clientSocket].request);
 				_clients[clientSocket].request.body_ready = true;
-				std::cout << "REQUEST DONE" << '\n';
 			}
 		}
 	}
@@ -284,7 +280,6 @@ void Webserv::handleRead(int client_fd)
 		_event.data.fd = client_fd;
 		epoll_ctl(_epfd, EPOLL_CTL_MOD, client_fd, &_event);
 	}
-
 }
 
 std::string	get_time_diff(struct timeval *last)
@@ -350,10 +345,10 @@ void Webserv::handleWrite(int client_fd)
 {
 	std::string	response;
 
+	// std::cout << "RAW REQUEST" << '\n';
+	// std::cout << _clients[client_fd].request.raw_request << '\n';
 	getRightServer(_clients[client_fd]);
 
-	std::cout << "RAW REQUEST" << '\n';
-	std::cout << _clients[client_fd].request.raw_request << '\n';
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	_clients[client_fd].classResponse.resetResponse(_clients[client_fd].configResponse);
 	_clients[client_fd].classResponse.InitResponseProcess();
