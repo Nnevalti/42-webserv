@@ -128,14 +128,55 @@ stringMap	Response::initType()
 {
 	stringMap tmp;
 
-	tmp["html"] = "text/html";
+	tmp["acc"] = "audio/aac";
+	tmp["abw"] = "application/x-abiword";
+	tmp["avi"] = "video/x-msvideo";
+	tmp["bin"] = "application/octet-stream";
+	tmp["bmp"] = "image/bmp";
+	tmp["bz"] = "application/x-bzip";
+	tmp["bz2"] = "application/x-bzip2";
+	tmp["csh"] = "application/x-csh";
 	tmp["css"] = "text/css";
-	tmp["js"] = "text/javascript";
+	tmp["csv"] = "text/csv";
+	tmp["doc"] = "application/msword";
+	tmp["gif"] = "image/gif";
+	tmp["htm"] = "text/html";
+	tmp["html"] = "text/html";
+	tmp["ico"] = "image/x-icon";
+	tmp["ics"] = "text/calendar";
+	tmp["jar"] = "application/java-archive";
 	tmp["jpeg"] = "image/jpeg";
 	tmp["jpg"] = "image/jpeg";
+	tmp["js"] = "application/javascript";
+	tmp["json"] = "application/json";
+	tmp["mid"] = "audio/midi";
+	tmp["midi"] = "audio/midi";
+	tmp["mpeg"] = "video/mpeg";
+	tmp["oga"] = "audio/ogg";
+	tmp["ogv"] = "video/ogg";
+	tmp["ogx"] = "application/ogg";
+	tmp["otf"] = "font/otf";
 	tmp["png"] = "image/png";
-	tmp["bmp"] = "image/bmp";
-	tmp["gif"] = "image/gif";
+	tmp["pdf"] = "application/pdf";
+	tmp["rar"] = "application/x-rar-compressed";
+	tmp["rtf"] = "application/rtf";
+	tmp["sh"] = "application/x-sh";
+	tmp["svg"] = "image/svg+xml";
+	tmp["tif"] = "image/tiff";
+	tmp["tiff"] = "image/tiff";
+	tmp["ts"] = "application/typescript";
+	tmp["ttf"] = "font/ttf";
+	tmp["vsd"] = "application/vnd.visio";
+	tmp["wav"] = "audio/x-wav";
+	tmp["weba"] = "audio/webm";
+	tmp["webm"] = "video/webm";
+	tmp["webp"] = "image/webm";
+	tmp["woff"] = "font/woff";
+	tmp["woff2"] = "font/woff2";
+	tmp["xhtml"] = "application/xhtml+xml";
+	tmp["xml"] = "application/xml";
+	tmp["zip"] = "application/zip";
+
 	return (tmp);
 }
 

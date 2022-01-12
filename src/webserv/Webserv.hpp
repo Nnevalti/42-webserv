@@ -60,6 +60,7 @@ class Webserv
 		*/
 		void			init(void);
 		void			epollCreate(void);
+		bool			is_already_launch(confVector::iterator it_v);
 		void			initServers(void);
 		int				init_socket(t_network network);
 		void			epollInit(void);

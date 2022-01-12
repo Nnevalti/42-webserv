@@ -53,7 +53,7 @@ void			Parser::parseFirstLine(Request &request)
 	if ((end = first.find_first_of(' ')) == std::string::npos)
 	{
 		request.setRet(400);
-		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
+		std::cerr << RED << "\rError parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
 	request.setMethod(first.substr(0, end));
@@ -61,21 +61,21 @@ void			Parser::parseFirstLine(Request &request)
 	if (std::find(methods.begin(), methods.end(), request.getMethod()) == methods.end())
 	{
 		request.setRet(400);
-		std::cerr << RED << "Error parsing request: wrong method" << SET << std::endl;
+		std::cerr << RED << "\rError parsing request: wrong method" << SET << std::endl;
 		return ;
 	}
 
 	if ((start = first.find_first_not_of(' ', end))  == std::string::npos)
 	{
 		request.setRet(400);
-		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
+		std::cerr << RED << "\rError parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
 
 	if ((end = first.find_first_of(' ', start)) == std::string::npos)
 	{
 		request.setRet(400);
-		std::cerr << RED << "Error parsing request: missing first line element" << SET << std::endl;
+		std::cerr << RED << "\rError parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
 	request.setPath(first.substr(start, end - start));
@@ -83,7 +83,7 @@ void			Parser::parseFirstLine(Request &request)
 	if ((end = first.find_first_not_of(' ', end)) == std::string::npos)
 	{
 		request.setRet(400);
-		std::cerr << RED << "Error parsing: missing first line element" << SET << std::endl;
+		std::cerr << RED << "\rError parsing: missing first line element" << SET << std::endl;
 		return ;
 	}
 
@@ -123,9 +123,6 @@ void			Parser::parseHeader(Request &request)
 	splitHeader(request);
 	parseFirstLine(request);
 
-	if (request.getCode() == 400)
-		return ;
-
 	for (stringVector::iterator i = request.header.begin() + 1; i != request.header.end(); i++)
 	{
 		token = findtoken(*i);
@@ -137,6 +134,7 @@ void			Parser::parseHeader(Request &request)
 		}
 	}
 	request.setNetwork(request.getHeader("Host"));
+
 }
 
 void			Parser::parseBody(Request& request)
