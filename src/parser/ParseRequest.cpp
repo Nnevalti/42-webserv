@@ -117,7 +117,6 @@ void			Parser::parseHeader(Request &request)
 	std::string	token;
 	std::string	value;
 
-	// can we move this in resetRequest ?
 	request.resetDirective();
 
 	splitHeader(request);

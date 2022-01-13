@@ -209,13 +209,14 @@ void	Webserv::getRightServer(Client &client)
 bool	Webserv::read_client_request(int clientSocket)
 {
 	char client_request[BUFFER_SIZE + 1];
-	int ret = 0;
 	std::string body("");
+	ssize_t ret = recv(clientSocket, client_request, BUFFER_SIZE, 0);
 
-	if ((ret = recv(clientSocket, &client_request, BUFFER_SIZE, 0)) < 0)
+	if (ret == -1)
 	{
 		removeClient(clientSocket);
 		std::cerr << RED << "\rError: recv() failed." << SET << '\n';
+		return false;
 	}
 	else if (ret == 0)
 	{
@@ -226,7 +227,7 @@ bool	Webserv::read_client_request(int clientSocket)
 	else
 	{
 		_clients[clientSocket].request.contentSize += ret;
-		client_request[ret] = '\0';
+		// client_request[ret] = '\0';
 		if (_clients[clientSocket].request.raw_request.empty())
 		{
 			_clients[clientSocket].request.raw_request = client_request;
@@ -235,29 +236,31 @@ bool	Webserv::read_client_request(int clientSocket)
 		}
 		else
 			_clients[clientSocket].request.raw_request += client_request;
-		if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
-			&& _clients[clientSocket].request.header_ready == false)
+	}
+	// *********************************************************************************
+	if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
+		&& _clients[clientSocket].request.header_ready == false)
+	{
+		// std::cout << "**************HEADER READY" << '\n';
+		_clients[clientSocket].request.header_ready = true;
+		_parser.parseHeader(_clients[clientSocket].request);
+		if (std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) == 0)
 		{
-			// std::cout << "**************HEADER READY" << '\n';
-			_clients[clientSocket].request.header_ready = true;
-			_parser.parseHeader(_clients[clientSocket].request);
-			if (std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) == 0)
-			{
-				_clients[clientSocket].request.body_ready = true;
-				return true;
-			}
+			_clients[clientSocket].request.body_ready = true;
+			return true;
 		}
-		if (_clients[clientSocket].request.header_ready == true)
-		{
-			body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
-			std::string header = _clients[clientSocket].request.raw_request.substr(0, _clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
+	}
+	if (_clients[clientSocket].request.header_ready == true)
+	{
+		body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
+		std::string header = _clients[clientSocket].request.raw_request.substr(0, _clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
 
-			if ((_clients[clientSocket].request.contentSize - header.size()) == (unsigned long)std::atol(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
-			{
-				// std::cout << "CONTENT SIZE = " << _clients[clientSocket].request.contentSize - header.size() << " CONTENT LENGTH " << std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) << '\n';
-				_parser.parseBody(_clients[clientSocket].request);
-				_clients[clientSocket].request.body_ready = true;
-			}
+
+		if ((_clients[clientSocket].request.contentSize - header.size()) == (unsigned long)std::atol(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
+		{
+			// std::cout << "CONTENT SIZE = " << _clients[clientSocket].request.contentSize - header.size() << " CONTENT LENGTH " << std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) << '\n';
+			_parser.parseBody(_clients[clientSocket].request);
+			_clients[clientSocket].request.body_ready = true;
 		}
 	}
 	return true;
@@ -345,8 +348,8 @@ void Webserv::handleWrite(int client_fd)
 {
 	std::string	response;
 
-	// std::cout << "RAW REQUEST" << '\n';
-	// std::cout << _clients[client_fd].request.raw_request << '\n';
+	std::cout << "RAW REQUEST" << '\n';
+	std::cout << _clients[client_fd].request.raw_request << '\n';
 	getRightServer(_clients[client_fd]);
 
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
