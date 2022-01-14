@@ -406,22 +406,20 @@ void Webserv::handle_timeout_clients(void)
 	{
 		if (check_timeout((*it).second.last_request))
 		{
-			removeClient((*it).first);
-			return handle_timeout_clients();
-			// if ((*it).second.hadResponse == true)
-			// {
-			// 	std::cout << "TIMEOUT BUT HAD RESPONSE" << std::endl;
-			// 	removeClient((*it).first);
-			// 	return handle_timeout_clients();
-			// }
-			// else
-			// {
-			// 	std::cout << "TIMEOUT BUT HAD NO RESPONSE" << std::endl;
-			// 	(*it).second.request.setRet(408);
-			// 	_event.events = EPOLLOUT;
-			// 	_event.data.fd = (*it).first;
-			// 	epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
-			// }
+			// removeClient((*it).first);
+			// return handle_timeout_clients();
+			if ((*it).second.request.raw_request.empty() || (*it).second.hadResponse == true)
+			{
+				removeClient((*it).first);
+				return handle_timeout_clients();
+			}
+			else
+			{
+				(*it).second.request.setRet(408);
+				_event.events = EPOLLOUT;
+				_event.data.fd = (*it).first;
+				epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
+			}
 		}
 	}
 }

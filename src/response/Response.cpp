@@ -320,7 +320,8 @@ void		Response::createHeader(void)
 		_directives["Retry-After"] = "2";
 	if (_code == 401)
 		_directives["WWW-Authenticate"] = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
-
+	if (_code == 200 && _config.getRequest().getMethod() == "POST")
+		_code = 204;
 	_header += "HTTP/1.1 " + ft_itoa(_code);
 	_header += " " + status[_code] + "\r\n";
 	for (stringMap::const_iterator i = _directives.begin(); i != _directives.end(); i++)
@@ -430,6 +431,5 @@ void		Response::postMethod(void)
 		tmpBody = cgi.execute();
 		parseCgiBody(tmpBody);
 	}
-	_code = 204;
 	createHeader();
 }
