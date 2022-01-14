@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/12 19:47:10 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/14 14:13:34 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,7 +320,8 @@ void		Response::createHeader(void)
 		_directives["Retry-After"] = "2";
 	if (_code == 401)
 		_directives["WWW-Authenticate"] = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
-
+	if (_code == 200 && _config.getRequest().getMethod() == "POST")
+		_code = 204;
 	_header += "HTTP/1.1 " + ft_itoa(_code);
 	_header += " " + status[_code] + "\r\n";
 	for (stringMap::const_iterator i = _directives.begin(); i != _directives.end(); i++)
@@ -429,11 +430,6 @@ void		Response::postMethod(void)
 		cgi.setEnv();
 		tmpBody = cgi.execute();
 		parseCgiBody(tmpBody);
-	}
-	else
-	{
-		_code = 204;
-		_directives["Content-Length"] = readFile(_code);
 	}
 	createHeader();
 }

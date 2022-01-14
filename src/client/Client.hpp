@@ -32,7 +32,6 @@ class Client
 
 		void		setSocket(int socket);
 		int			getSocket(void);
-		std::string	&getRequest(void);
 
 		void		setServer(Config server);
 		Config&		getServer(void);

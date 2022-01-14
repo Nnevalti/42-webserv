@@ -28,11 +28,10 @@
 		</form>
 
 		<!-- DEFAULT enctype = application/x-www-form-urlencoded -->
-		<h2>TEST .TXT</h2>
+		<h2>TEST NO FILE</h2>
 		<form action="http://127.0.0.1:8000/form.php" method="post" enctype="multipart/form-data">
 		  <p><input type="text" name="text1" value="low">
 		  <p><input type="text" name="text2" value="rider">
-		  <p><input type="hidden" name="MAX_FILE_SIZE" value="1000000" /><input type="file" name="userfile" accept=".txt">
 		  <p><button type="submit">Submit</button>
 		</form>
 

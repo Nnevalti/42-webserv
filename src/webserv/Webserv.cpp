@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/12 19:50:21 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/14 14:13:34 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,13 +209,14 @@ void	Webserv::getRightServer(Client &client)
 bool	Webserv::read_client_request(int clientSocket)
 {
 	char client_request[BUFFER_SIZE + 1];
-	int ret = 0;
 	std::string body("");
+	ssize_t ret = recv(clientSocket, client_request, BUFFER_SIZE, 0);
 
-	if ((ret = recv(clientSocket, &client_request, BUFFER_SIZE, 0)) < 0)
+	if (ret == -1)
 	{
 		removeClient(clientSocket);
 		std::cerr << RED << "\rError: recv() failed." << SET << '\n';
+		return false;
 	}
 	else if (ret == 0)
 	{
@@ -226,38 +227,35 @@ bool	Webserv::read_client_request(int clientSocket)
 	else
 	{
 		_clients[clientSocket].request.contentSize += ret;
+		// client_request[ret] = '\0';
 		if (_clients[clientSocket].request.raw_request.empty())
-		{
-			_clients[clientSocket].request.raw_request = client_request;
-			// handle timeout
 			gettimeofday(&_clients[clientSocket].last_request, NULL);
-		}
-		else
-			_clients[clientSocket].request.raw_request += std::string(client_request);
-		// std::cout << client_request << std::endl;
-		if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
-			&& _clients[clientSocket].request.header_ready == false)
+		_clients[clientSocket].request.raw_request.append(client_request, ret);
+	}
+	// *********************************************************************************
+	if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
+		&& _clients[clientSocket].request.header_ready == false)
+	{
+		// std::cout << "**************HEADER READY" << '\n';
+		_clients[clientSocket].request.header_ready = true;
+		_parser.parseHeader(_clients[clientSocket].request);
+		if (std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) == 0)
 		{
-			// std::cout << "**************HEADER READY" << '\n';
-			_clients[clientSocket].request.header_ready = true;
-			_parser.parseHeader(_clients[clientSocket].request);
-			if (std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) == 0)
-			{
-				_clients[clientSocket].request.body_ready = true;
-				return true;
-			}
+			_clients[clientSocket].request.body_ready = true;
+			return true;
 		}
-		if (_clients[clientSocket].request.header_ready == true)
-		{
-			body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
-			std::string header = _clients[clientSocket].request.raw_request.substr(0, _clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
+	}
+	if (_clients[clientSocket].request.header_ready == true)
+	{
+		body = _clients[clientSocket].request.raw_request.substr(_clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
+		std::string header = _clients[clientSocket].request.raw_request.substr(0, _clients[clientSocket].request.raw_request.find("\r\n\r\n") + 4);
 
-			if ((_clients[clientSocket].request.contentSize - header.size()) == (unsigned long)std::atol(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
-			{
-				// std::cout << "CONTENT SIZE = " << _clients[clientSocket].request.contentSize - header.size() << " CONTENT LENGTH " << std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) << '\n';
-				_parser.parseBody(_clients[clientSocket].request);
-				_clients[clientSocket].request.body_ready = true;
-			}
+
+		if ((_clients[clientSocket].request.contentSize - header.size()) == (unsigned long)std::atol(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
+		{
+			// std::cout << "CONTENT SIZE = " << _clients[clientSocket].request.contentSize - header.size() << " CONTENT LENGTH " << std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) << '\n';
+			_parser.parseBody(_clients[clientSocket].request);
+			_clients[clientSocket].request.body_ready = true;
 		}
 	}
 	return true;
@@ -408,22 +406,20 @@ void Webserv::handle_timeout_clients(void)
 	{
 		if (check_timeout((*it).second.last_request))
 		{
-			removeClient((*it).first);
-			return handle_timeout_clients();
-			// if ((*it).second.hadResponse == true)
-			// {
-			// 	std::cout << "TIMEOUT BUT HAD RESPONSE" << std::endl;
-			// 	removeClient((*it).first);
-			// 	return handle_timeout_clients();
-			// }
-			// else
-			// {
-			// 	std::cout << "TIMEOUT BUT HAD NO RESPONSE" << std::endl;
-			// 	(*it).second.request.setRet(408);
-			// 	_event.events = EPOLLOUT;
-			// 	_event.data.fd = (*it).first;
-			// 	epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
-			// }
+			// removeClient((*it).first);
+			// return handle_timeout_clients();
+			if ((*it).second.request.raw_request.empty() || (*it).second.hadResponse == true)
+			{
+				removeClient((*it).first);
+				return handle_timeout_clients();
+			}
+			else
+			{
+				(*it).second.request.setRet(408);
+				_event.events = EPOLLOUT;
+				_event.data.fd = (*it).first;
+				epoll_ctl(_epfd, EPOLL_CTL_MOD, (*it).first, &_event);
+			}
 		}
 	}
 }
