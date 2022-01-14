@@ -229,13 +229,8 @@ bool	Webserv::read_client_request(int clientSocket)
 		_clients[clientSocket].request.contentSize += ret;
 		// client_request[ret] = '\0';
 		if (_clients[clientSocket].request.raw_request.empty())
-		{
-			_clients[clientSocket].request.raw_request = client_request;
-			// handle timeout
 			gettimeofday(&_clients[clientSocket].last_request, NULL);
-		}
-		else
-			_clients[clientSocket].request.raw_request += client_request;
+		_clients[clientSocket].request.raw_request.append(client_request, ret);
 	}
 	// *********************************************************************************
 	if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
@@ -348,8 +343,8 @@ void Webserv::handleWrite(int client_fd)
 {
 	std::string	response;
 
-	std::cout << "RAW REQUEST" << '\n';
-	std::cout << _clients[client_fd].request.raw_request << '\n';
+	// std::cout << "RAW REQUEST" << '\n';
+	// std::cout << _clients[client_fd].request.raw_request << '\n';
 	getRightServer(_clients[client_fd]);
 
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());

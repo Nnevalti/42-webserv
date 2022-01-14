@@ -13,29 +13,19 @@ else
 	echo "\$_POST is empty\n";
 }
 
-if (!empty($_FILE))
-{
-	// UPLOAD
-	$uploaddir = __DIR__ . '/upload/';
-	$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-	$tmp_name = $_FILES['userfile']['tmp_name'];
-	echo $tmp_name;
-	echo '<pre>';
-	if (move_uploaded_file($tmp_name, $uploadfile)) {
-		echo "Le fichier est valide, et a été téléchargé
-			   avec succès. Voici plus d'informations :\n";
-	} else {
-		echo "Attaque potentielle par téléchargement de fichiers.
-			  Voici plus d'informations :\n";
-	}
-
-	echo 'Voici quelques informations de débogage :';
-	print_r($_FILES);
+// UPLOAD
+$uploaddir = __DIR__ . '/upload/';
+$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+$tmp_name = $_FILES['userfile']['tmp_name'];
+echo $tmp_name;
+echo '<pre>';
+if (move_uploaded_file($tmp_name, $uploadfile)) {
+	echo "File upload successfully\n";
+} else {
+	echo "Couldn't upload the file.\n";
 }
-else
-{
-	echo "\$_FILE is empty\n";
+echo 'Debug infos :';
+print_r($_FILES);
 
-}
 
 ?>

@@ -430,6 +430,6 @@ void		Response::postMethod(void)
 		tmpBody = cgi.execute();
 		parseCgiBody(tmpBody);
 	}
-
+	_code = 204;
 	createHeader();
 }

@@ -60,7 +60,7 @@
 # include "t_network.hpp"
 
 //* SHORTCUT
-# define BUFFER_SIZE 5000
+# define BUFFER_SIZE 4096
 # define MAX_EV 4096
 # define MAX_CLIENTS 1000
 # define CLIENT_TIMEOUT 10
