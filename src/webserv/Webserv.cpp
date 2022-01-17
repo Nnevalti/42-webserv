@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/14 14:13:34 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 04:52:16 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,6 +315,27 @@ std::string	get_time_diff(struct timeval *last)
 	return str.insert(0, (is_micro ? 11 : 10) - str.length(), ' ');
 }
 
+void displayInfo(Client &client, Request &request)
+{
+	char			buffer[100];
+	struct tm		*tm;
+	std::string path = client.request.getPath();
+
+	// request
+	tm = gmtime(&client.last_request.tv_sec);
+	strftime(buffer, 100, "%F - %T", tm);
+
+	std::cout << "\r👥[CLIENT]    " << BLUE << buffer << SET << " | " << client.request.getMethod()
+	<< " ";
+	if (path.size() >= 40)
+		std::cout << std::left << std::setw(37) << path.substr(0, 37) << "...";
+	else
+		std::cout << std::left << std::setw(40) << client.request.getPath();
+	std::cout << " " << get_time_diff(&client.last_request)
+	<< " | " << request.getCode() << " | " << client.request.getNetwork();
+
+}
+
 void displayInfo(Client &client, Response &response)
 {
 	char			buffer[100];
@@ -325,7 +346,7 @@ void displayInfo(Client &client, Response &response)
 	tm = gmtime(&client.last_request.tv_sec);
 	strftime(buffer, 100, "%F - %T", tm);
 
-	std::cout << "\r[WEBSERVER] " << buffer << " | " << client.request.getMethod()
+	std::cout << "\r🖥️ [WEBSERVER] " << BLUE << buffer << SET << " | " << client.request.getMethod()
 	<< " ";
 	if (path.size() >= 40)
 		std::cout << std::left << std::setw(37) << path.substr(0, 37) << "...";
@@ -363,6 +384,7 @@ void Webserv::handleWrite(int client_fd)
 		removeClient(client_fd);
 	// timeout
 	_clients[client_fd].hadResponse = true;
+	displayInfo(_clients[client_fd], _clients[client_fd].request);
 	displayInfo(_clients[client_fd], _clients[client_fd].classResponse);
 	// listen client again for other requests and wait for a close connection request
 	_event.events = EPOLLIN;

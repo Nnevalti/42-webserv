@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/11 19:15:06 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 04:44:14 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ void			Parser::parseFirstLine(Request &request)
 	if ((end = first.find_first_of(' ')) == std::string::npos)
 	{
 		request.setRet(400);
-		std::cerr << RED << "\rError parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
 	request.setMethod(first.substr(0, end));
@@ -61,21 +60,18 @@ void			Parser::parseFirstLine(Request &request)
 	if (std::find(methods.begin(), methods.end(), request.getMethod()) == methods.end())
 	{
 		request.setRet(400);
-		std::cerr << RED << "\rError parsing request: wrong method" << SET << std::endl;
 		return ;
 	}
 
 	if ((start = first.find_first_not_of(' ', end))  == std::string::npos)
 	{
 		request.setRet(400);
-		std::cerr << RED << "\rError parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
 
 	if ((end = first.find_first_of(' ', start)) == std::string::npos)
 	{
 		request.setRet(400);
-		std::cerr << RED << "\rError parsing request: missing first line element" << SET << std::endl;
 		return ;
 	}
 	request.setPath(first.substr(start, end - start));
@@ -83,7 +79,6 @@ void			Parser::parseFirstLine(Request &request)
 	if ((end = first.find_first_not_of(' ', end)) == std::string::npos)
 	{
 		request.setRet(400);
-		std::cerr << RED << "\rError parsing: missing first line element" << SET << std::endl;
 		return ;
 	}
 

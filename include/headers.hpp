@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 02:16:14 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 04:41:21 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@
 # define RED "\033[31m"
 # define GREEN "\033[32m"
 # define YELLOW "\033[33m"
+# define CYANBG "\033[46m"
+# define BLUE "\033[96m"
 # define SET "\033[0m"
 
 // *CLASS
