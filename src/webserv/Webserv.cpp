@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 18:41:48 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 18:51:01 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,9 +334,9 @@ void displayInfo(Client &client, Request &request)
 	std::cout << SET << " " << RED << get_time_diff(&client.last_request) << SET << " | "
 	<< GREEN << client.request.getNetwork() << SET << std::endl;
 	if (request.contentSize > 900)
-		std::cout << request.raw_request.substr(0, 897) << "..." << std::endl;
+		std::cout << GRAYBG << request.raw_request.substr(0, 897) << "..." << SET << std::endl;
 	else
-		std::cout << request.raw_request << std::endl;
+		std::cout << GRAYBG << request.raw_request << SET << std::endl;
 }
 
 void displayInfo(Client &client, Response &response)
@@ -355,10 +355,9 @@ void displayInfo(Client &client, Response &response)
 	std::cout << " " << RED << get_time_diff(&client.last_request) << SET << " | "
 	<< GREEN << client.request.getNetwork() << SET << std::endl;
 	if (response.getResponse().size() > 900)
-		std::cout << response.getResponse().substr(0, 897) << "..." << std::endl;
+		std::cout << GRAYBG << response.getResponse().substr(0, 897) << "..." << SET << std::endl;
 	else
-		std::cout << response.getResponse() << std::endl;
-
+		std::cout << GRAYBG << response.getResponse() << SET << std::endl;
 }
 
 

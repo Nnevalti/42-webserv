@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 16:36:13 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 18:44:13 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@
 # define PINKBG "\033[1;41m"
 # define GREENBG "\033[42m"
 # define PURPLEBG "\033[45m"
+# define GRAYBG "\033[40m"
 # define SET "\033[0m"
 
 // *CLASS
