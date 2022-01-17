@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 04:41:21 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 16:36:13 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,10 @@
 # define YELLOW "\033[33m"
 # define CYANBG "\033[46m"
 # define BLUE "\033[96m"
+# define ORANGEBG "\033[1;44m"
+# define PINKBG "\033[1;41m"
+# define GREENBG "\033[42m"
+# define PURPLEBG "\033[45m"
 # define SET "\033[0m"
 
 // *CLASS

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 04:52:16 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 18:41:48 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -325,37 +325,39 @@ void displayInfo(Client &client, Request &request)
 	tm = gmtime(&client.last_request.tv_sec);
 	strftime(buffer, 100, "%F - %T", tm);
 
-	std::cout << "\r👥[CLIENT]    " << BLUE << buffer << SET << " | " << client.request.getMethod()
-	<< " ";
-	if (path.size() >= 40)
-		std::cout << std::left << std::setw(37) << path.substr(0, 37) << "...";
+	std::cout << "\r                          \n";
+	std::cout << PURPLEBG <<"\r👥[CLIENT]" << SET << "    " << BLUE << buffer << SET << " | ";
+	if (path.size() + client.request.getMethod().size() >= 40)
+		std::cout << YELLOW << std::left << std::setw(37) << client.request.getMethod() + " " + path.substr(0, 37 - client.request.getMethod().size()) << "...";
 	else
-		std::cout << std::left << std::setw(40) << client.request.getPath();
-	std::cout << " " << get_time_diff(&client.last_request)
-	<< " | " << request.getCode() << " | " << client.request.getNetwork();
-
+		std::cout  << YELLOW << std::left << std::setw(40) << client.request.getMethod() + " " + client.request.getPath();
+	std::cout << SET << " " << RED << get_time_diff(&client.last_request) << SET << " | "
+	<< GREEN << client.request.getNetwork() << SET << std::endl;
+	if (request.contentSize > 900)
+		std::cout << request.raw_request.substr(0, 897) << "..." << std::endl;
+	else
+		std::cout << request.raw_request << std::endl;
 }
 
 void displayInfo(Client &client, Response &response)
 {
 	char			buffer[100];
 	struct tm		*tm;
-	std::string path = client.request.getPath();
+	std::string	resp = response.getResponse();
+	std::string firstLine = resp.substr(0, resp.find_first_of('\n') - 1);
 
 	// request
 	tm = gmtime(&client.last_request.tv_sec);
 	strftime(buffer, 100, "%F - %T", tm);
 
-	std::cout << "\r🖥️ [WEBSERVER] " << BLUE << buffer << SET << " | " << client.request.getMethod()
-	<< " ";
-	if (path.size() >= 40)
-		std::cout << std::left << std::setw(37) << path.substr(0, 37) << "...";
+	std::cout << CYANBG <<"\r🖥️ [WEBSERVER]" << SET << " " << BLUE << buffer << SET << " | "
+	 << YELLOW << std::left << std::setw(40) << firstLine << SET;
+	std::cout << " " << RED << get_time_diff(&client.last_request) << SET << " | "
+	<< GREEN << client.request.getNetwork() << SET << std::endl;
+	if (response.getResponse().size() > 900)
+		std::cout << response.getResponse().substr(0, 897) << "..." << std::endl;
 	else
-		std::cout << std::left << std::setw(40) << client.request.getPath();
-	std::cout << " " << get_time_diff(&client.last_request)
-	<< " | " << response.getCode() << " | " << client.request.getNetwork();
-
-	// response
+		std::cout << response.getResponse() << std::endl;
 
 }
 
