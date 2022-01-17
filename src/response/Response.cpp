@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 03:44:54 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 17:19:26 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -272,8 +272,7 @@ std::string			Response::readFile(std::string path)
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex()
-		&& (_config.getIndex()).compare(path.substr(path.find_last_of("/") + 1)))
+	if (checkPath(_config.getContentLocation()) == IS_A_DIRECTORY && _config.getAutoIndex())
 		_body = createAutoindexPage(_config.getContentLocation(), _config.getRequest().getPath());
 	else if (checkPath(path) == IS_A_FILE)
 	{
@@ -396,7 +395,11 @@ void		Response::getMethod(void)
 {
 	if(checkPath(_config.getContentLocation()) == IS_A_DIRECTORY &&
 	_config.getContentLocation() == (_config.getLocation().getRoot() + _config.getLocation().getAlias()))
+	{
 		_config.setContent(_config.getContentLocation() + "/" + _config.getIndex());
+		if (_config.getIndex() != "")
+			_config.setAutoIndex(false);
+	}
 	else
 		_config.setContent(_config.getContentLocation());
 
