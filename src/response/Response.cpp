@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/14 14:13:34 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 03:22:13 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,6 +212,8 @@ void			Response::initErrorMap(void)
 	status[200] = "OK";
 	status[201] = "Created";
 	status[204] = "No Content";
+	status[301] = "Moved Permanently";
+	status[308] = "Permanent Redirect";
 	status[400] = "Bad Request";
 	status[403] = "Forbidden";
 	status[404] = "Not Found";
@@ -320,8 +322,6 @@ void		Response::createHeader(void)
 		_directives["Retry-After"] = "2";
 	if (_code == 401)
 		_directives["WWW-Authenticate"] = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
-	if (_code == 200 && _config.getRequest().getMethod() == "POST")
-		_code = 204;
 	_header += "HTTP/1.1 " + ft_itoa(_code);
 	_header += " " + status[_code] + "\r\n";
 	for (stringMap::const_iterator i = _directives.begin(); i != _directives.end(); i++)
@@ -335,6 +335,16 @@ void		Response::InitResponseProcess(void)
 {
 	stringSet tmp(_config.getAllowMethod());
 
+	if (_config.getLocation().getReturn().first != "")
+	{
+		if(_config.getRequest().getMethod() != "POST")
+			_code = std::atoi(_config.getLocation().getReturn().first.c_str());
+		else
+			_code = 308;
+		_directives["Location"] = _config.getLocation().getReturn().second;
+		createHeader();
+		return ;
+	}
 	if (tmp.find(_config.getRequest().getMethod()) == tmp.end())
 		_code = 405;
 	else if (_config.getClientBodyBufferSize() < _config.getRequest().bodySize)
@@ -431,5 +441,13 @@ void		Response::postMethod(void)
 		tmpBody = cgi.execute();
 		parseCgiBody(tmpBody);
 	}
+	else
+		_code = 204;
+	if (_code == 200)
+	{
+		_code = 201;
+	}
+
+
 	createHeader();
 }

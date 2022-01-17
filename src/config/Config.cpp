@@ -6,13 +6,13 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 18:08:08 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 02:34:05 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
-Config::Config(void): extension(false), _root(""), _client_body_buffer_size(0), _cgi_pass(""), _index(""), _autoindex(false), _alias("")
+Config::Config(void): extension(false), _root(""), _client_body_buffer_size(0), _cgi_pass(""), _index(""), _autoindex(false), _alias(""), _return(std::make_pair("", ""))
 {}
 
 Config::Config(Config const & src)
@@ -36,6 +36,7 @@ Config &		Config::operator=(Config const &src)
 	_autoindex = src._autoindex;
 	_index = src._index;
 	_alias = src._alias;
+	_return = src._return;
 	extension = src.extension;
 	return *this;
 }
@@ -110,6 +111,16 @@ void		Config::setErrorCode(std::string page, int code)
 {
 	if (std::find(_error_page[page].begin(), _error_page[page].end(), code) == _error_page[page].end())
 		_error_page[page].push_back(code);
+}
+
+void		Config::setReturn(std::string code, std::string url)
+{
+	_return = std::make_pair(code, url);
+}
+
+pairString&	Config::getReturn(void)
+{
+	return (_return);
 }
 
 t_network&	Config::getNetwork(void)
@@ -228,6 +239,8 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 	out << "index: " << server._index << std::endl;
 
 	out << "alias: " << server._alias << std::endl;
+
+	out << "return: " << server._return.first << " " << server._return.second << std::endl;
 
 	for (serverMap::const_iterator i = server._location.begin(); i != server._location.end(); i++)
 		out << std::endl << "LOCATION " << i->first << std::endl << i->second << std::endl;

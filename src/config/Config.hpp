@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 18:02:18 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 02:19:29 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class Config {
 		void				setAlias(std::string alias);
 		void				setErrorPage(std::string page, std::vector<int> codes);
 		void				setErrorCode(std::string page, int code);
+		void				setReturn(std::string code, std::string url);
 
 		t_network&			getNetwork(void);
 		stringVector&		getServerName(void);
@@ -49,10 +50,11 @@ class Config {
 		std::string&		getCgiPass(void);
 		serverMap&			getLocation(void);
 		stringVector&		getAllowedMethods(void);
-		std::string&			getIndex(void);
+		std::string&		getIndex(void);
 		bool&				getAutoIndex(void);
 		std::string&		getAlias(void);
 		stringIntVectorMap&	getErrorPage(void);
+		pairString&			getReturn(void);
 		bool				extension;
 
 	private:
@@ -68,6 +70,7 @@ class Config {
 		std::string			_index;
 		bool				_autoindex;
 		std::string			_alias;
+		pairString			_return;
 };
 
 

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 16:08:22 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 02:24:23 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ class Parser
 		void					parseRoot(Config& configServer,stringVector opts);
 		void					parseAlias(Config& configServer,stringVector opts);
 		void					parseIndex(Config& configServer,stringVector opts);
+		void					parseReturn(Config& configServer, stringVector opts);
 		void					parseNetwork(Config& configServer,stringVector opts);
 		void					parseCgiPass(Config& configServer,stringVector opts);
 		void					parseCgiParam(Config& configServer,stringVector opts);

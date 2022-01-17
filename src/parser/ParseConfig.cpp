@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 14:02:09 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 03:02:44 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,10 +221,21 @@ parseDirectiveMap	Parser::_initParsingMap()
 	parseMap["autoindex"] = &Parser::parseAutoIndex;
 	parseMap["location"] = NULL;
 	parseMap["alias"] = &Parser::parseAlias;
+	parseMap["return"] = &Parser::parseReturn;
 	return parseMap;
 }
 
 parseDirectiveMap	Parser::_ParsingMap = Parser::_initParsingMap();
+
+void			Parser::parseReturn(Config& configServer, stringVector opts)
+{
+	if (opts.size() < 2)
+		throw std::runtime_error("Error Parsing: Missing Return's directive arguments");
+	if (opts.size() > 2)
+		throw std::runtime_error("Error Parsing: Too much Return's directive arguments");
+	configServer.setReturn(opts[0], opts[1]);
+}
+
 
 void			Parser::parseRoot(Config& configServer,stringVector opts)
 {

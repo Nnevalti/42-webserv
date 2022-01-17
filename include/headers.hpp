@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 13:19:05 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 02:16:14 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,3 +83,4 @@
 # define stringIntVectorMap			std::map<std::string, std::vector<int> >
 # define pairStringIntVector		std::pair<std::string, std::vector<int> >
 # define stringSet					std::set<std::string>
+# define pairString					std::pair<std::string, std::string>
