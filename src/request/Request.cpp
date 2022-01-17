@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 19:51:17 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/12 15:47:43 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 20:56:48 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,10 @@ std::map<std::string, std::string>	Request::getHeaders(void) const
 
 std::string		Request::getHeader(std::string str)
 {
-	return (_headers[str]);
+	if(_headers.count(str))
+		return (_headers[str]);
+	else
+		return ("");
 }
 
 std::string		Request::getQuery(void) const

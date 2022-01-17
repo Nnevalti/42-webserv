@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 18:51:01 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 22:18:09 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -372,6 +372,8 @@ void Webserv::handleWrite(int client_fd)
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
 	_clients[client_fd].classResponse.resetResponse(_clients[client_fd].configResponse);
 	_clients[client_fd].classResponse.InitResponseProcess();
+	if (_clients[client_fd].userId == "")
+		_clients[client_fd].userId = _clients[client_fd].classResponse.userId;
 	if (_clients[client_fd].classResponse.getStatus() == false)
 		return ;
 	response = _clients[client_fd].classResponse.getResponse();

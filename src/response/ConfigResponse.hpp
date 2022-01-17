@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 16:46:14 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 21:31:06 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,10 @@ class ConfigResponse {
 		void				setContentLocation(std::string content);
 		void				setCode(int code);
 		void				setContent(std::string content);
+		void				setCookies(stringMap cookies);
 
+		stringMap			getCookies(void) const;
+		std::string			getCookie(std::string key) const;
 		int					getCode(void) const;
 		Request				getRequest(void) const;
 		Config				getServer(void) const;
@@ -83,6 +86,7 @@ class ConfigResponse {
 		std::string		_contentLocation;
 		std::string		_content;
 		int				_code;
+		stringMap		_cookies;
 };
 
 

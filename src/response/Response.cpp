@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 17:19:26 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 22:20:45 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,6 +205,7 @@ void	Response::initDirectives(void)
 	_directives["Server"] = "Webserv";
 	_directives["Transfer-Encoding"] = "identity";
 	_directives["WwwAuthenticate"] = "";
+	_directives["Set-Cookie"] = "";
 }
 
 void			Response::initErrorMap(void)
@@ -301,6 +302,18 @@ std::string			Response::readFile(std::string path)
 	return (ft_itoa(_body.size()));
 }
 
+static std::string gen_random(const int len)
+{
+	static const char alphanum[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	std::string tmp_s;
+	tmp_s.reserve(len);
+
+	for (int i = 0; i < len; ++i)
+		tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+
+	return tmp_s;
+}
+
 void		Response::createHeader(void)
 {
 	stringVector tmp(_config.getAllow());
@@ -334,6 +347,13 @@ void		Response::createHeader(void)
 void		Response::InitResponseProcess(void)
 {
 	stringSet tmp(_config.getAllowMethod());
+
+	if (_config.getCookie("user_id") == "")
+	{
+		std::cout << _config.getCookie("user_id") << std::endl;
+		userId = gen_random(32);
+		_directives["Set-Cookie"] = "user_id=" + userId;
+	}
 
 	if (_config.getLocation().getReturn().first != "")
 	{

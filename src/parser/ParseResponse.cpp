@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/11 18:22:26 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 22:29:39 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,12 +84,42 @@ std::string				Parser::checkContentLocation(std::string content)
 	return (ret);
 }
 
+void		Parser::parseCookies(ConfigResponse& confResponse, Request& request)
+{
+	std::map<std::string, std::string>	cookiesToSet;
+	std::string							charSet(" ;");
+	std::string							cookies(request.getHeader("Cookie"));
+
+	cookies += " ";
+
+	size_t start = cookies.find_first_not_of(charSet, 0);
+	size_t end = 0;
+
+	while ((end = cookies.find_first_of(charSet, start)) != std::string::npos)
+	{
+		std::string	tmp = cookies.substr(start, end - start);
+
+		std::string token;
+		std::string value;
+
+		token.assign(tmp, 0, tmp.find_first_of('='));
+		value.assign(tmp, tmp.find_first_of('=') + 1, tmp.size());
+
+		cookiesToSet[token] = value;
+
+		if ((start = cookies.find_first_not_of(charSet, end)) == std::string::npos)
+			break ;
+	}
+	confResponse.setCookies(cookiesToSet);
+}
+
 void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Config& server)
 {
 	std::string	locationName(request.getPath());
 	Config		location(findLocation(server, locationName));
 	std::string	content;
 
+	parseCookies(confResponse, request);
 	confResponse.setCode(request.getCode());
 	confResponse.setRequest(request);
 	confResponse.setServer(server);

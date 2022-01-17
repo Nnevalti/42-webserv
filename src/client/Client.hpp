@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/25 13:49:50 by vdescham          #+#    #+#             */
-/*   Updated: 2022/01/05 17:27:12 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 19:39:56 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class Client
 		ConfigResponse	configResponse;
 		Response		classResponse;
 
+		std::string		userId;
 	private:
 		int				_socket;
 

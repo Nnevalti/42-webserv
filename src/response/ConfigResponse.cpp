@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/10 16:46:11 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 22:22:44 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ ConfigResponse&		ConfigResponse::operator=(const ConfigResponse& rhs)
 	_autoIndex = rhs._autoIndex;
 	_index = rhs._index;
 	_contentLocation = rhs._contentLocation;
+	_cookies = rhs._cookies;
 	return (*this);
 }
 
@@ -63,6 +64,11 @@ std::ostream	&operator<<(std::ostream &out, const ConfigResponse &conf)
 	out << "Allow Method : ";
 	for (stringSet::const_iterator i = conf._allowMethod.begin(); i != conf._allowMethod.end(); i++)
 		out << *i + " ";
+	out << std::endl;
+
+		out << "Cookie : ";
+	for (stringMap::const_iterator i = conf._cookies.begin(); i != conf._cookies.end(); i++)
+		out << i->first + "=" + i->second +" ";
 	out << std::endl;
 
 	out << "Accept Language : " << conf._acceptLanguage << std::endl;
@@ -158,6 +164,24 @@ void				ConfigResponse::setCode(int code)
 void				ConfigResponse::setContent(std::string content)
 {
 	_content = content;
+}
+
+void				ConfigResponse::setCookies(stringMap cookies)
+{
+	_cookies = cookies;
+}
+
+stringMap			ConfigResponse::getCookies(void) const
+{
+	return (_cookies);
+}
+
+std::string			ConfigResponse::getCookie(std::string token) const
+{
+	if (_cookies.count(token))
+		return (_cookies.at(token));
+	else
+		return ("");
 }
 
 int					ConfigResponse::getCode(void) const

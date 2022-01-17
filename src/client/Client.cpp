@@ -6,13 +6,13 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/25 13:49:50 by vdescham          #+#    #+#             */
-/*   Updated: 2021/12/06 20:35:50 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 19:44:25 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client(void) : hadResponse(false)
+Client::Client(void) : hadResponse(false), userId("")
 {
 	// handle timeout
 	gettimeofday(&last_request, NULL);
@@ -32,6 +32,7 @@ Client&		Client::operator=(const Client &rhs)
 		hadResponse = rhs.hadResponse;
 		_socket = rhs._socket;
 		_server = rhs._server;
+		userId = rhs.userId;
 	}
 	return *this;
 }
