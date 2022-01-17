@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 03:29:26 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 03:44:54 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -452,7 +452,11 @@ void		Response::postMethod(void)
 		_code = 204;
 	if (_code == 200)
 	{
+		std::string host = std::string(inet_ntoa(_config.getServer().getNetwork().host));
+		std::string port = ft_itoa(_config.getServer().getNetwork().port);
+		std::string location = host + ":" + port + "/upload";
 		_code = 201;
+		_directives["Location"] = location;
 	}
 
 	createHeader();
