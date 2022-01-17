@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 03:22:13 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/17 03:29:26 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,6 +199,7 @@ void	Response::initDirectives(void)
 	_directives["Content-Type"] = "";
 	_directives["Date"] = "";
 	_directives["Last-Modified"] = "";
+	_directives["Connection"] = "";
 	_directives["Location"] = "";
 	_directives["Retry-After"] = "";
 	_directives["Server"] = "Webserv";
@@ -345,12 +346,18 @@ void		Response::InitResponseProcess(void)
 		createHeader();
 		return ;
 	}
+
 	if (tmp.find(_config.getRequest().getMethod()) == tmp.end())
 		_code = 405;
 	else if (_config.getClientBodyBufferSize() < _config.getRequest().bodySize)
 		_code = 413;
 
-	if (_code != 200)
+	if(_code == 408)
+	{
+		_directives["Connection"] = "close";
+		createHeader();
+	}
+	else if (_code != 200)
 	{
 		_directives["Content-Length"] = readFile(_code);
 		createHeader();
@@ -447,7 +454,6 @@ void		Response::postMethod(void)
 	{
 		_code = 201;
 	}
-
 
 	createHeader();
 }
