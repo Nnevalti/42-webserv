@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 22:20:45 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:10:13 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,11 +104,6 @@ std::string	Response::getResponse(void) const
 int			Response::getCode(void) const
 {
 	return _code;
-}
-
-bool		Response::getStatus(void) const
-{
-	return (_status);
 }
 
 methodMap	Response::initMethods(void)
@@ -233,7 +228,6 @@ void		Response::resetResponse(ConfigResponse& conf)
 	initErrorMap();
 	initDirectives();
 	_config = conf;
-	_status = false;
 }
 
 std::string			Response::readFile(int code)
@@ -341,17 +335,19 @@ void		Response::createHeader(void)
 		if (i->second != "")
 			_header+= i->first + ": " + i->second + "\r\n";
 	_response = _header + "\r\n" + _body;
-	_status = true;
 }
 
-void		Response::InitResponseProcess(void)
+void		Response::InitResponseProcess(std::string id)
 {
 	stringSet tmp(_config.getAllowMethod());
 
-	if (_config.getCookie("user_id") == "")
+	if (_config.getCookie("user_id") == "" && _config.getCookie("cookieconsent_status") == "allow")
 	{
 		std::cout << _config.getCookie("user_id") << std::endl;
-		userId = gen_random(32);
+		if (id == "")
+			userId = gen_random(32);
+		else
+			userId = id;
 		_directives["Set-Cookie"] = "user_id=" + userId;
 	}
 

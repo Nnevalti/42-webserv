@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   autoindex.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vdescham <vdescham@student.42.fr           +#+  +:+       +#+        */
+/*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 12:36:53 by vdescham          #+#    #+#             */
-/*   Updated: 2022/01/05 01:41:00 by vdescham         ###   ########.fr       */
+/*   Updated: 2022/01/18 03:13:03 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "autoindex.hpp"
 
-std::string setLink(struct stat &buf, std::string dname, std::string url)
+std::string
+	setLink(struct stat &buf, std::string dname, std::string url)
 {
 	std::ostringstream output;
 	if (url.at(url.size() - 1) != '/')
@@ -27,7 +28,8 @@ std::string setLink(struct stat &buf, std::string dname, std::string url)
 	return output.str();
 }
 
-std::string setSize(struct stat &buf)
+std::string
+	setSize(struct stat &buf)
 {
 	std::ostringstream output;
 
@@ -35,7 +37,8 @@ std::string setSize(struct stat &buf)
 	return output.str();
 }
 
-std::string setCreationTime(struct stat &buf)
+std::string
+	setCreationTime(struct stat &buf)
 {
 	std::ostringstream output;
 	struct tm dt;
@@ -45,7 +48,8 @@ std::string setCreationTime(struct stat &buf)
 	return output.str();
 }
 
-std::string setModificationTime(struct stat &buf)
+std::string
+	setModificationTime(struct stat &buf)
 {
 	std::ostringstream output;
 	struct tm dt;
@@ -55,7 +59,8 @@ std::string setModificationTime(struct stat &buf)
 	return output.str();
 }
 
-std::string 		createDirList(std::string path, std::string dname, std::string url)
+std::string
+	createDirList(std::string path, std::string dname, std::string url)
 {
 	std::string output;
 	std::string info = path + dname;
@@ -74,7 +79,9 @@ std::string 		createDirList(std::string path, std::string dname, std::string url
 
 	return output;
 }
-std::string createFirstPart(std::string &path)
+
+std::string
+	createFirstPart(std::string &path)
 {
 	std::ostringstream output;
 
@@ -90,7 +97,8 @@ std::string createFirstPart(std::string &path)
 	return output.str();
 }
 
-std::string createAutoindexPage(std::string path, std::string url)
+std::string
+	createAutoindexPage(std::string path, std::string url)
 {
 	std::string page;
 	// opendir
@@ -127,17 +135,3 @@ std::string createAutoindexPage(std::string path, std::string url)
 	closedir(dirp);
 	return page;
 }
-
-// int main(int ac, char const **av)
-// {
-// 	if (ac != 2)
-// 	{
-// 		std::cerr << "Usage: ./a.out [dir_to_display]" << '\n';
-// 		return 0;
-// 	}
-// 	std::string page;
-// 	page = createAutoindexPage(av[1]);
-// 	if (!page.empty())
-// 		std::cout << page << '\n';
-// 	return 0;
-// }

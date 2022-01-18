@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 22:22:44 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:34:25 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ ConfigResponse&		ConfigResponse::operator=(const ConfigResponse& rhs)
 	_locationFile = rhs._locationFile;
 	_errorPage = rhs._errorPage;
 	_clientBodyBufferSize = rhs._clientBodyBufferSize;
-	_cgiParam = rhs._cgiParam;
 	_cgiPass = rhs._cgiPass;
 	_allowMethod = rhs._allowMethod;
 	_allow = rhs._allow;
@@ -56,10 +55,6 @@ std::ostream	&operator<<(std::ostream &out, const ConfigResponse &conf)
 		out << "\t" << i->first << " : " + i->second << std::endl;
 
 	out << "Client body buffer size : " << conf._clientBodyBufferSize << std::endl;
-
-	out << "Cgi param : ";
-	for (stringVector::const_iterator i = conf._cgiParam.begin(); i != conf._cgiParam.end(); i++)
-		out << *i + " ";
 
 	out << "Allow Method : ";
 	for (stringSet::const_iterator i = conf._allowMethod.begin(); i != conf._allowMethod.end(); i++)
@@ -117,11 +112,6 @@ void				ConfigResponse::setErrorMap(stringIntVectorMap map)
 void				ConfigResponse::setClientBodyBufferSize(size_t size)
 {
 	_clientBodyBufferSize = size;
-}
-
-void				ConfigResponse::setCgiParam(stringVector cgiParam)
-{
-	_cgiParam = cgiParam;
 }
 
 void				ConfigResponse::setCgiPass(std::string cgiPass)
@@ -229,11 +219,6 @@ std::string			ConfigResponse::getErrorPath(int code) const
 size_t				ConfigResponse::getClientBodyBufferSize(void) const
 {
 	return (_clientBodyBufferSize);
-}
-
-stringVector		ConfigResponse::getCgiParam(void) const
-{
-	return (_cgiParam);
 }
 
 std::string			ConfigResponse::getCgiPass(void) const

@@ -6,12 +6,11 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 12:36:53 by vdescham          #+#    #+#             */
-/*   Updated: 2022/01/05 01:41:00 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:16:58 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef Cgi_H
-# define Cgi_H
+#pragma once
 
 # include "ConfigResponse.hpp"
 
@@ -50,6 +49,3 @@ class Cgi
 		std::string		_interface;
 		std::string		_status;
 };
-
-
-#endif

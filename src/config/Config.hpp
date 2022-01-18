@@ -6,12 +6,11 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 02:19:29 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:34:25 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CONFIG_HPP
-# define CONFIG_HPP
+#pragma once
 
 # include "headers.hpp"
 
@@ -31,7 +30,6 @@ class Config {
 		void				setServerName(stringVector serverName);
 		void				setRoot(std::string root);
 		void				setClientBodyBufferSize(int buffer);
-		void				setCgiParam(stringVector cgiParam);
 		void				setCgiPass(std::string cgiPass);
 		void				setLocation(std::string location_name, Config location);
 		void				setAllowedMethods(stringVector methods);
@@ -46,7 +44,6 @@ class Config {
 		stringVector&		getServerName(void);
 		std::string&		getRoot(void);
 		size_t&				getClientBodyBufferSize(void);
-		stringVector&		getCgiParam(void);
 		std::string&		getCgiPass(void);
 		serverMap&			getLocation(void);
 		stringVector&		getAllowedMethods(void);
@@ -63,7 +60,6 @@ class Config {
 		stringVector		_server_name;
 		stringIntVectorMap	_error_page;
 		size_t				_client_body_buffer_size;
-		stringVector		_cgi_param; //TODO Delete this shit
 		std::string			_cgi_pass;
 		serverMap			_location;
 		stringVector		_allowed_methods;
@@ -72,6 +68,3 @@ class Config {
 		std::string			_alias;
 		pairString			_return;
 };
-
-
-#endif

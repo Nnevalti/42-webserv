@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:36 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 22:18:09 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:31:11 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ void	Webserv::accept_new_client(int server)
 
 		}
 	}
-	// std::cout << "\rClient connected on server: " << server << " " << new_socket << std::endl;
+
 	if(fcntl(new_socket, F_SETFL, O_NONBLOCK) < 0)
 	{
 		std::cerr << "Error: fcntl() failed" << '\n';
@@ -220,23 +220,20 @@ bool	Webserv::read_client_request(int clientSocket)
 	}
 	else if (ret == 0)
 	{
-		// std::cout << RED << "\rClosing connection request from clients" << SET << '\n';
 		removeClient(clientSocket);
 		return false;
 	}
 	else
 	{
 		_clients[clientSocket].request.contentSize += ret;
-		// client_request[ret] = '\0';
 		if (_clients[clientSocket].request.raw_request.empty())
 			gettimeofday(&_clients[clientSocket].last_request, NULL);
 		_clients[clientSocket].request.raw_request.append(client_request, ret);
 	}
-	// *********************************************************************************
+
 	if (_clients[clientSocket].request.raw_request.find("\r\n\r\n") != std::string::npos
 		&& _clients[clientSocket].request.header_ready == false)
 	{
-		// std::cout << "**************HEADER READY" << '\n';
 		_clients[clientSocket].request.header_ready = true;
 		_parser.parseHeader(_clients[clientSocket].request);
 		if (std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) == 0)
@@ -253,7 +250,6 @@ bool	Webserv::read_client_request(int clientSocket)
 
 		if ((_clients[clientSocket].request.contentSize - header.size()) == (unsigned long)std::atol(_clients[clientSocket].request.getHeader("Content-Length").c_str()))
 		{
-			// std::cout << "CONTENT SIZE = " << _clients[clientSocket].request.contentSize - header.size() << " CONTENT LENGTH " << std::atoi(_clients[clientSocket].request.getHeader("Content-Length").c_str()) << '\n';
 			_parser.parseBody(_clients[clientSocket].request);
 			_clients[clientSocket].request.body_ready = true;
 		}
@@ -365,34 +361,33 @@ void Webserv::handleWrite(int client_fd)
 {
 	std::string	response;
 
-	// std::cout << "RAW REQUEST" << '\n';
-	// std::cout << _clients[client_fd].request.raw_request << '\n';
 	getRightServer(_clients[client_fd]);
 
 	_parser.parseResponse(_clients[client_fd].configResponse, _clients[client_fd].request, _clients[client_fd].getServer());
+
 	_clients[client_fd].classResponse.resetResponse(_clients[client_fd].configResponse);
-	_clients[client_fd].classResponse.InitResponseProcess();
-	if (_clients[client_fd].userId == "")
+
+	_clients[client_fd].classResponse.InitResponseProcess(_clients[client_fd].userId);
+
+	if (_clients[client_fd].userId == "" && _clients[client_fd].classResponse.userId == "")
+		_clients[client_fd].userId = _clients[client_fd].configResponse.getCookie("user_id");
+	else if (_clients[client_fd].userId == "" && _clients[client_fd].classResponse.userId != "")
 		_clients[client_fd].userId = _clients[client_fd].classResponse.userId;
-	if (_clients[client_fd].classResponse.getStatus() == false)
-		return ;
+
 	response = _clients[client_fd].classResponse.getResponse();
-	// verify in response if we need to use a cgi binary for the request
-	//  if so we will pass in a function to execute it
-	// ***************************************************
-	// std::cout << "*******************RESPONSE" << '\n';
-	// std::cout << response << std::endl;
-	// Send response
 	if(send(client_fd, response.c_str(), response.size(), 0) < 0)
 		removeClient(client_fd);
+
 	// timeout
 	_clients[client_fd].hadResponse = true;
 	displayInfo(_clients[client_fd], _clients[client_fd].request);
 	displayInfo(_clients[client_fd], _clients[client_fd].classResponse);
+
 	// listen client again for other requests and wait for a close connection request
 	_event.events = EPOLLIN;
 	_event.data.fd = client_fd;
 	epoll_ctl(_epfd, EPOLL_CTL_MOD, client_fd, &_event);
+
 	// Reset all request variables to reuse it if another request comes in
 	_clients[client_fd].request.resetRequest();
 }

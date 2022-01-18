@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/29 15:46:53 by vdescham          #+#    #+#             */
-/*   Updated: 2021/12/02 02:24:19 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:27:04 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <ostream>
-
 
 class t_network
 {
@@ -38,6 +37,5 @@ class t_network
 	private:
 
 };
-
 
 #endif

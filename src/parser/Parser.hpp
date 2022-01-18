@@ -6,12 +6,11 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:31 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 21:46:44 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:34:25 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSER_HPP
-# define PARSER_HPP
+#pragma once
 
 # include "headers.hpp"
 # include "Config.hpp"
@@ -59,7 +58,6 @@ class Parser
 		void					parseReturn(Config& configServer, stringVector opts);
 		void					parseNetwork(Config& configServer,stringVector opts);
 		void					parseCgiPass(Config& configServer,stringVector opts);
-		void					parseCgiParam(Config& configServer,stringVector opts);
 		void					parseErrorPage(Config& configServer,stringVector opts);
 		void					parseAutoIndex(Config& configServer,stringVector opts);
 		void					parseServerName(Config& configServer,stringVector opts);
@@ -94,6 +92,3 @@ class Parser
 		void					parseCookies(ConfigResponse& confResponse, Request& request);
 
 };
-
-
-#endif

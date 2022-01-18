@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 19:44:34 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 22:29:39 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:34:25 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,6 @@ void		Parser::parseResponse(ConfigResponse& confResponse, Request& request, Conf
 	confResponse.setLocation(location);
 	confResponse.setErrorMap(location.getErrorPage());
 	confResponse.setClientBodyBufferSize(location.getClientBodyBufferSize());
-	confResponse.setCgiParam(location.getCgiParam());
 	confResponse.setCgiPass(location.getCgiPass());
 	confResponse.setAllowMethod(location.getAllowedMethods());
 	confResponse.setLanguage(setLanguage(request.getHeader("Accept-Language")));

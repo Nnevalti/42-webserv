@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/25 13:49:50 by vdescham          #+#    #+#             */
-/*   Updated: 2022/01/17 19:44:25 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:24:59 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ Client&		Client::operator=(const Client &rhs)
 		_socket = rhs._socket;
 		_server = rhs._server;
 		userId = rhs.userId;
+		cookies = rhs.cookies;
 	}
 	return *this;
 }

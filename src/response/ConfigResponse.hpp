@@ -6,12 +6,11 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 16:28:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 21:31:06 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:34:10 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CONFIGRESPONSE_H
-# define CONFIGRESPONSE_H
+#pragma once
 
 # include "headers.hpp"
 # include "Config.hpp"
@@ -36,7 +35,6 @@ class ConfigResponse {
 		void				setLocationFile(std::string path);
 		void				setErrorMap(stringIntVectorMap map);
 		void				setClientBodyBufferSize(size_t size);
-		void				setCgiParam(stringVector cgiParam);
 		void				setCgiPass(std::string cgiPass);
 		void				setAllowMethod(stringVector allow);
 		void				setLanguage(std::string lang);
@@ -58,7 +56,6 @@ class ConfigResponse {
 		errorMap			getErrorMap(void) const;
 		std::string			getErrorPath(int code) const;
 		size_t				getClientBodyBufferSize(void) const;
-		stringVector		getCgiParam(void) const;
 		std::string			getCgiPass(void) const;
 		stringSet			getAllowMethod(void) const;
 		stringVector		getAllow(void) const;
@@ -76,7 +73,6 @@ class ConfigResponse {
 		std::string		_locationFile;
 		errorMap		_errorPage;
 		size_t			_clientBodyBufferSize;
-		stringVector	_cgiParam;
 		std::string		_cgiPass;
 		stringSet		_allowMethod;
 		stringVector	_allow;
@@ -88,6 +84,3 @@ class ConfigResponse {
 		int				_code;
 		stringMap		_cookies;
 };
-
-
-#endif

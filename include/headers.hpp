@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 16:07:48 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 18:44:13 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:31:05 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@
 # define BUFFER_SIZE 4096
 # define MAX_EV 4096
 # define MAX_CLIENTS 1000
-# define CLIENT_TIMEOUT 10
+# define CLIENT_TIMEOUT 120
 // ^ in seconds ^
 
 # define DEFAULT "pages/default.conf"

@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 03:02:44 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:23:16 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,7 +214,6 @@ parseDirectiveMap	Parser::_initParsingMap()
 	parseMap["root"] = &Parser::parseRoot;
 	parseMap["error_page"] = &Parser::parseErrorPage;
 	parseMap["client_body_buffer_size"] = &Parser::parseClientBodyBufferSize;
-	parseMap["cgi_param"] = &Parser::parseCgiParam;
 	parseMap["cgi_pass"] = &Parser::parseCgiPass;
 	parseMap["allow_methods"] = &Parser::parseAllowedMethods;
 	parseMap["index"] = &Parser::parseIndex;
@@ -314,16 +313,6 @@ void					Parser::parseCgiPass(Config& configServer,stringVector opts)
 	if (opts.empty())
 		throw std::runtime_error("Error Parsing: Missing cgi_pass's directive arguments");
 	configServer.setCgiPass(opts.front());
-}
-
-void					Parser::parseCgiParam(Config& configServer,stringVector opts)
-{
-
-	if (opts.size() > 2)
-		throw std::runtime_error("Error Parsing: Too much cgi_param's directive arguments");
-	if (opts.size() <= 1)
-		throw std::runtime_error("Error Parsing: Missing cgi_param's directive arguments");
-	configServer.setCgiParam(opts);
 }
 
 void					Parser::parseErrorPage(Config& configServer,stringVector opts)

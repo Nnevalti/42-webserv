@@ -37,7 +37,7 @@ Cgi::Cgi(Cgi const & src)
 
 Cgi::~Cgi(void) {}
 
-Cgi &	Cgi::operator=(const Cgi &rhs)
+Cgi &				Cgi::operator=(const Cgi &rhs)
 {
 	_body = rhs._body;
 	_method = rhs._method;
@@ -61,7 +61,7 @@ static std::string	ft_itoa(int nb)
 	return (static_cast<std::ostringstream*>( &(std::ostringstream() << nb) )->str());
 }
 
-void			Cgi::initCgiData(ConfigResponse& Config)
+void				Cgi::initCgiData(ConfigResponse& Config)
 {
 	stringMap	headers(Config.getRequest().getHeaders());
 
@@ -85,7 +85,7 @@ void			Cgi::initCgiData(ConfigResponse& Config)
 	_status = "200";
 }
 
-void			Cgi::setEnv(void)
+void				Cgi::setEnv(void)
 {
 	_env["AUTH_TYPE"] = _authorisation;
 	_env["REDIRECT_STATUS"] = _status;
@@ -108,7 +108,7 @@ void			Cgi::setEnv(void)
 	_env["SERVER_SOFTWARE"] = _serverName;
 }
 
-char **Cgi::mapToTab(void)
+char				**Cgi::mapToTab(void)
 {
 	char **CgiEnv = new char *[_env.size() + 1];
 	std::string tempStr;
@@ -124,7 +124,7 @@ char **Cgi::mapToTab(void)
 	return CgiEnv;
 }
 
-std::string		Cgi::execute(void)
+std::string			Cgi::execute(void)
 {
 	char		**CgiEnv = mapToTab();
 	int			saveStdin = dup(STDIN_FILENO);

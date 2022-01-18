@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:53:35 by sgah              #+#    #+#             */
-/*   Updated: 2021/12/06 20:26:42 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:28:19 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ class Webserv
 
 		bool			fd_is_server(int ready_fd);
 		void			accept_new_client(int server);
-		// void			read_client_request(int client_Socket, std::string &request);
 		bool			read_client_request(int client_Socket);
 
 		void			getRightServer(Client &client);

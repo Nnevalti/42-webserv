@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:08 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 22:15:14 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:09:55 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,13 +42,12 @@ class Response {
 
 		std::string	findType(std::string contentlocation);
 
-		void		InitResponseProcess(void);
+		void		InitResponseProcess(std::string id);
 		void		initDirectives(void);
 		void		initErrorMap(void);
 
 		std::string	getResponse(void) const;
 		int			getCode(void) const;
-		bool		getStatus(void) const;
 
 		std::string	userId;
 
@@ -67,5 +66,4 @@ class Response {
 		std::string			_header;
 		std::string			_body;
 		std::string			_response;
-		bool				_status;
 };

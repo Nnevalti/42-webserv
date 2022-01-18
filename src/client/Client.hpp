@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/25 13:49:50 by vdescham          #+#    #+#             */
-/*   Updated: 2022/01/17 19:39:56 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:24:45 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ class Client
 		Response		classResponse;
 
 		std::string		userId;
+		stringMap		cookies;
 	private:
 		int				_socket;
 

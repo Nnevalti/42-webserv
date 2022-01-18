@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/23 16:16:28 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 02:34:05 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 03:22:51 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ Config &		Config::operator=(Config const &src)
 	_server_name = src._server_name;
 	_error_page = src._error_page;
 	_client_body_buffer_size = src._client_body_buffer_size;
-	_cgi_param = src._cgi_param;
 	_cgi_pass = src._cgi_pass;
 	_location = src._location;
 	_allowed_methods = src._allowed_methods;
@@ -65,11 +64,6 @@ void		Config::setRoot(std::string root)
 void		Config::setClientBodyBufferSize(int buffer)
 {
 	_client_body_buffer_size = buffer;
-}
-
-void		Config::setCgiParam(stringVector cgiParam)
-{
-	_cgi_param = cgiParam;
 }
 
 void		Config::setCgiPass(std::string cgiPass)
@@ -133,7 +127,7 @@ stringVector&	Config::getServerName(void)
 	return (_server_name);
 }
 
-std::string&		Config::getRoot(void)
+std::string&	Config::getRoot(void)
 {
 	return (_root);
 }
@@ -143,12 +137,7 @@ size_t&			Config::getClientBodyBufferSize(void)
 	return (_client_body_buffer_size);
 }
 
-stringVector&	Config::getCgiParam(void)
-{
-	return (_cgi_param);
-}
-
-std::string&		Config::getCgiPass(void)
+std::string&	Config::getCgiPass(void)
 {
 	return (_cgi_pass);
 }
@@ -183,7 +172,7 @@ stringIntVectorMap&	Config::getErrorPage(void)
 	return (_error_page);
 }
 
-std::ostream	&operator<<(std::ostream &out, const Config &server)
+std::ostream		&operator<<(std::ostream &out, const Config &server)
 {
 	out << "============================================" << std::endl;
 	out << "                   CONF" << std::endl;
@@ -218,13 +207,6 @@ std::ostream	&operator<<(std::ostream &out, const Config &server)
 	}
 
 	out << "client_body_buffer_size: " << server._client_body_buffer_size << std::endl;
-
-	out << "cgi_param:" << std::endl;
-	for (stringVector::const_iterator i = server._cgi_param.begin(); i != server._cgi_param.end(); i++)
-		if (i == server._cgi_param.begin())
-			out << "\t" << *i << " = ";
-		else
-			out << *i << std::endl;
 
 	out << "cgi_pass:	" << server._cgi_pass << std::endl;
 
