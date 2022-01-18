@@ -136,11 +136,22 @@ std::string			Cgi::execute(void)
 	std::string	body;
 	pid_t		pid;
 
-	write(In, _body.c_str(), std::atoi(_contentSize.c_str()));
+	if (write(In, _body.c_str(), std::atoi(_contentSize.c_str())) == -1)
+	{
+		for (int i = 0;  CgiEnv[i]; i++)
+			delete CgiEnv[i];
+		delete [] CgiEnv;
+		return ("Status: 500\r\n");
+	}
 	lseek(In, 0, SEEK_SET);
 
 	if ((pid = fork()) == -1)
+	{
+		for (int i = 0;  CgiEnv[i]; i++)
+			delete CgiEnv[i];
+		delete [] CgiEnv;
 		return ("Status: 500\r\n");
+	}
 	else if (pid == 0)
 	{
 		char * const * nll = NULL;
@@ -148,7 +159,13 @@ std::string			Cgi::execute(void)
 		dup2(In, STDIN_FILENO);
 		dup2(Out, STDOUT_FILENO);
 		execve(_cgiPass.c_str(), nll, CgiEnv);
-		write(STDOUT_FILENO, "Status: 500\r\n", 15);
+		if (write(STDOUT_FILENO, "Status: 500\r\n", 15) == -1)
+		{
+			for (int i = 0;  CgiEnv[i]; i++)
+				delete CgiEnv[i];
+			delete [] CgiEnv;
+			return ("Status: 500\r\n");
+		}
 	}
 	else
 	{
