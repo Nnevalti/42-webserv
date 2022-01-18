@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/30 20:06:10 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/17 04:44:14 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 14:49:56 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,9 +136,8 @@ void			Parser::parseBody(Request& request)
 	std::string		body;
 	size_t			body_start(0);
 
-	body_start = request.raw_request.find("\r\n\r\n");
 	if ((body_start = request.raw_request.find("\r\n\r\n")) == std::string::npos)
-		std::cout << "ERROR in parse Body" << '\n';
+		std::cerr << "ERROR in parse Body" << std::endl;
 	if (request.getCode() == 400)
 		return ;
 
