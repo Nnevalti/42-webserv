@@ -6,11 +6,11 @@ int incrementcount()
   FILE *f;
   int i;
 
-  f = fopen("/mnt/nfs/homes/vdescham/Documents/42-webserv/DOC/POC/vdescham/CGI/CGI_test/count.txt", "r+");
+  f = fopen("/mnt/nfs/homes/sgah/project/42-webserv/pages/index/count.txt", "r+");
   if (!f)
   {
      sleep(1);
-     f = fopen("/mnt/nfs/homes/vdescham/Documents/42-webserv/DOC/POC/vdescham/CGI/CGI_test/count.txt", "r+");
+     f = fopen("/mnt/nfs/homes/sgah/project/42-webserv/pages/index/count.txt", "r+");
      if (!f)
        return -1;
   }
