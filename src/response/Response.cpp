@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 18:34:09 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/18 03:10:13 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 14:31:23 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -343,7 +343,6 @@ void		Response::InitResponseProcess(std::string id)
 
 	if (_config.getCookie("user_id") == "" && _config.getCookie("cookieconsent_status") == "allow")
 	{
-		std::cout << _config.getCookie("user_id") << std::endl;
 		if (id == "")
 			userId = gen_random(32);
 		else

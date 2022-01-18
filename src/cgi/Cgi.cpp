@@ -178,7 +178,8 @@ std::string			Cgi::execute(void)
 		while (ret > 0)
 		{
 			ret = read(Out, buffer, BUFFER_SIZE);
-			buffer[ret] = '\0';
+			if (ret != -1)
+				buffer[ret] = '\0';
 			body += buffer;
 		}
 	}

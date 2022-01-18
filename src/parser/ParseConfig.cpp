@@ -6,7 +6,7 @@
 /*   By: sgah <sgah@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 15:32:32 by sgah              #+#    #+#             */
-/*   Updated: 2022/01/18 03:23:16 by sgah             ###   ########.fr       */
+/*   Updated: 2022/01/18 14:19:30 by sgah             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,7 +305,6 @@ void			Parser::parseNetwork(Config& configServer,stringVector opts)
 	configServer.setNetwork(net);
 }
 
-//TODO DELETE THIS SHIT!!
 void					Parser::parseCgiPass(Config& configServer,stringVector opts)
 {
 	if (opts.size() > 1)
